@@ -3,6 +3,8 @@
 namespace Dynamic\Salsify\Task;
 
 use Dynamic\Salsify\Model\Fetcher;
+use Dynamic\Salsify\Model\Mapper;
+use JsonStreamingParser\Parser;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\BuildTask;
@@ -55,6 +57,9 @@ class ImportTask extends BuildTask
         echo 'Salsify export complete' . $this->lineEnding;
 
         echo $fetcher->getExportUrl() . $this->lineEnding;
+        $mapper = new Mapper($fetcher->getExportUrl());
+        $mapper->map();
+        
         // TODO
     }
 }
