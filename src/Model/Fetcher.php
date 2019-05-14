@@ -58,7 +58,8 @@ class Fetcher
      * @param string|int $channelID
      * @return $this
      */
-    public function setChannelID($channelID) {
+    public function setChannelID($channelID)
+    {
         $this->channelID = $channelID;
         return $this;
     }
@@ -67,7 +68,8 @@ class Fetcher
      * @param bool useLatest
      * @return $this
      */
-    public function setUseLatest($useLatest) {
+    public function setUseLatest($useLatest)
+    {
         $this->useLatest = $useLatest;
         return $this;
     }
@@ -195,7 +197,8 @@ class Fetcher
     /**
      * @return string
      */
-    public function getExportUrl() {
+    public function getExportUrl()
+    {
         return $this->channelRunDataUrl;
     }
 }
