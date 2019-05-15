@@ -4,7 +4,6 @@ namespace Dynamic\Salsify\Task;
 
 use Dynamic\Salsify\Model\Fetcher;
 use Dynamic\Salsify\Model\Mapper;
-use JsonStreamingParser\Parser;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\BuildTask;
@@ -38,31 +37,44 @@ class ImportTask extends BuildTask
     /**
      * @var
      */
-    private $lineEnding;
+    private static $lineEnding;
+
+    /**
+     * @var bool
+     */
+    private static $output = true;
 
     /**
      * @param \SilverStripe\Control\HTTPRequest $request
      */
     public function run($request)
     {
-        $this->lineEnding = Director::is_cli() ? PHP_EOL : '<br />';
+        static::$lineEnding = Director::is_cli() ? PHP_EOL : '<br />';
 
         $channelID = Config::inst()->get(Fetcher::class, 'channel');
         $fetcher = new Fetcher($channelID, true);
 
         $fetcher->startExportRun();
-        echo 'Started Salsify export.' . $this->lineEnding;
+        static::echo('Started Salsify export.');
 
         $fetcher->waitForExportRunToComplete();
-        echo 'Salsify export complete' . $this->lineEnding;
-        echo $fetcher->getExportUrl() . $this->lineEnding;
+        static::echo('Salsify export complete');
+        static::echo($fetcher->getExportUrl());
 
-        echo 'Staring data import' . $this->lineEnding;
-        echo '-------------------' . $this->lineEnding;
+        static::echo('Staring data import');
+        static::echo('-------------------');
 
         $mapper = new Mapper($fetcher->getExportUrl());
-        $mapper->map($this->lineEnding);
+        $mapper->map();
+    }
 
-        // TODO
+    /**
+     * @param $string
+     */
+    public static function echo($string)
+    {
+        if (static::config()->get('output')) {
+            echo $string . static::$lineEnding;
+        }
     }
 }

@@ -1,0 +1,5 @@
+Dynamic\Salsify\Tests\TestOnly\MappedObject:
+  existing:
+    Unique: '3'
+    Seller: 'George C. Parker'
+    Title: 'Brooklyn Bridge'
