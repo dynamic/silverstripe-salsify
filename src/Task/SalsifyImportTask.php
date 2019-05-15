@@ -55,11 +55,14 @@ class ImportTask extends BuildTask
 
         $fetcher->waitForExportRunToComplete();
         echo 'Salsify export complete' . $this->lineEnding;
-
         echo $fetcher->getExportUrl() . $this->lineEnding;
+
+        echo 'Staring data import' . $this->lineEnding;
+        echo '-------------------' . $this->lineEnding;
+
         $mapper = new Mapper($fetcher->getExportUrl());
-        $mapper->map();
-        
+        $mapper->map($this->lineEnding);
+
         // TODO
     }
 }
