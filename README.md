@@ -15,21 +15,57 @@ composer require dynamic/silverstripe-salsify
 ## License
 See [License](license.md)
 
-## Example configuration (optional)
-If your module makes use of the config API in SilverStripe it's a good idea to provide an example config
- here that will get the module working out of the box and expose the user to the possible configuration options.
+## Example configuration
+### Fetcher
+To set up a fetcher an api key and a channel id need to be provided.
+The channel id can be found by visiting the channel in Salsify and copying the last section of the url.
+`https://app.salsify.com/app/orgs/<org_id>/channels/<channel_id>`
+To find the api key follow [this](https://developers.salsify.com/reference#token-based-authentication)
+```yaml
+Dynamic\Salsify\Model\Fetcher:
+  apiKey: 'api key here'
+  channel: 'channel id'
+```
 
-Provide a yaml code example where possible.
+The fetcher can also have the timout changed for http requests.
+This is not a timout for Salsify to generate an export.
+Timeout is in milliseconds and defaults to 2000 ms or 2 seconds.
+```yaml
+Dynamic\Salsify\Model\Fetcher:
+  timeout: 2000
+```
+
+### Mapper
+To set up a mapper, which will map fields from Salsify to SilverStripe, some configuration is needed.
 
 ```yaml
-
-Page:
-  config_option: true
-  another_config:
-    - item1
-    - item2
-  
+Dynamic\Salsify\Model\Mapper:
+  mapping:
+    \Page:
+      SKU:
+        salsifyField: SKU
+        unique: true
+      Title: Product Title
 ```
+
+Under the `mapping` config one or more classes can be specified for import.
+Each class can have one or more fields to map, and must have at least one that is unique.
+All fields have the key of the SilverStripe field to map to.
+`Title: Product Title` will map `Product Title` from Salsify to `Title` in SilverStripe.
+
+#### Unique Fields
+Like non-unique fields, the key is the SilverStripe field to map to.
+`salsifyField` is the field from Salsify to map.
+`unique` is either true or false and will be used as a filter to check against existing records.
+```yaml
+SKU:
+    salsifyField: SKU
+    unique: true
+```
+
+The unique fields will be added to an array, with the values for each product and will be used as a filter to find existing.
+This allows for multiple compound unique fields.
+
 
 ## Maintainers
  * Dynamic <dev@dynamicagency.com>
