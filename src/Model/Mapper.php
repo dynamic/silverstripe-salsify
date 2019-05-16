@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Dynamic\Salsify\Task\ImportTask;
 use JsonMachine\JsonMachine;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
@@ -17,16 +18,6 @@ class Mapper
     use Configurable;
     use Extensible;
     use Injectable;
-
-    /* $this->config()->get('mapping')
-        \Page => [
-            dbFieldA => [
-                salsifyField => jsonFieldA
-                unique => 1
-            ]
-            dbFieldB => jsonFieldB
-        ]
-     */
 
     /**
      * @var \JsonMachine\JsonMachine
@@ -46,40 +37,37 @@ class Mapper
     public function __construct($file)
     {
         $this->stream = JsonMachine::fromFile($file, '/4/products');
-        //print_r($this->config()->get('mapping'));
     }
 
     /**
      * Maps the data
-     * @param string $lineEnding
      */
-    public function map($lineEnding)
+    public function map()
     {
         foreach ($this->stream as $name => $data) {
             foreach ($this->config()->get('mapping') as $class => $mappings) {
-                $this->mapToObject($class, $mappings, $data, $lineEnding);
+                $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
             }
         }
-        echo "Imported and updated $this->importCount products.$lineEnding";
+        ImportTask::echo("Imported and updated $this->importCount products.");
     }
 
     /**
      * @param string $class
      * @param array $mappings
      * @param array $data
-     * @param string $lineEnding
      */
-    private function mapToObject($class, $mappings, $data, $lineEnding)
+    private function mapToObject($class, $mappings, $data)
     {
         $object = $this->findObjectByUnique($class, $mappings, $data);
         if (!$object) {
             $object = $class::create();
         }
 
-        $firstUniqueKey = $this->uniqueFields($class, $mappings)[0];
+        $firstUniqueKey = array_keys($this->uniqueFields($class, $mappings))[0];
         $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
-        echo "Updating $firstUniqueKey $firstUniqueValue $lineEnding";
+        ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
 
         foreach ($mappings as $dbField => $salsifyField) {
             if (is_array($salsifyField)) {
@@ -90,7 +78,7 @@ class Mapper
             }
 
             if (!array_key_exists($salsifyField, $data)) {
-                echo "Skipping mapping for field $salsifyField for $firstUniqueKey $firstUniqueValue $lineEnding";
+                ImportTask::echo("Skipping mapping for field $salsifyField for $firstUniqueKey $firstUniqueValue");
                 continue;
             }
 
@@ -101,7 +89,7 @@ class Mapper
             $object->write();
             $this->importCount++;
         } else {
-            echo "$firstUniqueKey $firstUniqueValue was not changed.$lineEnding";
+            ImportTask::echo("$firstUniqueKey $firstUniqueValue was not changed.");
         }
     }
 
@@ -116,8 +104,8 @@ class Mapper
     {
         $uniqueFields = $this->uniqueFields($class, $mappings);
         $filter = [];
-        foreach ($uniqueFields as $field) {
-            $filter[$field] = $data[$field];
+        foreach ($uniqueFields as $dbField => $salsifyField) {
+            $filter[$dbField] = $data[$salsifyField];
         }
 
         return DataObject::get($class)->filter($filter)->first();
@@ -140,7 +128,7 @@ class Mapper
                 continue;
             }
 
-            if (!array_key_exists('unique', $salsifyField) &&
+            if (!array_key_exists('unique', $salsifyField) ||
                 !array_key_exists('salsifyField', $salsifyField)) {
                 continue;
             }
@@ -149,7 +137,7 @@ class Mapper
                 continue;
             }
 
-            $uniqueFields[] = $salsifyField['salsifyField'];
+            $uniqueFields[$dbField] = $salsifyField['salsifyField'];
         }
 
         $this->currentUniqueFields = $uniqueFields;
