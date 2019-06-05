@@ -43,6 +43,10 @@ class MapperTest extends SapphireTest
                     'salsifyField' => 'custom-field-seller',
                     'unique' => false,
                 ],
+                'Image' => [
+                    'salsifyField' => 'custom-field-image',
+                    'type' => 'IMAGE',
+                ],
                 'Unknown' => [
                     'unique' => true,
                 ],

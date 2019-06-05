@@ -20,6 +20,15 @@ class Mapper
     use Injectable;
 
     /**
+     * @var array
+     */
+    private static $field_types = [
+        'RAW' => '0',
+        'FILE' => '1',
+        'IMAGE' => '2',
+    ];
+
+    /**
      * @var \JsonMachine\JsonMachine
      */
     private $stream;
@@ -70,10 +79,19 @@ class Mapper
         ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
 
         foreach ($mappings as $dbField => $salsifyField) {
+            $type = $this->config()->get('field_types')['RAW'];
             if (is_array($salsifyField)) {
                 if (!array_key_exists('salsifyField', $salsifyField)) {
                     continue;
                 }
+
+                if (array_key_exists('type', $salsifyField)) {
+                    if (array_key_exists($salsifyField['type'], $this->config()->get('field_types'))) {
+                        $type = $this->config()->get('field_types')[$salsifyField['type']];
+                        ImportTask::echo('Changing type to ' . $salsifyField['type']);
+                    }
+                }
+
                 $salsifyField = $salsifyField['salsifyField'];
             }
 
