@@ -41,6 +41,13 @@ class MapperTest extends SapphireTest
                 'Title' => 'custom-field-title',
                 'Seller' => [
                     'salsifyField' => 'custom-field-seller',
+                    'unique' => false,
+                ],
+                'Unknown' => [
+                    'unique' => true,
+                ],
+                'Unknown2' => [
+                    'salsifyField' => 'XXXXX',
                 ],
             ]
         ]);
@@ -62,5 +69,10 @@ class MapperTest extends SapphireTest
         $this->assertEquals(7, MappedObject::get()->count());
         // check to see if existing object was modified
         $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->Seller);
+
+        // tests for unchanged
+        $mapper = new Mapper(__DIR__ . '/../data.json');
+        $mapper->map();
+        $this->assertEquals(7, MappedObject::get()->count());
     }
 }

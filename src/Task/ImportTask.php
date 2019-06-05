@@ -51,6 +51,11 @@ class ImportTask extends BuildTask
     {
         static::$lineEnding = Director::is_cli() ? PHP_EOL : '<br />';
 
+        if (!Mapper::config()->get('mapping')) {
+            static::echo('No mappings found');
+            return;
+        }
+
         $channelID = Config::inst()->get(Fetcher::class, 'channel');
         $fetcher = new Fetcher($channelID, true);
 
