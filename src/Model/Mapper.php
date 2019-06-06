@@ -201,10 +201,17 @@ class Mapper
                 $asset = $this->getAssetBySalsifyID($value);
                 $url = $asset['salsify:url'];
                 $name = $asset['salsify:name'];
-                if (!in_array($asset['salsify:format'], Image::getAllowedExtensions())) {
-                    $url = str_replace('.' . $asset['salsify:format'], '.png', $asset['salsify:url']);
-                    $name = str_replace('.' . $asset['salsify:format'], '.png', $asset['salsify:name']);
+                $format = $asset['salsify:format'];
+
+                if ($format != pathinfo($asset['salsify:name'])['extension']) {
+                    $format = pathinfo($asset['salsify:name'])['extension'];
                 }
+
+                if (!in_array($asset['salsify:format'], Image::getAllowedExtensions())) {
+                    $url = str_replace('.' . $format, '.png', $asset['salsify:url']);
+                    $name = str_replace('.' . $format, '.png', $asset['salsify:name']);
+                }
+
                 $file = $this->findOrCreateFile($asset['salsify:id'], Image::class);
                 $file->setFromStream(fopen($url, 'r'), $name);
                 $file->write();

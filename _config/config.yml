@@ -7,3 +7,7 @@ Dynamic\Salsify\Model\Fetcher:
 SilverStripe\Assets\File:
   extensions:
     - Dyanmic\Salsify\ORM\FileExtension
+
+SilverStripe\AssetAdmin\Forms\FileFormFactory:
+  extensions:
+    - Dyanmic\Salsify\ORM\AssetFormFactoryExtension

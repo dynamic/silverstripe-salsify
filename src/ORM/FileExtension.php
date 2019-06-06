@@ -3,6 +3,7 @@
 namespace Dyanmic\Salsify\ORM;
 
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataExtension;
 
 /**
@@ -18,13 +19,4 @@ class FileExtension extends DataExtension
     private static $db = [
         'SalisfyID' => 'Varchar(255)',
     ];
-
-    /**
-     * @param \SilverStripe\Forms\FieldList $fields
-     */
-    public function updateCMSFields(FieldList $fields)
-    {
-        parent::updateCMSFields($fields);
-        $fields->removeByName('SalsifyID');
-    }
 }
