@@ -4,6 +4,8 @@ namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\Task\ImportTask;
 use JsonMachine\JsonMachine;
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
@@ -29,9 +31,19 @@ class Mapper
     ];
 
     /**
-     * @var \JsonMachine\JsonMachine
+     * @var
      */
-    private $stream;
+    private $file;
+
+    /**
+     * @var JsonMachine
+     */
+    private $productStream;
+
+    /**
+     * @var JsonMachine
+     */
+    private $assetStream;
 
     /**
      * @var array
@@ -43,9 +55,15 @@ class Mapper
      */
     private $importCount = 0;
 
+    /**
+     * Mapper constructor.
+     * @param $file
+     */
     public function __construct($file)
     {
-        $this->stream = JsonMachine::fromFile($file, '/4/products');
+        $this->file = $file;
+        $this->productStream = JsonMachine::fromFile($file, '/4/products');
+        $this->resetAssetStream();
     }
 
     /**
@@ -53,7 +71,7 @@ class Mapper
      */
     public function map()
     {
-        foreach ($this->stream as $name => $data) {
+        foreach ($this->productStream as $name => $data) {
             foreach ($this->config()->get('mapping') as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
@@ -74,6 +92,8 @@ class Mapper
             $object = $class::create();
         }
 
+        $fieldTypes = $this->config()->get('field_types');
+
         $firstUniqueKey = array_keys($this->uniqueFields($class, $mappings))[0];
         $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
         ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
@@ -86,9 +106,8 @@ class Mapper
                 }
 
                 if (array_key_exists('type', $salsifyField)) {
-                    if (array_key_exists($salsifyField['type'], $this->config()->get('field_types'))) {
-                        $type = $this->config()->get('field_types')[$salsifyField['type']];
-                        ImportTask::echo('Changing type to ' . $salsifyField['type']);
+                    if (array_key_exists($salsifyField['type'], $fieldTypes)) {
+                        $type = $fieldTypes[$salsifyField['type']];
                     }
                 }
 
@@ -100,7 +119,7 @@ class Mapper
                 continue;
             }
 
-            $object->$dbField = $data[$salsifyField];
+            $object->$dbField = $this->handleType($type, $data[$salsifyField]);
         }
 
         if ($object->isChanged()) {
@@ -160,5 +179,100 @@ class Mapper
 
         $this->currentUniqueFields = $uniqueFields;
         return $uniqueFields;
+    }
+
+    /**
+     * @param int $type
+     * @param string|int $value
+     * @return mixed
+     */
+    private function handleType($type, $value)
+    {
+        $fieldTypes = $this->config()->get('field_types');
+        switch ($type) {
+            case $fieldTypes['RAW']:
+                return $value;
+
+            case $fieldTypes['FILE']:
+                if ($asset = $this->createFile($this->getAssetBySalsifyID($value))) {
+                    return $asset;
+                }
+            case $fieldTypes['IMAGE']:
+                $asset = $this->getAssetBySalsifyID($value);
+                $url = $asset['salsify:url'];
+                $name = $asset['salsify:name'];
+                if (!in_array($asset['salsify:format'], Image::getAllowedExtensions())) {
+                    $url = str_replace('.' . $asset['salsify:format'], '.png', $asset['salsify:url']);
+                    $name = str_replace('.' . $asset['salsify:format'], '.png', $asset['salsify:name']);
+                }
+                $file = $this->findOrCreateFile($asset['salsify:id'], Image::class);
+                $file->setFromStream(fopen($url, 'r'), $name);
+                $file->write();
+        }
+        return '';
+    }
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    private function getAssetBySalsifyID($id)
+    {
+        if (is_array($id)) {
+            $id = $id[count($id) - 1];
+        }
+
+        $asset = false;
+        foreach ($this->assetStream as $name => $data) {
+            if ($data['salsify:id'] == $id) {
+                $asset = $data;
+            }
+        }
+        $this->resetAssetStream();
+        return $asset;
+    }
+
+    /**
+     * @param array|bool $assetData
+     * @param string $class
+     * @return File|bool
+     */
+    private function createFile($assetData)
+    {
+        if (!$assetData) {
+            return false;
+        }
+
+        /** @var File|\Dyanmic\Salsify\ORM\FileExtension $file */
+        $file = $this->findOrCreateFile($assetData['salsify:id']);
+        $file->setFromStream(fopen($assetData['salsify:url'], 'r'), $assetData['salsify:name']);
+
+        $file->write();
+        return $file;
+    }
+
+    /**
+     * @param string $id
+     * @param string $class
+     * @return File
+     */
+    private function findOrCreateFile($id, $class = File::class)
+    {
+        /** @var File|\Dyanmic\Salsify\ORM\FileExtension $file */
+        if ($file = $class::get()->find('SalisfyID', $id)) {
+            return $file;
+        }
+
+        $file = $class::create();
+        $file->SalisfyID = $id;
+        return $file;
+    }
+
+    /**
+     *
+     */
+    private function resetAssetStream()
+    {
+        $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
     }
 }
