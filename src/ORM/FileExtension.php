@@ -9,6 +9,7 @@ use SilverStripe\ORM\DataExtension;
 /**
  * Class FileExtension
  * @property string SalisfyID
+ * @property string SalsifyUpdatedAt
  */
 class FileExtension extends DataExtension
 {
@@ -18,5 +19,6 @@ class FileExtension extends DataExtension
      */
     private static $db = [
         'SalisfyID' => 'Varchar(255)',
+        'SalsifyUpdatedAt' => 'Varchar(255)'
     ];
 }

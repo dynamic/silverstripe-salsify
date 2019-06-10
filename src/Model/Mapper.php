@@ -119,7 +119,7 @@ class Mapper
                 continue;
             }
 
-            $object->$dbField = $this->handleType($type, $data[$salsifyField]);
+            $object->$dbField = $this->handleType($type, $data[$salsifyField], $dbField);
         }
 
         if ($object->isChanged()) {
@@ -184,9 +184,10 @@ class Mapper
     /**
      * @param int $type
      * @param string|int $value
+     * @param string $dbField
      * @return mixed
      */
-    private function handleType($type, $value)
+    private function handleType($type, $value, $dbField)
     {
         $fieldTypes = $this->config()->get('field_types');
         switch ($type) {
@@ -195,26 +196,43 @@ class Mapper
 
             case $fieldTypes['FILE']:
                 if ($asset = $this->createFile($this->getAssetBySalsifyID($value))) {
-                    return $asset;
+                    return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
                 }
+
             case $fieldTypes['IMAGE']:
                 $asset = $this->getAssetBySalsifyID($value);
-                $url = $asset['salsify:url'];
-                $name = $asset['salsify:name'];
-                $format = $asset['salsify:format'];
-
-                if ($format != pathinfo($asset['salsify:name'])['extension']) {
-                    $format = pathinfo($asset['salsify:name'])['extension'];
-                }
-
-                if (!in_array($asset['salsify:format'], Image::getAllowedExtensions())) {
-                    $url = str_replace('.' . $format, '.png', $asset['salsify:url']);
-                    $name = str_replace('.' . $format, '.png', $asset['salsify:name']);
-                }
 
                 $file = $this->findOrCreateFile($asset['salsify:id'], Image::class);
+                if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $asset['salsify:updated_at']) {
+                    return preg_match('/ID$/', $dbField) ? $file->ID : $file;
+                }
+
+                $url = $asset['salsify:url'];
+                $name = $asset['salsify:name'];
+                $supportedImageExtensions = Image::get_category_extensions(
+                    Image::singleton()->File->getAllowedCategories()
+                );
+
+                if (!in_array(pathinfo($asset['salsify:url'])['extension'], $supportedImageExtensions)) {
+                    $url = str_replace(
+                        '.' . pathinfo($asset['salsify:url'])['extension'],
+                        '.png',
+                        $asset['salsify:url']
+                    );
+                }
+
+                if (!in_array(pathinfo($asset['salsify:name'])['extension'], $supportedImageExtensions)) {
+                    $name = str_replace(
+                        '.' . pathinfo($asset['salsify:name'])['extension'],
+                        '.png',
+                        $asset['salsify:name']
+                    );
+                }
+
+                $file->SalsifyUpdatedAt = $asset['salsify:updated_at'];
                 $file->setFromStream(fopen($url, 'r'), $name);
                 $file->write();
+                return preg_match('/ID$/', $dbField) ? $file->ID : $file;
         }
         return '';
     }
@@ -250,8 +268,12 @@ class Mapper
             return false;
         }
 
-        /** @var File|\Dyanmic\Salsify\ORM\FileExtension $file */
         $file = $this->findOrCreateFile($assetData['salsify:id']);
+        if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $assetData['salsify:updated_at']) {
+            return $file;
+        }
+
+        $file->SalsifyUpdatedAt = $assetData['salsify:updated_at'];
         $file->setFromStream(fopen($assetData['salsify:url'], 'r'), $assetData['salsify:name']);
 
         $file->write();
@@ -261,7 +283,7 @@ class Mapper
     /**
      * @param string $id
      * @param string $class
-     * @return File
+     * @return File|\Dyanmic\Salsify\ORM\FileExtension
      */
     private function findOrCreateFile($id, $class = File::class)
     {
