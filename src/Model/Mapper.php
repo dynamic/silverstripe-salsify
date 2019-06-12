@@ -198,6 +198,7 @@ class Mapper
                 if ($asset = $this->createFile($this->getAssetBySalsifyID($value))) {
                     return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
                 }
+                return '';
 
             case $fieldTypes['IMAGE']:
                 $asset = $this->getAssetBySalsifyID($value);
