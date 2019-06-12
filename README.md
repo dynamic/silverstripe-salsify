@@ -61,14 +61,41 @@ Like non-unique fields, the key is the SilverStripe field to map to.
 `salsifyField` is the field from Salsify to map.
 `unique` is either true or false and will be used as a filter to check against existing records.
 ```yaml
-SKU:
-    salsifyField: SKU
-    unique: true
+Dynamic\Salsify\Model\Mapper:
+  mapping:
+    \Page:
+      SKU:
+        salsifyField: SKU
+        unique: true
 ```
-
 The unique fields will be added to an array, with the values for each product and will be used as a filter to find existing.
 This allows for multiple compound unique fields.
 
+#### Files and Images
+To get an image or file from salsify to map to an object a type needs to be specified.
+Types can be `RAW`, `FILE`, and `IMAGE`.
+
+```yaml
+Dynamic\Salsify\Model\Mapper:
+  mapping:
+    \Page:
+      FrontImage:
+        salsifyField: Front Image
+        type: IMAGE
+```
+
+Images and files can also be mapped by ID.
+```yaml
+Dynamic\Salsify\Model\Mapper:
+  mapping:
+    \Page:
+      FrontImageID:
+        salsifyField: Front Image
+        type: IMAGE
+```
+
+If the mapping is specified as an image and it is not a valid image extension, 
+salsify will be used to try and convert the file into a png.
 
 ## Maintainers
  * Dynamic <dev@dynamicagency.com>

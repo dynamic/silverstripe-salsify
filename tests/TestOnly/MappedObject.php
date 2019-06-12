@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Tests\TestOnly;
 
+use SilverStripe\Assets\Image;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
 
@@ -27,5 +28,12 @@ class MappedObject extends DataObject implements TestOnly
         'Unique' => 'Varchar',
         'Title' => 'Varchar',
         'Seller' => 'Varchar',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $has_one = [
+        'Image' => Image::class,
     ];
 }

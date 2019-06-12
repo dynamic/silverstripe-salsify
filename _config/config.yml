@@ -3,3 +3,11 @@ name: salsify-config
 ---
 Dynamic\Salsify\Model\Fetcher:
   timeout: 2000
+
+SilverStripe\Assets\File:
+  extensions:
+    - Dyanmic\Salsify\ORM\FileExtension
+
+SilverStripe\AssetAdmin\Forms\FileFormFactory:
+  extensions:
+    - Dyanmic\Salsify\ORM\AssetFormFactoryExtension

@@ -25,6 +25,74 @@
   {
     "digital_assets":[
       {
+        "salsify:id":"DA-001",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/240px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg",
+        "salsify:name":"Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"jpg"
+      },
+      {
+        "salsify:id":"DA-002",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Brooklyn_Bridge_Postdlf.jpg/330px-Brooklyn_Bridge_Postdlf.tif",
+        "salsify:name":"Brooklyn_Bridge_Postdlf.tif",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"tiff"
+      },
+      {
+        "salsify:id":"DA-003",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Statue_of_Liberty_7.jpg/250px-Statue_of_Liberty_7.jpg",
+        "salsify:name":"Statue_of_Liberty_7.jpg",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"jpg"
+      },
+      {
+        "salsify:id":"DA-004",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/The_Metropolitan_Museum_of_Art_Logo.svg/150px-The_Metropolitan_Museum_of_Art_Logo.svg.png",
+        "salsify:name":"The_Metropolitan_Museum_of_Art_Logo.png",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"png"
+      },
+      {
+        "salsify:id":"DA-005",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/General_Grant_National_Memorial_New_York_November_2016_003.jpg/250px-General_Grant_National_Memorial_New_York_November_2016_003.jpg",
+        "salsify:name":"General_Grant_National_Memorial_New_York_November_2016_003.jpg",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"jpg"
+      },
+      {
+        "salsify:id":"DA-006",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg/250px-Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg",
+        "salsify:name":"250px-Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"jpg"
+      },
+      {
+        "salsify:id":"DA-007",
+        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/250px-Taj_Mahal_%28Edited%29.jpeg",
+        "salsify:name":"250px-Taj_Mahal_%28Edited%29.jpeg",
+        "salsify:created_at":"2018-11-12T17:19:29.454Z",
+        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type":"image",
+        "salsify:bytes":13653240,
+        "salsify:format":"jpeg"
       }
     ]
   },
@@ -39,7 +107,8 @@
         "salsify:system_id":"XXXX-001",
         "custom-field-unique":"2",
         "custom-field-title":"Eiffel Tower",
-        "custom-field-seller":"Victor Lustig"
+        "custom-field-seller":"Victor Lustig",
+        "custom-field-image":"DA-001"
       },
       {
         "salsify:id": "00000000000002",
@@ -50,7 +119,8 @@
         "salsify:system_id":"XXXX-002",
         "custom-field-unique":"3",
         "custom-field-title":"Brooklyn Bridge",
-        "custom-field-seller":"William McCloundy"
+        "custom-field-seller":"William McCloundy",
+        "custom-field-image":"DA-002"
       },
       {
         "salsify:id": "00000000000003",
@@ -61,7 +131,8 @@
         "salsify:system_id":"XXXX-003",
         "custom-field-unique":"5",
         "custom-field-title":"Statue of Liberty",
-        "custom-field-seller":"George C. Parker"
+        "custom-field-seller":"George C. Parker",
+        "custom-field-image":"DA-003"
       },
       {
         "salsify:id": "00000000000004",
@@ -72,7 +143,8 @@
         "salsify:system_id":"XXXX-004",
         "custom-field-unique":"7",
         "custom-field-title":"Metropolitan Museum of Art",
-        "custom-field-seller":"George C. Parker"
+        "custom-field-seller":"George C. Parker",
+        "custom-field-image":"DA-004"
       },
       {
         "salsify:id": "00000000000005",
@@ -83,7 +155,8 @@
         "salsify:system_id":"XXXX-005",
         "custom-field-unique":"11",
         "custom-field-title":"Grant's Tomb",
-        "custom-field-seller":"George C. Parker"
+        "custom-field-seller":"George C. Parker",
+        "custom-field-image":"DA-005"
       },
       {
         "salsify:id": "00000000000006",
@@ -94,7 +167,8 @@
         "salsify:system_id":"XXXX-006",
         "custom-field-unique":"13",
         "custom-field-title":"Karlstejn Castle",
-        "custom-field-seller":"Harry Jelinek"
+        "custom-field-seller":"Harry Jelinek",
+        "custom-field-image":"DA-006"
       },
       {
         "salsify:id": "00000000000007",
@@ -105,7 +179,8 @@
         "salsify:system_id":"XXXX-007",
         "custom-field-unique":"17",
         "custom-field-title":"Taj Mahal",
-        "custom-field-seller":"Natwarlal"
+        "custom-field-seller":"Natwarlal",
+        "custom-field-image":"DA-007"
       }
     ]
   }
