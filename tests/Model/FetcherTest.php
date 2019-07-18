@@ -13,11 +13,18 @@ class FetcherTest extends SapphireTest
 {
 
     /**
+     * @var array
+     */
+    private $fetcherConfig = [
+        'channel' => 'CHANNEL_ID'
+    ];
+
+    /**
      *
      */
     public function testSetChannelID()
     {
-        $fetcher = new Fetcher();
+        $fetcher = new Fetcher($this->fetcherConfig);
         $this->assertEquals($fetcher, $fetcher->setChannelID('XXXX'));
     }
 
@@ -26,7 +33,7 @@ class FetcherTest extends SapphireTest
      */
     public function testSetUseLatest()
     {
-        $fetcher = new Fetcher();
+        $fetcher = new Fetcher($this->fetcherConfig);
         $this->assertEquals($fetcher, $fetcher->setUseLatest(true));
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Dynamic\Salsify\Task;
 
-use Dynamic\Salsify\Model\Fetcher;
-use Dynamic\Salsify\Model\Mapper;
+use Dynamic\Salsify\Model\Importer;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 
 /**
@@ -51,26 +51,19 @@ class ImportTask extends BuildTask
     {
         static::$lineEnding = Director::is_cli() ? PHP_EOL : '<br />';
 
-        if (!Mapper::config()->get('mapping')) {
-            static::echo('No mappings found');
-            return;
+        // gets all importers
+        $injectorConfig = array_keys(Config::inst()->get(Injector::class));
+        $importers = array_filter(
+            $injectorConfig,
+            function ($element) {
+                return strncmp($element, Importer::class, strlen(Importer::class)) === 0;
+            }
+        );
+
+        foreach ($importers as $importerClass) {
+            $importer = Injector::inst()->create($importerClass);
+            $importer->run();
         }
-
-        $channelID = Config::inst()->get(Fetcher::class, 'channel');
-        $fetcher = new Fetcher($channelID, true);
-
-        $fetcher->startExportRun();
-        static::echo('Started Salsify export.');
-
-        $fetcher->waitForExportRunToComplete();
-        static::echo('Salsify export complete');
-        static::echo($fetcher->getExportUrl());
-
-        static::echo('Staring data import');
-        static::echo('-------------------');
-
-        $mapper = new Mapper($fetcher->getExportUrl());
-        $mapper->map();
     }
 
     /**

@@ -28,34 +28,35 @@ class MapperTest extends SapphireTest
         MappedObject::class,
     ];
 
+    private $mapperConfig = [
+        MappedObject::class => [
+            'Unique' => [
+                'salsifyField' => 'custom-field-unique',
+                'unique' => true,
+            ],
+            'Title' => 'custom-field-title',
+            'Seller' => [
+                'salsifyField' => 'custom-field-seller',
+                'unique' => false,
+            ],
+            'Image' => [
+                'salsifyField' => 'custom-field-image',
+                'type' => 'IMAGE',
+            ],
+            'Unknown' => [
+                'unique' => true,
+            ],
+            'Unknown2' => [
+                'salsifyField' => 'XXXXX',
+            ],
+        ]
+    ];
+
     /**
      *
      */
     public function setUp()
     {
-        Config::modify()->set(Mapper::class, 'mapping', [
-            MappedObject::class => [
-                'Unique' => [
-                    'salsifyField' => 'custom-field-unique',
-                    'unique' => true,
-                ],
-                'Title' => 'custom-field-title',
-                'Seller' => [
-                    'salsifyField' => 'custom-field-seller',
-                    'unique' => false,
-                ],
-                'Image' => [
-                    'salsifyField' => 'custom-field-image',
-                    'type' => 'IMAGE',
-                ],
-                'Unknown' => [
-                    'unique' => true,
-                ],
-                'Unknown2' => [
-                    'salsifyField' => 'XXXXX',
-                ],
-            ]
-        ]);
         Config::modify()->set(ImportTask::class, 'output', false);
         return parent::setUp();
     }
@@ -67,7 +68,7 @@ class MapperTest extends SapphireTest
     {
         $this->assertEquals(1, MappedObject::get()->count());
 
-        $mapper = new Mapper(__DIR__ . '/../data.json');
+        $mapper = new Mapper(__DIR__ . '/../data.json', $this->mapperConfig);
         $mapper->map();
 
         // check to see if added
@@ -76,7 +77,7 @@ class MapperTest extends SapphireTest
         $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->Seller);
 
         // tests for unchanged
-        $mapper = new Mapper(__DIR__ . '/../data.json');
+        $mapper = new Mapper(__DIR__ . '/../data.json', $this->mapperConfig);
         $mapper->map();
         $this->assertEquals(7, MappedObject::get()->count());
         $this->assertEquals(7, Image::get()->count());

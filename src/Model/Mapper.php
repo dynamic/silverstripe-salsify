@@ -36,6 +36,11 @@ class Mapper
     private $file;
 
     /**
+     * @var array
+     */
+    private $mapping;
+
+    /**
      * @var JsonMachine
      */
     private $productStream;
@@ -59,9 +64,10 @@ class Mapper
      * Mapper constructor.
      * @param $file
      */
-    public function __construct($file)
+    public function __construct($file, $mapping)
     {
         $this->file = $file;
+        $this->mapping = $mapping;
         $this->productStream = JsonMachine::fromFile($file, '/4/products');
         $this->resetAssetStream();
     }
@@ -72,7 +78,7 @@ class Mapper
     public function map()
     {
         foreach ($this->productStream as $name => $data) {
-            foreach ($this->config()->get('mapping') as $class => $mappings) {
+            foreach ($this->mapping as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
             }
@@ -234,6 +240,19 @@ class Mapper
                 $file->setFromStream(fopen($url, 'r'), $name);
                 $file->write();
                 return preg_match('/ID$/', $dbField) ? $file->ID : $file;
+        }
+
+        $results = $this->extend(__FUNCTION__);
+        if ($results && is_array($results)) {
+            // Remove NULLs
+            $results = array_filter($results, function ($v) {
+                return !is_null($v);
+            });
+
+            // return last result
+            if ($results) {
+                return $results[count($results) - 1];
+            }
         }
         return '';
     }

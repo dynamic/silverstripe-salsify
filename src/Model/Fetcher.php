@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Exception;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
@@ -24,6 +25,16 @@ class Fetcher
     const API_BASE_URL = 'https://app.salsify.com/api/';
 
     /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * @var string
+     */
+    protected $apiKey;
+
+    /**
      * @var string
      */
     protected $channelID;
@@ -41,17 +52,85 @@ class Fetcher
     /**
      * @var bool
      */
-    protected $useLatest;
+    protected $useLatest = false;
+
+    /**
+     * @var int
+     */
+    protected $timeout;
 
     /**
      * Importer constructor.
      * @param string|int $channelID
      * @param bool $useLatest
      */
-    public function __construct($channelID = '', $useLatest = false)
+    public function __construct($config)
     {
-        $this->channelID = $channelID;
-        $this->useLatest = $useLatest;
+        $this->config = $config;
+
+        if (array_key_exists('channel', $this->config) && $config['channel']) {
+            $this->setChannelID($config['channel']);
+        }
+
+        if (array_key_exists('useLatest', $this->config) && $config['useLatest']) {
+            $this->setUseLatest((bool)$config['useLatest']);
+        }
+
+        $this->setTimeout();
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        if (!$this->apiKey) {
+            $this->setApiKey();
+        }
+
+        if (!$this->apiKey) {
+            throw new Exception('No api key provided');
+        }
+        return $this->apiKey;
+    }
+
+    /**
+     * Sets the api key
+     */
+    public function setApiKey()
+    {
+        $this->apiKey = $this->config()->get('apiKey');
+        if (array_key_exists('apiKey', $this->config) && $this->config['apiKey']) {
+            $this->apiKey = $this->config['apiKey'];
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        if (!$this->timeout) {
+            $this->setTimeout();
+        }
+
+        return $this->timeout;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout($timeout = 0)
+    {
+        if (10 <= $timeout) {
+            $this->timeout = $timeout;
+            return;
+        }
+
+        $this->timeout = $this->config()->get('timeout');
+        if (array_key_exists('timeout', $this->config) && $this->config['timeout']) {
+            $this->timeout = $this->config['timeout'];
+        }
     }
 
     /**
@@ -111,10 +190,11 @@ class Fetcher
 
     /**
      * @return string
+     * @throws \Exception
      */
     private function apiUrlSuffix()
     {
-        return '?format=json&auth_token=' . $this->config()->get('apiKey');
+        return '?format=json&auth_token=' . $this->getApiKey();
     }
 
     /**
@@ -122,6 +202,8 @@ class Fetcher
      * @param string $method
      * @param string|null $postBody
      * @return array|string
+     *
+     * @throws \Exception
      */
     private function salsifyRequest($url, $method = 'GET', $postBody = null)
     {
@@ -132,7 +214,7 @@ class Fetcher
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
             // seemed reasonable settings
-            CURLOPT_TIMEOUT => $this->config()->get('timeout'),
+            CURLOPT_TIMEOUT => $this->getTimeout(),
             CURLOPT_FRESH_CONNECT => true,
             CURLOPT_FORBID_REUSE => true,
         );
@@ -152,6 +234,7 @@ class Fetcher
 
     /**
      * @return $this
+     * @throws \Exception
      */
     public function startExportRun()
     {
