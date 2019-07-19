@@ -2,7 +2,9 @@
 
 namespace Dynamic\Salsify\Tests\Model\Mapper;
 
+use \Exception;
 use Dynamic\Salsify\Model\Fetcher;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
 
 /**
@@ -13,20 +15,47 @@ class FetcherTest extends SapphireTest
 {
 
     /**
-     *
+     * @var string
      */
-    public function testSetChannelID()
-    {
-        $fetcher = new Fetcher();
-        $this->assertEquals($fetcher, $fetcher->setChannelID('XXXX'));
-    }
+    private $importerKey = 'test';
 
     /**
      *
      */
-    public function testSetUseLatest()
+    public function setUp()
     {
-        $fetcher = new Fetcher();
-        $this->assertEquals($fetcher, $fetcher->setUseLatest(true));
+        Config::modify()->remove(Fetcher::class, 'apiKey');
+        return parent::setUp();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testConstructorFailsWithoutAPIKey()
+    {
+        $this->expectException(Exception::class);
+        new Fetcher($this->importerKey);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testConstructorFailsWithoutChannel()
+    {
+        Config::modify()->set(Fetcher::class, 'apiKey', 'API_KEY');
+        $this->expectException(Exception::class);
+        new Fetcher($this->importerKey);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testConstructor()
+    {
+        Config::modify()->set(Fetcher::class . '.' . $this->importerKey, 'apiKey', 'API_KEY');
+        Config::modify()->set(Fetcher::class . '.' . $this->importerKey, 'channel', 'CHANNEL');
+
+        $fetcher = new Fetcher($this->importerKey);
+        $this->assertInstanceOf(Fetcher::class, $fetcher);
     }
 }

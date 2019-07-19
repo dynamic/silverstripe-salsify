@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Exception;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
@@ -11,22 +12,17 @@ use SilverStripe\Core\Injector\Injectable;
  * @package Dynamic\Salsify\Model
  *
  * Based off https://github.com/XinV/salsify-php-api/blob/master/lib/Salsify/API.php
+ *
+ * @mixin Configurable
+ * @mixin Extensible
+ * @mixin Injectable
  */
-class Fetcher
+class Fetcher extends Service
 {
-    use Configurable;
-    use Extensible;
-    use Injectable;
-
     /**
      * @var string
      */
     const API_BASE_URL = 'https://app.salsify.com/api/';
-
-    /**
-     * @var string
-     */
-    protected $channelID;
 
     /**
      * @var string
@@ -39,39 +35,21 @@ class Fetcher
     protected $channelRunDataUrl;
 
     /**
-     * @var bool
-     */
-    protected $useLatest;
-
-    /**
      * Importer constructor.
-     * @param string|int $channelID
-     * @param bool $useLatest
+     * @param string $importerKey
+     * @throws \Exception
      */
-    public function __construct($channelID = '', $useLatest = false)
+    public function __construct($importerKey)
     {
-        $this->channelID = $channelID;
-        $this->useLatest = $useLatest;
-    }
+        parent::__construct($importerKey);
 
-    /**
-     * @param string|int $channelID
-     * @return $this
-     */
-    public function setChannelID($channelID)
-    {
-        $this->channelID = $channelID;
-        return $this;
-    }
+        if (!$this->config()->get('apiKey')) {
+            throw new Exception('An API key needs to be provided');
+        }
 
-    /**
-     * @param bool useLatest
-     * @return $this
-     */
-    public function setUseLatest($useLatest)
-    {
-        $this->useLatest = $useLatest;
-        return $this;
+        if (!$this->config()->get('channel')) {
+            throw new Exception('A fetcher needs a channel');
+        }
     }
 
     /**
@@ -79,7 +57,7 @@ class Fetcher
      */
     private function channelUrl()
     {
-        return self::API_BASE_URL . 'channels/' . $this->channelID;
+        return self::API_BASE_URL . 'channels/' . $this->config()->get('channel');
     }
 
     /**
@@ -103,7 +81,7 @@ class Fetcher
      */
     private function channelRunUrl()
     {
-        if ($this->useLatest) {
+        if ($this->config()->get('useLatest')) {
             return $this->channelRunsBaseUrl() . '/latest';
         }
         return $this->channelRunsBaseUrl() . '/' . $this->channelRunID;
@@ -111,6 +89,7 @@ class Fetcher
 
     /**
      * @return string
+     * @throws \Exception
      */
     private function apiUrlSuffix()
     {
@@ -122,6 +101,8 @@ class Fetcher
      * @param string $method
      * @param string|null $postBody
      * @return array|string
+     *
+     * @throws \Exception
      */
     private function salsifyRequest($url, $method = 'GET', $postBody = null)
     {
@@ -152,10 +133,11 @@ class Fetcher
 
     /**
      * @return $this
+     * @throws \Exception
      */
     public function startExportRun()
     {
-        if (!$this->useLatest) {
+        if (!$this->config()->get('useLatest')) {
             $response = $this->salsifyRequest($this->createChannelRunUrl(), 'POST');
             $this->channelRunID = $response['id'];
         }
