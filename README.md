@@ -21,7 +21,7 @@ See [License](license.md)
 ## Example configuration
 ### Importer
 Importers will run fetchers and mappers. Each importer needs to be passed an importerKey to its constructor.
-For the rest of the readme `example` will be used for the sub-config.
+For the rest of the readme `example` will be used for the services.
 ```yaml
 SilverStripe\Core\Injector\Injector:
   Dynamic\Salsify\Model\Importer.example:
@@ -32,54 +32,52 @@ SilverStripe\Core\Injector\Injector:
 
 ### Fetcher
 To set up a fetcher an api key and a channel id need to be provided.
-The `apiKey` can be in the root Fetcher config, but can also be overridden in a specific sub config.
+The `apiKey` can be in the root Fetcher config, but can also be overridden in a specific service config.
 The channel id can be found by visiting the channel in Salsify and copying the last section of the url.
 `https://app.salsify.com/app/orgs/<org_id>/channels/<channel_id>`
 To find the api key follow [this](https://developers.salsify.com/reference#token-based-authentication)
 ```yaml
 Dynamic\Salsify\Model\Fetcher:
   apiKey: 'api key here'
-  example:
+
+Dynamic\Salsify\Model\Fetcher.example:
     channel: 'channel id'
 ```
-or 
+or
 ```yaml
-Dynamic\Salsify\Model\Fetcher:
-  example:
-    apiKey: 'api key here'
-    channel: 'channel id'
+Dynamic\Salsify\Model\Fetcher.example:
+  apiKey: 'api key here'
+  channel: 'channel id'
 ```
 
 The fetcher can also have the timout changed for http requests.
 This is not a timout for Salsify to generate an export.
 Timeout is in milliseconds and defaults to 2000 ms or 2 seconds.
-Like an `apiKey` the timeout can be set in the root fetcher config and be overridden by a sub-config.
+Like an `apiKey` the timeout can be set in the root fetcher config and be overridden by a service config.
 ```yaml
 Dynamic\Salsify\Model\Fetcher:
   timeout: 4000
 ```
 or
 ```yaml
-Dynamic\Salsify\Model\Fetcher:
-  example:
-    timeout: 4000
+Dynamic\Salsify\Model\Fetcher.example:
+  timeout: 4000
 ```
 
 ### Mapper
 To set up a mapper, which will map fields from Salsify to SilverStripe, some configuration is needed.
 
 ```yaml
-Dynamic\Salsify\Model\Mapper:
-  example:
-    mapping:
-      \Page:
-        SKU:
-          salsifyField: SKU
-          unique: true
-        Title: Product Title
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+       SKU:
+        salsifyField: SKU
+        unique: true
+      Title: Product Title
 ```
 
-Each mapper instance will need a sub-config.
+Each mapper instance will need a service config.
 Under the `mapping` config one or more classes can be specified for import.
 Each class can have one or more fields to map, and must have at least one that is unique.
 All fields have the key of the SilverStripe field to map to.
@@ -90,13 +88,12 @@ Like non-unique fields, the key is the SilverStripe field to map to.
 `salsifyField` is the field from Salsify to map.
 `unique` is either true or false and will be used as a filter to check against existing records.
 ```yaml
-Dynamic\Salsify\Model\Mapper:
-  example:
-    mapping:
-      \Page:
-        SKU:
-          salsifyField: SKU
-          unique: true
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      SKU:
+        salsifyField: SKU
+        unique: true
 ```
 The unique fields will be added to an array, with the values for each product and will be used as a filter to find existing.
 This allows for multiple compound unique fields.
@@ -117,13 +114,12 @@ Dynamic\Salsify\Model\Mapper:
 
 Images and files can also be mapped by ID.
 ```yaml
-Dynamic\Salsify\Model\Mapper:
-  example:
-    mapping:
-      \Page:
-        FrontImageID:
-          salsifyField: Front Image
-          type: IMAGE
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      FrontImageID:
+        salsifyField: Front Image
+        type: IMAGE
 ```
 
 If the mapping is specified as an image and it is not a valid image extension, 

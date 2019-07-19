@@ -2,11 +2,13 @@
 
 namespace Dynamic\Salsify\Model;
 
-use \InvalidArgumentException;
 use Dynamic\Salsify\Task\ImportTask;
+use InvalidArgumentException;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
 
 /**
  * Class Importer
@@ -24,14 +26,22 @@ class Importer
     protected $importerKey;
 
     /**
+     * @var \Dynamic\Salsify\Model\Fetcher
+     */
+    protected $fetcher;
+
+    /**
      * Importer constructor.
      * @param string $importerKey
+     * @param \Dynamic\Salsify\Model\Fetcher $fetcher
      */
-    public function __construct($importerKey = null)
+    public function __construct($importerKey, $fetcher = null)
     {
         if ($importerKey) {
             $this->setImporterKey($importerKey);
         }
+
+        $this->fetcher = $fetcher;
     }
 
     /**
@@ -70,26 +80,67 @@ class Importer
         return $this;
     }
 
-    /**
-     * @param string $class
-     * @return mixed
-     */
-    public function getConfig($class)
+    public function createServices()
     {
-        return $class::config()->get($this->getImporterKey());
+        /** @var string|Configurable $mapperService */
+        $fetcherService = Fetcher::class . '.' . $this->getImporterKey();
+        /** @var string|Configurable $mapperService */
+        $mapperService = Mapper::class . '.' . $this->getImporterKey();
+
+        if (!Injector::inst()->has($fetcherService)) {
+            Injector::inst()->load([
+                $fetcherService => [
+                    'class' => Fetcher::class,
+                ],
+            ]);
+        }
+
+        if (!Injector::inst()->has($mapperService)) {
+            Injector::inst()->load([
+                $mapperService => [
+                    'class' => Mapper::class,
+                ],
+            ]);
+        }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function run()
     {
+        $this->createServices();
+
+        /** @var string|Configurable $mapperService */
+        $fetcherService = Fetcher::class . '.' . $this->getImporterKey();
+        /** @var string|Configurable $mapperService */
+        $mapperService = Mapper::class . '.' . $this->getImporterKey();
+
         ImportTask::echo('-------------------');
         ImportTask::echo('Now running import for ' . $this->getImporterKey());
-        $mapperConfig = $this->getConfig(Mapper::class);
-        if (!$mapperConfig || !$mapperConfig['mapping']) {
+
+        if (
+            !Config::forClass($fetcherService)->get('apiKey') &&
+            !Config::forClass(Fetcher::class)->get('apiKey')
+        ) {
+            ImportTask::echo('No api key found');
+            return;
+        }
+
+        if (!Config::forClass($fetcherService)->get('channel')) {
+            ImportTask::echo('No channel found');
+            return;
+        }
+
+        if (!Config::forClass($mapperService)->get('mapping')) {
             ImportTask::echo('No mappings found');
             return;
         }
 
-        $fetcher = new Fetcher($this->getConfig(Fetcher::class));
+        $fetcher = Injector::inst()->createWithArgs($fetcherService, [
+            'importerKey' => $this->getImporterKey(),
+        ]);
+
         $fetcher->startExportRun();
         ImportTask::echo('Started Salsify export.');
         $fetcher->waitForExportRunToComplete();
@@ -97,7 +148,10 @@ class Importer
 
         ImportTask::echo('Staring data import');
         ImportTask::echo('-------------------');
-        $mapper = new Mapper($fetcher->getExportUrl(), $mapperConfig['mapping']);
+        $mapper = Injector::inst()->createWithArgs($mapperService, [
+            'importerKey' => $this->getImporterKey(),
+            'file' => $fetcher->getExportUrl(),
+        ]);
         $mapper->map();
     }
 }

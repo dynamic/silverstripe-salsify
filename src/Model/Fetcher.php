@@ -12,32 +12,17 @@ use SilverStripe\Core\Injector\Injectable;
  * @package Dynamic\Salsify\Model
  *
  * Based off https://github.com/XinV/salsify-php-api/blob/master/lib/Salsify/API.php
+ *
+ * @mixin Configurable
+ * @mixin Extensible
+ * @mixin Injectable
  */
-class Fetcher
+class Fetcher extends Service
 {
-    use Configurable;
-    use Extensible;
-    use Injectable;
-
     /**
      * @var string
      */
     const API_BASE_URL = 'https://app.salsify.com/api/';
-
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var string
-     */
-    protected $apiKey;
-
-    /**
-     * @var string
-     */
-    protected $channelID;
 
     /**
      * @var string
@@ -50,107 +35,21 @@ class Fetcher
     protected $channelRunDataUrl;
 
     /**
-     * @var bool
-     */
-    protected $useLatest = false;
-
-    /**
-     * @var int
-     */
-    protected $timeout;
-
-    /**
      * Importer constructor.
-     * @param string|int $channelID
-     * @param bool $useLatest
+     * @param string $importerKey
+     * @throws \Exception
      */
-    public function __construct($config)
+    public function __construct($importerKey)
     {
-        $this->config = $config;
+        parent::__construct($importerKey);
 
-        if (array_key_exists('channel', $this->config) && $config['channel']) {
-            $this->setChannelID($config['channel']);
+        if (!$this->config()->get('apiKey')) {
+            throw new Exception('An API key needs to be provided');
         }
 
-        if (array_key_exists('useLatest', $this->config) && $config['useLatest']) {
-            $this->setUseLatest((bool)$config['useLatest']);
+        if (!$this->config()->get('channel')) {
+            throw new Exception('A fetcher needs a channel');
         }
-
-        $this->setTimeout();
-    }
-
-    /**
-     * @return string
-     */
-    public function getApiKey()
-    {
-        if (!$this->apiKey) {
-            $this->setApiKey();
-        }
-
-        if (!$this->apiKey) {
-            throw new Exception('No api key provided');
-        }
-        return $this->apiKey;
-    }
-
-    /**
-     * Sets the api key
-     */
-    public function setApiKey()
-    {
-        $this->apiKey = $this->config()->get('apiKey');
-        if (array_key_exists('apiKey', $this->config) && $this->config['apiKey']) {
-            $this->apiKey = $this->config['apiKey'];
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getTimeout()
-    {
-        if (!$this->timeout) {
-            $this->setTimeout();
-        }
-
-        return $this->timeout;
-    }
-
-    /**
-     * @param int $timeout
-     */
-    public function setTimeout($timeout = 0)
-    {
-        if (10 <= $timeout) {
-            $this->timeout = $timeout;
-            return;
-        }
-
-        $this->timeout = $this->config()->get('timeout');
-        if (array_key_exists('timeout', $this->config) && $this->config['timeout']) {
-            $this->timeout = $this->config['timeout'];
-        }
-    }
-
-    /**
-     * @param string|int $channelID
-     * @return $this
-     */
-    public function setChannelID($channelID)
-    {
-        $this->channelID = $channelID;
-        return $this;
-    }
-
-    /**
-     * @param bool useLatest
-     * @return $this
-     */
-    public function setUseLatest($useLatest)
-    {
-        $this->useLatest = $useLatest;
-        return $this;
     }
 
     /**
@@ -158,7 +57,7 @@ class Fetcher
      */
     private function channelUrl()
     {
-        return self::API_BASE_URL . 'channels/' . $this->channelID;
+        return self::API_BASE_URL . 'channels/' . $this->config()->get('channel');
     }
 
     /**
@@ -182,7 +81,7 @@ class Fetcher
      */
     private function channelRunUrl()
     {
-        if ($this->useLatest) {
+        if ($this->config()->get('useLatest')) {
             return $this->channelRunsBaseUrl() . '/latest';
         }
         return $this->channelRunsBaseUrl() . '/' . $this->channelRunID;
@@ -194,7 +93,7 @@ class Fetcher
      */
     private function apiUrlSuffix()
     {
-        return '?format=json&auth_token=' . $this->getApiKey();
+        return '?format=json&auth_token=' . $this->config()->get('apiKey');
     }
 
     /**
@@ -214,7 +113,7 @@ class Fetcher
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
             // seemed reasonable settings
-            CURLOPT_TIMEOUT => $this->getTimeout(),
+            CURLOPT_TIMEOUT => $this->config()->get('timeout'),
             CURLOPT_FRESH_CONNECT => true,
             CURLOPT_FORBID_REUSE => true,
         );
@@ -238,7 +137,7 @@ class Fetcher
      */
     public function startExportRun()
     {
-        if (!$this->useLatest) {
+        if (!$this->config()->get('useLatest')) {
             $response = $this->salsifyRequest($this->createChannelRunUrl(), 'POST');
             $this->channelRunID = $response['id'];
         }

@@ -3,24 +3,18 @@
 namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\Task\ImportTask;
+use Exception;
 use JsonMachine\JsonMachine;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Image;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Extensible;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 
 /**
  * Class Mapper
  * @package Dynamic\Salsify\Model
  */
-class Mapper
+class Mapper extends Service
 {
-    use Configurable;
-    use Extensible;
-    use Injectable;
-
     /**
      * @var array
      */
@@ -34,11 +28,6 @@ class Mapper
      * @var
      */
     private $file;
-
-    /**
-     * @var array
-     */
-    private $mapping;
 
     /**
      * @var JsonMachine
@@ -62,23 +51,30 @@ class Mapper
 
     /**
      * Mapper constructor.
+     * @param string $importerKey
      * @param $file
+     * @throws \Exception
      */
-    public function __construct($file, $mapping)
+    public function __construct($importerKey, $file)
     {
+        parent::__construct($importerKey);
+        if (!$this->config()->get('mapping')) {
+            throw  new Exception('A Mapper needs a mapping');
+        }
+
         $this->file = $file;
-        $this->mapping = $mapping;
         $this->productStream = JsonMachine::fromFile($file, '/4/products');
         $this->resetAssetStream();
     }
 
     /**
      * Maps the data
+     * @throws \Exception
      */
     public function map()
     {
         foreach ($this->productStream as $name => $data) {
-            foreach ($this->mapping as $class => $mappings) {
+            foreach ($this->config()->get('mapping') as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
             }
@@ -87,9 +83,10 @@ class Mapper
     }
 
     /**
-     * @param string $class
+     * @param string|DataObject $class
      * @param array $mappings
      * @param array $data
+     * @throws \Exception
      */
     private function mapToObject($class, $mappings, $data)
     {
@@ -192,6 +189,7 @@ class Mapper
      * @param string|int $value
      * @param string $dbField
      * @return mixed
+     * @throws \Exception
      */
     private function handleType($type, $value, $dbField)
     {
@@ -279,8 +277,8 @@ class Mapper
 
     /**
      * @param array|bool $assetData
-     * @param string $class
      * @return File|bool
+     * @throws \Exception
      */
     private function createFile($assetData)
     {
@@ -302,7 +300,7 @@ class Mapper
 
     /**
      * @param string $id
-     * @param string $class
+     * @param string|DataObject $class
      * @return File|\Dyanmic\Salsify\ORM\FileExtension
      */
     private function findOrCreateFile($id, $class = File::class)
