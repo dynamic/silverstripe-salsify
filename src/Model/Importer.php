@@ -119,10 +119,8 @@ class Importer
         ImportTask::echo('-------------------');
         ImportTask::echo('Now running import for ' . $this->getImporterKey());
 
-        if (
-            !Config::forClass($fetcherService)->get('apiKey') &&
-            !Config::forClass(Fetcher::class)->get('apiKey')
-        ) {
+        if (!Config::forClass($fetcherService)->get('apiKey') &&
+            !Config::forClass(Fetcher::class)->get('apiKey')) {
             ImportTask::echo('No api key found');
             return;
         }
