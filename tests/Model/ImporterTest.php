@@ -3,9 +3,9 @@
 namespace Dynamic\Salsify\Tests\Model\Mapper;
 
 use Dynamic\Salsify\Model\Fetcher;
-use Dynamic\Salsify\Model\Mapper;
-use \InvalidArgumentException;
 use Dynamic\Salsify\Model\Importer;
+use Dynamic\Salsify\Model\Mapper;
+use InvalidArgumentException;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 
@@ -19,7 +19,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testCanConstruct() {
+    public function testCanConstruct()
+    {
         $importer = new Importer('test');
         $this->assertInstanceOf(Importer::class, $importer);
     }
@@ -27,7 +28,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testGetImporterKey() {
+    public function testGetImporterKey()
+    {
         $importer = new Importer('test');
         $this->assertEquals('test', $importer->getImporterKey());
     }
@@ -35,7 +37,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testImportKeyNotString() {
+    public function testImportKeyNotString()
+    {
         $importer = new Importer('test');
         $this->expectException(InvalidArgumentException::class);
         /** @noinspection PhpParamsInspection */
@@ -45,7 +48,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testImportKeyNotEmpty() {
+    public function testImportKeyNotEmpty()
+    {
         $importer = new Importer('test');
         $this->expectException(InvalidArgumentException::class);
         $importer->setImporterKey('');
@@ -54,7 +58,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testImportKeyContainsInvalidCharacters() {
+    public function testImportKeyContainsInvalidCharacters()
+    {
         $importer = new Importer('test');
         $this->expectException(InvalidArgumentException::class);
         $importer->setImporterKey('test@');
@@ -63,7 +68,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testCreateServicesFetcher() {
+    public function testCreateServicesFetcher()
+    {
         $this->assertFalse(Injector::inst()->has(Fetcher::class . '.test'));
 
         $importer = new Importer('test');
@@ -74,7 +80,8 @@ class ImporterTest extends SapphireTest
     /**
      *
      */
-    public function testCreateServicesMapper() {
+    public function testCreateServicesMapper()
+    {
         $this->assertFalse(Injector::inst()->has(Mapper::class . '.test'));
 
         $importer = new Importer('test');
