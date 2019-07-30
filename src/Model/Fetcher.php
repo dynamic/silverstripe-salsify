@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\Model;
 
 use Exception;
+use GuzzleHttp\Client;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
@@ -57,7 +58,11 @@ class Fetcher extends Service
      */
     private function channelUrl()
     {
-        return self::API_BASE_URL . 'channels/' . $this->config()->get('channel');
+        $channel = $this->config()->get('channel');
+        if ($organization = $this->config()->get('organizationID')) {
+            return "orgs/{$organization}/channels/{$channel}";
+        }
+        return "channels/{$channel}";
     }
 
     /**
@@ -88,15 +93,6 @@ class Fetcher extends Service
     }
 
     /**
-     * @return string
-     * @throws \Exception
-     */
-    private function apiUrlSuffix()
-    {
-        return '?format=json&auth_token=' . $this->config()->get('apiKey');
-    }
-
-    /**
      * @param string $url
      * @param string $method
      * @param string|null $postBody
@@ -106,28 +102,41 @@ class Fetcher extends Service
      */
     private function salsifyRequest($url, $method = 'GET', $postBody = null)
     {
-        $defaultCurlOptions = array(
-            CURLOPT_URL => $url . $this->apiUrlSuffix(),
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HEADER => false,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
-            // seemed reasonable settings
-            CURLOPT_TIMEOUT => $this->config()->get('timeout'),
-            CURLOPT_FRESH_CONNECT => true,
-            CURLOPT_FORBID_REUSE => true,
-        );
+        $client = new Client([
+            'base_uri' => self::API_BASE_URL,
+            'timeout' => $this->config()->get('timeout'),
+            'http_errors' => false,
+            'verify' => true,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->config()->get('apiKey'),
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
         if ($method === 'POST' && is_array($postBody)) {
-            $postBody = json_encode($postBody);
+            $response = $client->request($method, $url, [
+                'json' => $postBody,
+            ]);
+        } else {
+            $response = $client->request($method, $url);
         }
-        $ch = curl_init($url);
-        curl_setopt_array($ch, $defaultCurlOptions);
-        $response = curl_exec($ch);
-        $httpStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($response && !empty($response)) {
-            $response = json_decode($response, true);
+
+
+        if ($response->getStatusCode() === 404) {
+            throw new Exception("Endpoint wasn't found. Are you sure the channel and organization are correct?");
         }
+
+        if ($response->getBody() && !empty($response->getBody())) {
+            $response = json_decode($response->getBody(), true);
+
+            // throw exceptions for salsify errors
+            if (array_key_exists('errors', $response)) {
+                foreach ($response['errors'] as $error) {
+                    throw new Exception($error);
+                }
+            }
+        }
+
         return $response;
     }
 
@@ -137,7 +146,7 @@ class Fetcher extends Service
      */
     public function startExportRun()
     {
-        if (!$this->config()->get('useLatest')) {
+        if ($this->config()->get('useLatest') !== true) {
             $response = $this->salsifyRequest($this->createChannelRunUrl(), 'POST');
             $this->channelRunID = $response['id'];
         }

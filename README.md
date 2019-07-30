@@ -50,6 +50,19 @@ Dynamic\Salsify\Model\Fetcher.example:
   channel: 'channel id'
 ```
 
+An organization ID can also be included to avoid an account having access to multiple organizations.
+```yaml
+Dynamic\Salsify\Model\Fetcher:
+  organizationID: 'org id'
+```
+or
+```yaml
+Dynamic\Salsify\Model\Fetcher.example:
+  organizationID: 'org id'
+```
+
+https://developers.salsify.com/docs/organization-id
+
 The fetcher can also have the timout changed for http requests.
 This is not a timout for Salsify to generate an export.
 Timeout is in milliseconds and defaults to 2000 ms or 2 seconds.
