@@ -1,5 +1,9 @@
 language: php
 
+services:
+  - mysql
+  - postgresql
+
 env:
   global:
     - TRAVIS_NODE_VERSION="10"
