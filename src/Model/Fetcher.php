@@ -123,7 +123,7 @@ class Fetcher extends Service
 
 
         if ($response->getStatusCode() === 404) {
-            throw new Exception("Endpoint wasn't found. Are you sure the channel and orginization are correct?");
+            throw new Exception("Endpoint wasn't found. Are you sure the channel and organization are correct?");
         }
 
         if ($response->getBody() && !empty($response->getBody())) {
