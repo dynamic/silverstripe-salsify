@@ -18,7 +18,9 @@ use SilverStripe\Core\Injector\Injectable;
 abstract class Service
 {
     use Configurable;
-    use Extensible;
+    use Extensible {
+        defineMethods as extensibleDefineMethods;
+    }
     use Injectable;
 
     /**

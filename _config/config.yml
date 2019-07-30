@@ -4,6 +4,12 @@ name: salsify-config
 Dynamic\Salsify\Model\Fetcher:
   timeout: 2000
 
+Dynamic\Salsify\Model\Mapper:
+  extensions:
+    - Dynamic\Salsify\TypeHandler\RawHandler
+    - Dynamic\Salsify\TypeHandler\FileHandler
+    - Dynamic\Salsify\TypeHandler\ImageHandler
+
 SilverStripe\Assets\File:
   extensions:
     - Dyanmic\Salsify\ORM\FileExtension

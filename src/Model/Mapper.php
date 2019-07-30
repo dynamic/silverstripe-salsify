@@ -5,8 +5,6 @@ namespace Dynamic\Salsify\Model;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
-use SilverStripe\Assets\File;
-use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -15,15 +13,6 @@ use SilverStripe\ORM\DataObject;
  */
 class Mapper extends Service
 {
-    /**
-     * @var array
-     */
-    private static $field_types = [
-        'RAW' => '0',
-        'FILE' => '1',
-        'IMAGE' => '2',
-    ];
-
     /**
      * @var
      */
@@ -84,7 +73,7 @@ class Mapper extends Service
 
     /**
      * @param string|DataObject $class
-     * @param array $mappings
+     * @param array $mappings The mapping for a specific class
      * @param array $data
      * @throws \Exception
      */
@@ -102,7 +91,7 @@ class Mapper extends Service
         ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
 
         foreach ($mappings as $dbField => $salsifyField) {
-            $type = $this->config()->get('field_types')['RAW'];
+            $type = 'Raw';
             if (is_array($salsifyField)) {
                 if (!array_key_exists('salsifyField', $salsifyField)) {
                     continue;
@@ -122,7 +111,8 @@ class Mapper extends Service
                 continue;
             }
 
-            $object->$dbField = $this->handleType($type, $data[$salsifyField], $dbField);
+            // TODO - handle has_many and many_many fields
+            $object->$dbField = $this->handleType($type, $data[$salsifyField], $dbField, $class);
         }
 
         if ($object->isChanged()) {
@@ -142,9 +132,11 @@ class Mapper extends Service
      */
     private function findObjectByUnique($class, $mappings, $data)
     {
-        $uniqueFields = $this->uniqueFields($class, $mappings);
+        $uniqueFields = $this->uniqueFields($mappings);
+        // creates a filter
         $filter = [];
         foreach ($uniqueFields as $dbField => $salsifyField) {
+            // adds unique fields to filter
             $filter[$dbField] = $data[$salsifyField];
         }
 
@@ -152,12 +144,14 @@ class Mapper extends Service
     }
 
     /**
-     * @param string $class
+     * Gets a list of all the unique field keys
+     *
      * @param array $mappings
      * @return array
      */
-    private function uniqueFields($class, $mappings)
+    private function uniqueFields($mappings)
     {
+        // cached after first map
         if (!empty($this->currentUniqueFields)) {
             return $this->currentUniqueFields;
         }
@@ -173,7 +167,7 @@ class Mapper extends Service
                 continue;
             }
 
-            if (!$salsifyField['unique'] == true) {
+            if ($salsifyField['unique'] !== true) {
                 continue;
             }
 
@@ -191,134 +185,29 @@ class Mapper extends Service
      * @return mixed
      * @throws \Exception
      */
-    private function handleType($type, $value, $dbField)
+    private function handleType($type, $value, $dbField, $class)
     {
         $fieldTypes = $this->config()->get('field_types');
-        switch ($type) {
-            case $fieldTypes['RAW']:
-                return $value;
-
-            case $fieldTypes['FILE']:
-                if ($asset = $this->createFile($this->getAssetBySalsifyID($value))) {
-                    return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
-                }
-                return '';
-
-            case $fieldTypes['IMAGE']:
-                $asset = $this->getAssetBySalsifyID($value);
-
-                $file = $this->findOrCreateFile($asset['salsify:id'], Image::class);
-                if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $asset['salsify:updated_at']) {
-                    return preg_match('/ID$/', $dbField) ? $file->ID : $file;
-                }
-
-                $url = $asset['salsify:url'];
-                $name = $asset['salsify:name'];
-                $supportedImageExtensions = Image::get_category_extensions(
-                    Image::singleton()->File->getAllowedCategories()
-                );
-
-                if (!in_array(pathinfo($asset['salsify:url'])['extension'], $supportedImageExtensions)) {
-                    $url = str_replace(
-                        '.' . pathinfo($asset['salsify:url'])['extension'],
-                        '.png',
-                        $asset['salsify:url']
-                    );
-                }
-
-                if (!in_array(pathinfo($asset['salsify:name'])['extension'], $supportedImageExtensions)) {
-                    $name = str_replace(
-                        '.' . pathinfo($asset['salsify:name'])['extension'],
-                        '.png',
-                        $asset['salsify:name']
-                    );
-                }
-
-                $file->SalsifyUpdatedAt = $asset['salsify:updated_at'];
-                $file->setFromStream(fopen($url, 'r'), $name);
-                $file->write();
-                return preg_match('/ID$/', $dbField) ? $file->ID : $file;
-        }
-
-        $results = $this->extend(__FUNCTION__);
-        if ($results && is_array($results)) {
-            // Remove NULLs
-            $results = array_filter($results, function ($v) {
-                return !is_null($v);
-            });
-
-            // return last result
-            if ($results) {
-                return $results[count($results) - 1];
-            }
+        if ($this->hasMethod("handle{$type}Type")) {
+            return $this->{"handle{$type}Type"}($value, $dbField, $class);
+        } else {
+            ImportTask::echo("{$type} is not a valid type. skipping.");
         }
         return '';
     }
 
     /**
-     * @param $id
-     * @return array|bool
+     * @return \JsonMachine\JsonMachine
      */
-    private function getAssetBySalsifyID($id)
+    public function getAssetStream()
     {
-        if (is_array($id)) {
-            $id = $id[count($id) - 1];
-        }
-
-        $asset = false;
-        foreach ($this->assetStream as $name => $data) {
-            if ($data['salsify:id'] == $id) {
-                $asset = $data;
-            }
-        }
-        $this->resetAssetStream();
-        return $asset;
-    }
-
-    /**
-     * @param array|bool $assetData
-     * @return File|bool
-     * @throws \Exception
-     */
-    private function createFile($assetData)
-    {
-        if (!$assetData) {
-            return false;
-        }
-
-        $file = $this->findOrCreateFile($assetData['salsify:id']);
-        if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $assetData['salsify:updated_at']) {
-            return $file;
-        }
-
-        $file->SalsifyUpdatedAt = $assetData['salsify:updated_at'];
-        $file->setFromStream(fopen($assetData['salsify:url'], 'r'), $assetData['salsify:name']);
-
-        $file->write();
-        return $file;
-    }
-
-    /**
-     * @param string $id
-     * @param string|DataObject $class
-     * @return File|\Dyanmic\Salsify\ORM\FileExtension
-     */
-    private function findOrCreateFile($id, $class = File::class)
-    {
-        /** @var File|\Dyanmic\Salsify\ORM\FileExtension $file */
-        if ($file = $class::get()->find('SalisfyID', $id)) {
-            return $file;
-        }
-
-        $file = $class::create();
-        $file->SalisfyID = $id;
-        return $file;
+        return $this->assetStream;
     }
 
     /**
      *
      */
-    private function resetAssetStream()
+    public function resetAssetStream()
     {
         $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
     }
