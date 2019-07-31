@@ -28,16 +28,18 @@ class FileHandler extends Extension
     protected $assetStream;
 
     /**
-     * @param $value
-     * @param $field
+     * @param $data
+     * @param $dataField
+     * @param $config
+     * @param $dbField
      * @param string |DataObject $class
-     * @return string
+     * @return string|int
      *
      * @throws \Exception
      */
-    public function handleFileType($value, $field, $class)
+    public function handleFileType($data, $dataField, $config, $dbField, $class)
     {
-        $data = $this->getAssetBySalsifyID($value);
+        $data = $this->getAssetBySalsifyID($data[$dataField]);
         if (!$data) {
             return '';
         }
@@ -48,7 +50,7 @@ class FileHandler extends Extension
             $data['salsify:url'],
             $data['salsify:name']
         );
-        return preg_match('/ID$/', $field) ? $asset->ID : $asset;
+        return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
     }
 
     /**

@@ -92,36 +92,22 @@ class Mapper extends Service
             $object = $class::create();
         }
 
-        $fieldTypes = $this->config()->get('field_types');
-
         $firstUniqueKey = array_keys($this->uniqueFields($mappings))[0];
         $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
         ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
 
         foreach ($mappings as $dbField => $salsifyField) {
+            $field = $salsifyField;
+            $value = null;
             // default to raw
-            $type = 'Raw';
+            $type = $this->getFieldType($salsifyField);
+
             if (is_array($salsifyField)) {
-                if (!array_key_exists('salsifyField', $salsifyField)) {
-                    continue;
-                }
-
-                if (array_key_exists('type', $salsifyField)) {
-                    if (in_array($salsifyField['type'], $fieldTypes)) {
-                        $type = $salsifyField['type'];
-                    }
-                }
-
-                $salsifyField = $salsifyField['salsifyField'];
-            }
-
-            if (!array_key_exists($salsifyField, $data)) {
-                ImportTask::echo("Skipping mapping for field $salsifyField for $firstUniqueKey $firstUniqueValue");
-                continue;
+                $field = $salsifyField['salsifyField'];
             }
 
             // TODO - handle has_many and many_many fields
-            $object->$dbField = $this->handleType($type, $data[$salsifyField], $dbField, $class);
+            $object->$dbField = $this->handleType($type, $data, $field, $salsifyField, $dbField, $class);
         }
 
         if ($object->isChanged()) {
@@ -188,19 +174,37 @@ class Mapper extends Service
     }
 
     /**
+     * @param string|array $field
+     * @return string
+     */
+    public function getFieldType($field)
+    {
+        $fieldTypes = $this->config()->get('field_types');
+        if (is_array($field) && array_key_exists('type', $field)) {
+            if (in_array($field['type'], $fieldTypes)) {
+                return $field['type'];
+            }
+        }
+        return 'Raw';
+    }
+
+    /**
      * @param int $type
-     * @param string|int $value
-     * @param string $field
-     * @param $class
+     * @param array $data
+     * @param string $dataField
+     * @param array $config
+     * @param string $dbField
+     * @param string $class
+     *
      * @return mixed
      * @throws \Exception
      */
-    private function handleType($type, $value, $field, $class)
+    private function handleType($type, $data, $dataField, $config, $dbField, $class)
     {
         if ($this->hasMethod("handle{$type}Type")) {
-            return $this->{"handle{$type}Type"}($value, $field, $class);
+            return $this->{"handle{$type}Type"}($data, $dataField, $config, $dbField, $class);
         } else {
-            ImportTask::echo("{$type} is not a valid type. skipping field {$field}.");
+            ImportTask::echo("{$type} is not a valid type. skipping field {$dbField}.");
         }
         return '';
     }

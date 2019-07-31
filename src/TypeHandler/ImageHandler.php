@@ -26,31 +26,33 @@ class ImageHandler extends FileHandler
     private static $defaultImageType = 'png';
 
     /**
-     * @param $value
-     * @param $field
+     * @param $data
+     * @param $dataField
+     * @param $config
+     * @param $dbField
      * @param string |DataObject $class
-     * @return string
+     * @return string|int
      *
      * @throws \Exception
      */
-    public function handleImageType($value, $field, $class)
+    public function handleImageType($data, $dataField, $config, $dbField, $class)
     {
-        $data = $this->getAssetBySalsifyID($value);
-        if (!$data) {
+        $assetData = $this->getAssetBySalsifyID($data[$dataField]);
+        if (!$assetData) {
             return '';
         }
 
-        $url = $this->fixExtension($data['salsify:url']);
-        $name = $this->fixExtension($data['salsify:name']);
+        $url = $this->fixExtension($assetData['salsify:url']);
+        $name = $this->fixExtension($assetData['salsify:name']);
 
         $asset = $this->updateFile(
-            $data['salsify:id'],
-            $data['salsify:updated_at'],
+            $assetData['salsify:id'],
+            $assetData['salsify:updated_at'],
             $url,
             $name,
             Image::class
         );
-        return preg_match('/ID$/', $field) ? $asset->ID : $asset;
+        return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
     }
 
     protected function fixExtension($string)
