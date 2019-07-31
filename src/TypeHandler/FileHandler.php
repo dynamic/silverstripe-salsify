@@ -2,7 +2,6 @@
 
 namespace Dynamic\Salsify\TypeHandler;
 
-
 use JsonMachine\JsonMachine;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Extension;
@@ -30,9 +29,11 @@ class FileHandler extends Extension
 
     /**
      * @param $value
-     * @param $dbField
+     * @param $field
      * @param string |DataObject $class
      * @return string
+     *
+     * @throws \Exception
      */
     public function handleFileType($value, $field, $class)
     {
@@ -92,19 +93,20 @@ class FileHandler extends Extension
      * @param string $updatedAt
      * @param string $url
      * @param string $name
+     * @param string|DataObject $class
      *
      * @return File|bool
      * @throws \Exception
      */
     protected function updateFile($id, $updatedAt, $url, $name, $class = File::class)
     {
-        $file = $this->findOrCreateFile($assetData['salsify:id'], $class);
-        if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $assetData['salsify:updated_at']) {
+        $file = $this->findOrCreateFile($id, $class);
+        if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $updatedAt) {
             return $file;
         }
 
-        $file->SalsifyUpdatedAt = $assetData['salsify:updated_at'];
-        $file->setFromStream(fopen($assetData['salsify:url'], 'r'), $assetData['salsify:name']);
+        $file->SalsifyUpdatedAt = $updatedAt;
+        $file->setFromStream(fopen($url, 'r'), $name);
 
         $file->write();
         return $file;

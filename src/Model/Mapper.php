@@ -57,6 +57,14 @@ class Mapper extends Service
     }
 
     /**
+     *
+     */
+    public function resetAssetStream()
+    {
+        $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
+    }
+
+    /**
      * Maps the data
      * @throws \Exception
      */
@@ -86,11 +94,12 @@ class Mapper extends Service
 
         $fieldTypes = $this->config()->get('field_types');
 
-        $firstUniqueKey = array_keys($this->uniqueFields($class, $mappings))[0];
+        $firstUniqueKey = array_keys($this->uniqueFields($mappings))[0];
         $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
         ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
 
         foreach ($mappings as $dbField => $salsifyField) {
+            // default to raw
             $type = 'Raw';
             if (is_array($salsifyField)) {
                 if (!array_key_exists('salsifyField', $salsifyField)) {
@@ -98,8 +107,8 @@ class Mapper extends Service
                 }
 
                 if (array_key_exists('type', $salsifyField)) {
-                    if (array_key_exists($salsifyField['type'], $fieldTypes)) {
-                        $type = $fieldTypes[$salsifyField['type']];
+                    if (in_array($salsifyField['type'], $fieldTypes)) {
+                        $type = $salsifyField['type'];
                     }
                 }
 
@@ -181,17 +190,17 @@ class Mapper extends Service
     /**
      * @param int $type
      * @param string|int $value
-     * @param string $dbField
+     * @param string $field
+     * @param $class
      * @return mixed
      * @throws \Exception
      */
-    private function handleType($type, $value, $dbField, $class)
+    private function handleType($type, $value, $field, $class)
     {
-        $fieldTypes = $this->config()->get('field_types');
         if ($this->hasMethod("handle{$type}Type")) {
-            return $this->{"handle{$type}Type"}($value, $dbField, $class);
+            return $this->{"handle{$type}Type"}($value, $field, $class);
         } else {
-            ImportTask::echo("{$type} is not a valid type. skipping.");
+            ImportTask::echo("{$type} is not a valid type. skipping field {$field}.");
         }
         return '';
     }
@@ -202,13 +211,5 @@ class Mapper extends Service
     public function getAssetStream()
     {
         return $this->assetStream;
-    }
-
-    /**
-     *
-     */
-    public function resetAssetStream()
-    {
-        $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
     }
 }

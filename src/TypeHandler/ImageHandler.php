@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler;
 
-
+use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -20,13 +20,18 @@ class ImageHandler extends FileHandler
         'Image'
     ];
 
-    private static $defualtImageType = 'png';
+    /**
+     * @var string
+     */
+    private static $defaultImageType = 'png';
 
     /**
      * @param $value
-     * @param $dbField
+     * @param $field
      * @param string |DataObject $class
      * @return string
+     *
+     * @throws \Exception
      */
     public function handleImageType($value, $field, $class)
     {
@@ -42,7 +47,8 @@ class ImageHandler extends FileHandler
             $data['salsify:id'],
             $data['salsify:updated_at'],
             $url,
-            $name
+            $name,
+            Image::class
         );
         return preg_match('/ID$/', $field) ? $asset->ID : $asset;
     }
@@ -54,10 +60,10 @@ class ImageHandler extends FileHandler
         );
         $extension = pathinfo($string)['extension'];
 
-        if (in_array($extension, $supportedImageExtensions)) {
+        if (!in_array($extension, $supportedImageExtensions)) {
             return str_replace(
                 '.' . $extension,
-                '.' . $this->owner->config()->get('defualtImageType'),
+                '.' . $this->owner->config()->get('defaultImageType'),
                 $string
             );
         }
