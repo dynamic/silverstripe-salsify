@@ -7,8 +7,9 @@ Dynamic\Salsify\Model\Fetcher:
 Dynamic\Salsify\Model\Mapper:
   extensions:
     - Dynamic\Salsify\TypeHandler\RawHandler
-    - Dynamic\Salsify\TypeHandler\FileHandler
-    - Dynamic\Salsify\TypeHandler\ImageHandler
+    - Dynamic\Salsify\TypeHandler\Asset\FileHandler
+    - Dynamic\Salsify\TypeHandler\Asset\ImageHandler
+    - Dynamic\Salsify\TypeHandler\Relation\HasOneRelation
 
 SilverStripe\Assets\File:
   extensions:

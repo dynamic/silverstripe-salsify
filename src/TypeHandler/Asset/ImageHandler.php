@@ -1,6 +1,6 @@
 <?php
 
-namespace Dynamic\Salsify\TypeHandler;
+namespace Dynamic\Salsify\TypeHandler\Asset;
 
 use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
@@ -9,9 +9,9 @@ use SilverStripe\ORM\DataObject;
  * Class ImageHandler
  * @package Dynamic\Salsify\TypeHandler
  *
- * @property-read \Dynamic\Salsify\Model\Mapper|\Dynamic\Salsify\TypeHandler\ImageHandler $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|\Dynamic\Salsify\TypeHandler\Asset\ImageHandler $owner
  */
-class ImageHandler extends FileHandler
+class ImageHandler extends AssetHandler
 {
     /**
      * @var array

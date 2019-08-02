@@ -83,9 +83,11 @@ class Mapper extends Service
      * @param string|DataObject $class
      * @param array $mappings The mapping for a specific class
      * @param array $data
+     *
+     * @return DataObject
      * @throws \Exception
      */
-    private function mapToObject($class, $mappings, $data)
+    public function mapToObject($class, $mappings, $data)
     {
         $object = $this->findObjectByUnique($class, $mappings, $data);
         if (!$object) {
@@ -106,8 +108,8 @@ class Mapper extends Service
                 $field = $salsifyField['salsifyField'];
             }
 
-            // TODO - handle has_many and many_many fields
-            $object->$dbField = $this->handleType($type, $data, $field, $salsifyField, $dbField, $class);
+            $value = $this->handleType($type, $data, $field, $salsifyField, $dbField, $class);
+            $this->writeValue($object, $dbField, $value);
         }
 
         if ($object->isChanged()) {
@@ -116,6 +118,7 @@ class Mapper extends Service
         } else {
             ImportTask::echo("$firstUniqueKey $firstUniqueValue was not changed.");
         }
+        return $object;
     }
 
     /**
@@ -190,23 +193,52 @@ class Mapper extends Service
 
     /**
      * @param int $type
-     * @param array $data
-     * @param string $dataField
-     * @param array $config
+     * @param array $salsifyData
+     * @param string $salsifyField
+     * @param array $dbFieldConfig
      * @param string $dbField
      * @param string $class
      *
      * @return mixed
      * @throws \Exception
      */
-    private function handleType($type, $data, $dataField, $config, $dbField, $class)
+    private function handleType($type, $salsifyData, $salsifyField, $dbFieldConfig, $dbField, $class)
     {
         if ($this->hasMethod("handle{$type}Type")) {
-            return $this->{"handle{$type}Type"}($data, $dataField, $config, $dbField, $class);
+            return $this->{"handle{$type}Type"}($salsifyData, $salsifyField, $dbFieldConfig, $dbField, $class);
         } else {
             ImportTask::echo("{$type} is not a valid type. skipping field {$dbField}.");
         }
         return '';
+    }
+
+    /**
+     * @param DataObject $object
+     * @param string $dbField
+     * @param mixed $value
+     *
+     * @throws \Exception
+     */
+    private function writeValue($object, $dbField, $value) {
+        $isManyRelation = array_key_exists($dbField, $object->config()->get('has_many')) ||
+            array_key_exists($dbField, $object->config()->get('many_many')) ||
+            array_key_exists($dbField, $object->config()->get('belongs_many_many'));
+
+        if (!$isManyRelation) {
+            $object->$dbField = $value;
+            return;
+        }
+
+        if (!$object->exists()) {
+            $object->write();
+        }
+
+        if (is_array($value)) {
+            $object->{$dbField}()->addMany($value);
+            return;
+        }
+
+        $object->{$dbField}()->add($value);
     }
 
     /**
