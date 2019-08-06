@@ -32,7 +32,7 @@ class ManyHandler extends Extension
      */
     public function handleManyRelationType($data, $dataField, $config, $dbField, $class)
     {
-        if (!array_key_exists('relation', $config) || !is_array($config['relation']) ) {
+        if (!array_key_exists('relation', $config) || !is_array($config['relation'])) {
             return [];
         }
 

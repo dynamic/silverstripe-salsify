@@ -222,7 +222,8 @@ class Mapper extends Service
      *
      * @throws \Exception
      */
-    private function writeValue($object, $dbField, $value) {
+    private function writeValue($object, $dbField, $value)
+    {
         $isManyRelation = array_key_exists($dbField, $object->config()->get('has_many')) ||
             array_key_exists($dbField, $object->config()->get('many_many')) ||
             array_key_exists($dbField, $object->config()->get('belongs_many_many'));

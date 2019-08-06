@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler\Relation;
 
-use \SilverStripe\Core\Extension;
+use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -31,7 +31,7 @@ class HasOneHandler extends Extension
      */
     public function handleHasOneHandlerType($data, $dataField, $config, $dbField, $class)
     {
-        if (!array_key_exists('relation', $config) || !is_array($config['relation']) ) {
+        if (!array_key_exists('relation', $config) || !is_array($config['relation'])) {
             return preg_match('/ID$/', $dbField) ? 0 : null;
         }
 
