@@ -35,6 +35,18 @@ class ManyHandler extends Extension
         if (!array_key_exists('relation', $config) || !is_array($config['relation']) ) {
             return [];
         }
-        return [];
+
+        $fieldData = $data[$dataField];
+        $related = [];
+
+        foreach ($fieldData as $entry) {
+            $entryData = array_merge($data, [
+                $dataField => $entry
+            ]);
+            $relationConfig = $config['relation'];
+            $relatedClass = array_key_first($relationConfig);
+            $related[] = $this->owner->mapToObject($relatedClass, $relationConfig[$relatedClass], $entryData);
+        }
+        return $related;
     }
 }

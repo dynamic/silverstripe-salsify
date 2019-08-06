@@ -105,6 +105,9 @@ class Mapper extends Service
             $type = $this->getFieldType($salsifyField);
 
             if (is_array($salsifyField)) {
+                if (!array_key_exists('salsifyField', $salsifyField)) {
+                    continue;
+                }
                 $field = $salsifyField['salsifyField'];
             }
 

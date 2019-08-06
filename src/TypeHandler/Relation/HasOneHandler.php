@@ -32,11 +32,12 @@ class HasOneHandler extends Extension
     public function handleHasOneHandlerType($data, $dataField, $config, $dbField, $class)
     {
         if (!array_key_exists('relation', $config) || !is_array($config['relation']) ) {
-            $relationConfig = $config['relation'];
-            $relatedClass = array_key_first($relationConfig);
-            $object = $this->owner->mapToObject($relatedClass, $relationConfig[$relatedClass], $data);
-            return preg_match('/ID$/', $dbField) ? $object->ID : $object;
+            return preg_match('/ID$/', $dbField) ? 0 : null;
         }
-        return preg_match('/ID$/', $dbField) ? 0 : null;
+
+        $relationConfig = $config['relation'];
+        $relatedClass = array_key_first($relationConfig);
+        $object = $this->owner->mapToObject($relatedClass, $relationConfig[$relatedClass], $data);
+        return preg_match('/ID$/', $dbField) ? $object->ID : $object;
     }
 }
