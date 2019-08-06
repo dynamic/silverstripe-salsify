@@ -55,7 +55,7 @@ class MapperTest extends SapphireTest
                     ],
                     'Image' => [
                         'salsifyField' => 'custom-field-image',
-                        'type' => 'IMAGE',
+                        'type' => 'Image',
                     ],
                     'Unknown' => [
                         'unique' => true,

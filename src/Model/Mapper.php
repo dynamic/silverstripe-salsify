@@ -111,6 +111,10 @@ class Mapper extends Service
                 $field = $salsifyField['salsifyField'];
             }
 
+            if (!array_key_exists($field, $data)) {
+                continue;
+            }
+
             $value = $this->handleType($type, $data, $field, $salsifyField, $dbField, $class);
             $this->writeValue($object, $dbField, $value);
         }
