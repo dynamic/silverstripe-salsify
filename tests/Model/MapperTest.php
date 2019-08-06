@@ -4,6 +4,7 @@ namespace Dynamic\Salsify\Tests\Model\Mapper;
 
 use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
+use Dynamic\Salsify\Tests\TestOnly\ImageExtension;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
 use Exception;
 use SilverStripe\Assets\Image;
@@ -53,9 +54,13 @@ class MapperTest extends SapphireTest
                         'salsifyField' => 'custom-field-seller',
                         'unique' => false,
                     ],
-                    'Image' => [
-                        'salsifyField' => 'custom-field-image',
-                        'type' => 'IMAGE',
+                    'MainImage' => [
+                        'salsifyField' => 'custom-field-front-image',
+                        'type' => 'Image',
+                    ],
+                    'Images' => [
+                        'salsifyField' => 'custom-field-images',
+                        'type' => 'ManyImages',
                     ],
                     'Unknown' => [
                         'unique' => true,
@@ -108,7 +113,8 @@ class MapperTest extends SapphireTest
         $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
         $mapper->map();
         $this->assertEquals(7, MappedObject::get()->count());
-        $this->assertEquals(7, Image::get()->count());
-        $this->assertTrue(MappedObject::get()->first()->ImageID > 0);
+        $this->assertEquals(9, Image::get()->count());
+        $this->assertEquals(2, MappedObject::get()->find('Unique', '3')->Images()->count());
+        $this->assertTrue(MappedObject::get()->first()->MainImageID > 0);
     }
 }

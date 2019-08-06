@@ -1,186 +1,210 @@
 [
   {
-    "header":{
-      "version":"2",
-      "scope":[
+    "header": {
+      "version": "2",
+      "scope": [
         "all"
       ]
     }
   },
   {
-    "attributes":[
+    "attributes": [
     ]
   },
   {
-    "attribute_values":[
+    "attribute_values": [
       {
-        "salsify:id":"Single Package",
-        "salsify:attribute_id":"relation_type",
-        "salsify:name":"Single Package",
-        "salsify:created_at":"2018-07-10T20:51:25.920Z",
-        "salsify:updated_at":"2018-07-10T20:51:25.920Z"
+        "salsify:id": "Single Package",
+        "salsify:attribute_id": "relation_type",
+        "salsify:name": "Single Package",
+        "salsify:created_at": "2018-07-10T20:51:25.920Z",
+        "salsify:updated_at": "2018-07-10T20:51:25.920Z"
       }
     ]
   },
   {
-    "digital_assets":[
+    "digital_assets": [
       {
-        "salsify:id":"DA-001",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/240px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg",
-        "salsify:name":"Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"jpg"
+        "salsify:id": "DA-001-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/240px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg",
+        "salsify:name": "Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpg"
       },
       {
-        "salsify:id":"DA-002",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Brooklyn_Bridge_Postdlf.jpg/330px-Brooklyn_Bridge_Postdlf.tif",
-        "salsify:name":"Brooklyn_Bridge_Postdlf.tif",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"tiff"
+        "salsify:id": "DA-002-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Brooklyn_Bridge_Postdlf.jpg/330px-Brooklyn_Bridge_Postdlf.tif",
+        "salsify:name": "Brooklyn_Bridge_Postdlf.tif",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "tiff"
       },
       {
-        "salsify:id":"DA-003",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Statue_of_Liberty_7.jpg/250px-Statue_of_Liberty_7.jpg",
-        "salsify:name":"Statue_of_Liberty_7.jpg",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"jpg"
+        "salsify:id": "DA-002-002",
+        "salsify:url": "https://ae01.alicdn.com/kf/HTB19aNwLXXXXXbKXpXXq6xXFXXXA/Manhattan-Bridge-New-York-City-black-and-white-mural-wallpaper-bedroom-living-room-TV-background-wall.jpg",
+        "salsify:name": "Manhattan-Bridge-New-York-City-black-and-white.jpg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpg"
       },
       {
-        "salsify:id":"DA-004",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/The_Metropolitan_Museum_of_Art_Logo.svg/150px-The_Metropolitan_Museum_of_Art_Logo.svg.png",
-        "salsify:name":"The_Metropolitan_Museum_of_Art_Logo.png",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"png"
+        "salsify:id": "DA-002-003",
+        "salsify:url": "http://www.4usky.com/data/out/14/164101780-brooklyn-bridge-wallpapers.jpg",
+        "salsify:name": "brooklyn-bridge-lights.jpg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpg"
       },
       {
-        "salsify:id":"DA-005",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/General_Grant_National_Memorial_New_York_November_2016_003.jpg/250px-General_Grant_National_Memorial_New_York_November_2016_003.jpg",
-        "salsify:name":"General_Grant_National_Memorial_New_York_November_2016_003.jpg",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"jpg"
+        "salsify:id": "DA-003-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Statue_of_Liberty_7.jpg/250px-Statue_of_Liberty_7.jpg",
+        "salsify:name": "Statue_of_Liberty_7.jpg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpg"
       },
       {
-        "salsify:id":"DA-006",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg/250px-Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg",
-        "salsify:name":"250px-Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"jpg"
+        "salsify:id": "DA-004-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/The_Metropolitan_Museum_of_Art_Logo.svg/150px-The_Metropolitan_Museum_of_Art_Logo.svg.png",
+        "salsify:name": "The_Metropolitan_Museum_of_Art_Logo.png",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "png"
       },
       {
-        "salsify:id":"DA-007",
-        "salsify:url":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/250px-Taj_Mahal_%28Edited%29.jpeg",
-        "salsify:name":"250px-Taj_Mahal_%28Edited%29.jpeg",
-        "salsify:created_at":"2018-11-12T17:19:29.454Z",
-        "salsify:updated_at":"2018-11-12T17:20:10.847Z",
-        "salsify:asset_resource_type":"image",
-        "salsify:bytes":13653240,
-        "salsify:format":"jpeg"
+        "salsify:id": "DA-005-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/General_Grant_National_Memorial_New_York_November_2016_003.jpg/250px-General_Grant_National_Memorial_New_York_November_2016_003.jpg",
+        "salsify:name": "General_Grant_National_Memorial_New_York_November_2016_003.jpg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpg"
+      },
+      {
+        "salsify:id": "DA-006-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg/250px-Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg",
+        "salsify:name": "250px-Burg_Karlstein_-_Karl%C5%A1tejn_-_panoramio.jpg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpg"
+      },
+      {
+        "salsify:id": "DA-007-001",
+        "salsify:url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/250px-Taj_Mahal_%28Edited%29.jpeg",
+        "salsify:name": "250px-Taj_Mahal_%28Edited%29.jpeg",
+        "salsify:created_at": "2018-11-12T17:19:29.454Z",
+        "salsify:updated_at": "2018-11-12T17:20:10.847Z",
+        "salsify:asset_resource_type": "image",
+        "salsify:bytes": 13653240,
+        "salsify:format": "jpeg"
       }
     ]
   },
   {
-    "products":[
+    "products": [
       {
         "salsify:id": "00000000000001",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-001",
-        "custom-field-unique":"2",
-        "custom-field-title":"Eiffel Tower",
-        "custom-field-seller":"Victor Lustig",
-        "custom-field-image":"DA-001"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-001",
+        "custom-field-unique": "2",
+        "custom-field-title": "Eiffel Tower",
+        "custom-field-seller": "Victor Lustig",
+        "custom-field-front-image": "DA-001-001"
       },
       {
         "salsify:id": "00000000000002",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-002",
-        "custom-field-unique":"3",
-        "custom-field-title":"Brooklyn Bridge",
-        "custom-field-seller":"William McCloundy",
-        "custom-field-image":"DA-002"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-002",
+        "custom-field-unique": "3",
+        "custom-field-title": "Brooklyn Bridge",
+        "custom-field-seller": "William McCloundy",
+        "custom-field-front-image": "DA-002-001",
+        "custom-field-images": [
+          "DA-002-002",
+          "DA-002-003"
+        ]
       },
       {
         "salsify:id": "00000000000003",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-003",
-        "custom-field-unique":"5",
-        "custom-field-title":"Statue of Liberty",
-        "custom-field-seller":"George C. Parker",
-        "custom-field-image":"DA-003"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-003",
+        "custom-field-unique": "5",
+        "custom-field-title": "Statue of Liberty",
+        "custom-field-seller": "George C. Parker",
+        "custom-field-front-image": "DA-003-001"
       },
       {
         "salsify:id": "00000000000004",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-004",
-        "custom-field-unique":"7",
-        "custom-field-title":"Metropolitan Museum of Art",
-        "custom-field-seller":"George C. Parker",
-        "custom-field-image":"DA-004"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-004",
+        "custom-field-unique": "7",
+        "custom-field-title": "Metropolitan Museum of Art",
+        "custom-field-seller": "George C. Parker",
+        "custom-field-front-image": "DA-004-001"
       },
       {
         "salsify:id": "00000000000005",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-005",
-        "custom-field-unique":"11",
-        "custom-field-title":"Grant's Tomb",
-        "custom-field-seller":"George C. Parker",
-        "custom-field-image":"DA-005"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-005",
+        "custom-field-unique": "11",
+        "custom-field-title": "Grant's Tomb",
+        "custom-field-seller": "George C. Parker",
+        "custom-field-front-image": "DA-005-001"
       },
       {
         "salsify:id": "00000000000006",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-006",
-        "custom-field-unique":"13",
-        "custom-field-title":"Karlstejn Castle",
-        "custom-field-seller":"Harry Jelinek",
-        "custom-field-image":"DA-006"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-006",
+        "custom-field-unique": "13",
+        "custom-field-title": "Karlstejn Castle",
+        "custom-field-seller": "Harry Jelinek",
+        "custom-field-front-image": "DA-006-001"
       },
       {
         "salsify:id": "00000000000007",
         "salsify:created_at": "2018-07-13T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
-        "salsify:version":1,
-        "salsify:profile_asset_id":null,
-        "salsify:system_id":"XXXX-007",
-        "custom-field-unique":"17",
-        "custom-field-title":"Taj Mahal",
-        "custom-field-seller":"Natwarlal",
-        "custom-field-image":"DA-007"
+        "salsify:version": 1,
+        "salsify:profile_asset_id": null,
+        "salsify:system_id": "XXXX-007",
+        "custom-field-unique": "17",
+        "custom-field-title": "Taj Mahal",
+        "custom-field-seller": "Natwarlal",
+        "custom-field-front-image": "DA-007-001"
       }
     ]
   }
