@@ -34,6 +34,13 @@ class MappedObject extends DataObject implements TestOnly
      * @var array
      */
     private static $has_one = [
-        'Image' => Image::class,
+        'MainImage' => Image::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $many_many = [
+        'Images' => Image::class,
     ];
 }

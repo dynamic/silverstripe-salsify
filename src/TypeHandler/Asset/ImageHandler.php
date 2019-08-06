@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
+use Dynamic\Salsify\Task\ImportTask;
 use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
 
@@ -17,7 +18,8 @@ class ImageHandler extends AssetHandler
      * @var array
      */
     private static $field_types = [
-        'Image'
+        'Image',
+        'ManyImages',
     ];
 
     /**
@@ -71,5 +73,28 @@ class ImageHandler extends AssetHandler
         }
 
         return $string;
+    }
+
+    /**
+     * @param $data
+     * @param $dataField
+     * @param $config
+     * @param $dbField
+     * @param string |DataObject $class
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function handleManyImagesType($data, $dataField, $config, $dbField, $class)
+    {
+        $files = [];
+        $fieldData = $data[$dataField];
+        foreach ($fieldData as $fileID) {
+            $entryData = array_merge($data, [
+                $dataField => $fileID
+            ]);
+            $files[] = $this->owner->handleImageType($entryData, $dataField, $config, $dbField, $class);
+        }
+        return $files;
     }
 }
