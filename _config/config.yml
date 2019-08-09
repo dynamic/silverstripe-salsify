@@ -14,8 +14,12 @@ Dynamic\Salsify\Model\Mapper:
 
 SilverStripe\Assets\File:
   extensions:
-    - Dyanmic\Salsify\ORM\FileExtension
+    - Dyanmic\Salsify\ORM\SalsifyIDExtension
 
 SilverStripe\AssetAdmin\Forms\FileFormFactory:
   extensions:
     - Dyanmic\Salsify\ORM\AssetFormFactoryExtension
+
+SilverStripe\Admin\LeftAndMain:
+  extensions:
+    - Dyanmic\Salsify\ORM\SalsifyFetchExtension

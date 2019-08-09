@@ -38,9 +38,10 @@ class Fetcher extends Service
     /**
      * Importer constructor.
      * @param string $importerKey
+     * @param bool $noChannel
      * @throws \Exception
      */
-    public function __construct($importerKey)
+    public function __construct($importerKey, $noChannel = false)
     {
         parent::__construct($importerKey);
 
@@ -48,7 +49,7 @@ class Fetcher extends Service
             throw new Exception('An API key needs to be provided');
         }
 
-        if (!$this->config()->get('channel')) {
+        if ($noChannel === false && !$this->config()->get('channel')) {
             throw new Exception('A fetcher needs a channel');
         }
     }

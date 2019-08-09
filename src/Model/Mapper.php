@@ -13,10 +13,11 @@ use SilverStripe\ORM\DataObject;
  */
 class Mapper extends Service
 {
+
     /**
      * @var
      */
-    private $file;
+    private $file = null;
 
     /**
      * @var JsonMachine
@@ -44,16 +45,18 @@ class Mapper extends Service
      * @param $file
      * @throws \Exception
      */
-    public function __construct($importerKey, $file)
+    public function __construct($importerKey, $file = null)
     {
         parent::__construct($importerKey);
         if (!$this->config()->get('mapping')) {
             throw  new Exception('A Mapper needs a mapping');
         }
 
-        $this->file = $file;
-        $this->productStream = JsonMachine::fromFile($file, '/4/products');
-        $this->resetAssetStream();
+        if ($file !== null) {
+            $this->file = $file;
+            $this->productStream = JsonMachine::fromFile($file, '/4/products');
+            $this->resetAssetStream();
+        }
     }
 
     /**
@@ -255,5 +258,13 @@ class Mapper extends Service
     public function getAssetStream()
     {
         return $this->assetStream;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFile()
+    {
+        return $this->file !== null;
     }
 }

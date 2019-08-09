@@ -20,8 +20,8 @@ class AssetFormFactoryExtension extends Extension
     public function updateFormFields(FieldList $fields, $controller, $formName, $context)
     {
         $record = isset($context['Record']) ? $context['Record'] : null;
-        if ($record && $record->SalisfyID) {
-            $fields->insertAfter('LastEdited', ReadonlyField::create('SalisfyID', 'Salsify ID'));
+        if ($record && $record->SalsifyID) {
+            $fields->insertAfter('LastEdited', ReadonlyField::create('SalsifyID', 'Salsify ID'));
         }
     }
 }
