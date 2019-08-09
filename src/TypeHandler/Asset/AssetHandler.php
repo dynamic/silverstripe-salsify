@@ -23,9 +23,9 @@ class AssetHandler extends Extension
      */
     protected function fetchAsset($id)
     {
-        $apiKey = $this->owner->getFetcherConfig()->get('apiKey');//Config::inst()->get(Fetcher::class, 'apiKey');
-        $timeout = $this->owner->getFetcherConfig()->get('timeout');
-        $orgID = $this->owner->getFetcherConfig()->get('organizationID');
+        $apiKey = $this->owner->config()->get('apiKey');//Config::inst()->get(Fetcher::class, 'apiKey');
+        $timeout = $this->owner->config()->get('timeout');
+        $orgID = $this->owner->config()->get('organizationID');
 
         $url = "v1/orgs/{$orgID}/digital_assets/{$id}";
 

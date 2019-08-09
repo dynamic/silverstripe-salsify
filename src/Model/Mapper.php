@@ -13,10 +13,6 @@ use SilverStripe\ORM\DataObject;
  */
 class Mapper extends Service
 {
-    /**
-     * @var \SilverStripe\Core\Config\Config_ForClass
-     */
-    private $fetcherConfig;
 
     /**
      * @var
@@ -46,32 +42,21 @@ class Mapper extends Service
     /**
      * Mapper constructor.
      * @param string $importerKey
-     * @param \SilverStripe\Core\Config\Config_ForClass $fetcherConfig
      * @param $file
      * @throws \Exception
      */
-    public function __construct($importerKey, $fetcherConfig = null, $file = null)
+    public function __construct($importerKey, $file = null)
     {
         parent::__construct($importerKey);
         if (!$this->config()->get('mapping')) {
             throw  new Exception('A Mapper needs a mapping');
         }
 
-        $this->fetcherConfig = $fetcherConfig;
-
         if ($file !== null) {
             $this->file = $file;
             $this->productStream = JsonMachine::fromFile($file, '/4/products');
             $this->resetAssetStream();
         }
-    }
-
-    /**
-     * @return \SilverStripe\Core\Config\Config_ForClass|null
-     */
-    public function getFetcherConfig()
-    {
-        return $this->fetcherConfig;
     }
 
     /**

@@ -111,8 +111,18 @@ trait InstanceCreator
     {
         $this->mapper = Injector::inst()->createWithArgs($this->getMapperInstanceString(), [
             'importerKey' => $this->getImporterKey(),
-            'fetcherConfig' => $this->getFetcher()->config(),
             'file' => property_exists($this, 'file') ? $this->file : null,
         ]);
+
+        $configKeys = [
+            'apiKey',
+            'timeout',
+            'organizationID',
+        ];
+        for ($i = 0; $i < count($configKeys); $i++) {
+            $currentKey = $configKeys[$i];
+            $fetcherConfig = $this->getFetcher()->config()->get($currentKey);
+            $this->mapper->config()->set($currentKey, $fetcherConfig);
+        }
     }
 }

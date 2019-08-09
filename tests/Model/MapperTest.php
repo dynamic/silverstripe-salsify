@@ -82,7 +82,7 @@ class MapperTest extends SapphireTest
     {
         Config::modify()->remove(Mapper::class . '.' . $this->importerKey, 'mapping');
         $this->expectException(Exception::class);
-        new Mapper($this->importerKey, null,__DIR__ . '/../data.json');
+        new Mapper($this->importerKey,__DIR__ . '/../data.json');
     }
 
     /**
@@ -90,7 +90,7 @@ class MapperTest extends SapphireTest
      */
     public function testConstructor()
     {
-        $mapper = new Mapper($this->importerKey, null,__DIR__ . '/../data.json');
+        $mapper = new Mapper($this->importerKey,__DIR__ . '/../data.json');
         $this->assertInstanceOf(Mapper::class, $mapper);
     }
 
@@ -101,7 +101,7 @@ class MapperTest extends SapphireTest
     {
         $this->assertEquals(1, MappedObject::get()->count());
 
-        $mapper = new Mapper($this->importerKey, null,__DIR__ . '/../data.json');
+        $mapper = new Mapper($this->importerKey,__DIR__ . '/../data.json');
         $mapper->map();
 
         // check to see if added
@@ -110,7 +110,7 @@ class MapperTest extends SapphireTest
         $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->Seller);
 
         // tests for unchanged
-        $mapper = new Mapper($this->importerKey, null,__DIR__ . '/../data.json');
+        $mapper = new Mapper($this->importerKey,__DIR__ . '/../data.json');
         $mapper->map();
         $this->assertEquals(7, MappedObject::get()->count());
         $this->assertEquals(9, Image::get()->count());
