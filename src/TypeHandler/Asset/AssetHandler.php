@@ -5,7 +5,6 @@ namespace Dynamic\Salsify\TypeHandler\Asset;
 use Dynamic\Salsify\Model\Fetcher;
 use GuzzleHttp\Client;
 use SilverStripe\Assets\File;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 
@@ -24,9 +23,9 @@ class AssetHandler extends Extension
      */
     protected function fetchAsset($id)
     {
-        $apiKey = Config::inst()->get(Fetcher::class, 'apiKey');
-        $timeout = Config::inst()->get(Fetcher::class, 'timeout');
-        $orgID = Config::inst()->get(Fetcher::class, 'organizationID');
+        $apiKey = $this->owner->getFetcherConfig()->get('apiKey');//Config::inst()->get(Fetcher::class, 'apiKey');
+        $timeout = $this->owner->getFetcherConfig()->get('timeout');
+        $orgID = $this->owner->getFetcherConfig()->get('organizationID');
 
         $url = "v1/orgs/{$orgID}/digital_assets/{$id}";
 
@@ -78,7 +77,7 @@ class AssetHandler extends Extension
     protected function findOrCreateFile($id, $class = File::class)
     {
         /** @var File|\Dyanmic\Salsify\ORM\SalsifyIDExtension $file */
-        if ($file = $class::get()->find('SalisfyID', $id)) {
+        if ($file = $class::get()->find('SalsifyID', $id)) {
             return $file;
         }
 

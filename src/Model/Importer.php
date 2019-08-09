@@ -45,7 +45,7 @@ class Importer
     /**
      * @return string
      */
-    protected function getImporterKey()
+    public function getImporterKey()
     {
         return $this->importerKey;
     }

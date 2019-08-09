@@ -51,7 +51,7 @@ trait InstanceCreator
         return Injector::inst()->has($className . '.' . $this->getImporterKey());
     }
 
-    protected function createServices()
+    public function createServices()
     {
         if (!Injector::inst()->has($this->getMapperInstanceString())) {
             Injector::inst()->load([
@@ -111,6 +111,7 @@ trait InstanceCreator
     {
         $this->mapper = Injector::inst()->createWithArgs($this->getMapperInstanceString(), [
             'importerKey' => $this->getImporterKey(),
+            'fetcherConfig' => $this->getFetcher()->config(),
             'file' => property_exists($this, 'file') ? $this->file : null,
         ]);
     }
