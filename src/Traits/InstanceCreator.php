@@ -24,7 +24,7 @@ trait InstanceCreator
     /**
      * @return string
      */
-    protected abstract function getImporterKey();
+    abstract protected function getImporterKey();
 
     /**
      * @return string
