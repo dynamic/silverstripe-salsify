@@ -57,7 +57,7 @@ class AssetHandler extends Extension
         }
 
         if ($this->owner->hasFile() === false) {
-           return $this->fetchAsset($id);
+            return $this->fetchAsset($id);
         }
 
         $asset = false;

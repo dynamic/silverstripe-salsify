@@ -9,7 +9,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\Core\Injector\Injector;
 
 /**
  * Class Importer
@@ -46,7 +45,7 @@ class Importer
     /**
      * @return string
      */
-    public function getImporterKey()
+    protected function getImporterKey()
     {
         return $this->importerKey;
     }
