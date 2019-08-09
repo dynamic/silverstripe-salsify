@@ -19,6 +19,12 @@ composer require dynamic/silverstripe-salsify
 See [License](license.md)
 
 ## Example configuration
+### Extensions
+#### SalsifyIDExtension
+It is recommended to add `Dyanmic\Salsify\ORM\SalsifyIDExtension` as an extension of any object being mapped to.
+It will add a `SalsifyID` and `SalsifyUpdatedAt` field that can be mapped to.
+The `SalsifyID` field is used in single object updates.
+
 ### Importer
 Importers will run fetchers and mappers. Each importer needs to be passed an importerKey to its constructor.
 For the rest of the readme `example` will be used for the services.
@@ -116,7 +122,7 @@ To get an image or file from salsify to map to an object a type needs to be spec
 Types can be `RAW`, `FILE`, and `IMAGE`.
 
 ```yaml
-Dynamic\Salsify\Model\Mapper:
+Dynamic\Salsify\Model\Mapper.example:
   example:
     mapping:
       \Page:
@@ -137,6 +143,29 @@ Dynamic\Salsify\Model\Mapper.example:
 
 If the mapping is specified as an image and it is not a valid image extension, 
 salsify will be used to try and convert the file into a png.
+
+### Single Object Import
+Adding a re-fetch button in the cms requires some configuration. 
+An organization is required to fetch a single product.
+A `SalsifyID` field is also required for single object imports.
+Only a mapping service with the name of `single` is required and will act just like a normal mapper config; however, a fetcher service config can also be defined to specify the organization.
+
+```yaml
+Dynamic\Salsify\Model\Fetcher.single:
+  organizationID: 'org id'
+
+Dynamic\Salsify\Model\Mapper.single:
+  mapping:
+    \Page:
+      SalsifyID:
+        salsifyField: 'salsify:id'
+        unique: true
+      SKU: SKU
+      Title: GTIN Name
+      FrontImage:
+        salsifyField: Front Image
+        type: Image
+```
 
 ## Maintainers
  * Dynamic <dev@dynamicagency.com>

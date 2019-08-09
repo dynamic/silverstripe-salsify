@@ -5,10 +5,9 @@ namespace Dyanmic\Salsify\ORM;
 use Dynamic\Salsify\Model\Fetcher;
 use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
+use Dynamic\Salsify\Traits\InstanceCreator;
 use GuzzleHttp\Client;
 use SilverStripe\Admin\LeftAndMainExtension;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Security;
@@ -20,11 +19,12 @@ use SilverStripe\Security\Security;
  */
 class SalsifyFetchExtension extends LeftAndMainExtension
 {
+    use InstanceCreator;
 
     /**
-     * @var string
+     * @var bool
      */
-    const MAPPER_INSTANCE = Mapper::class . '.single';
+    private $noChannel = true;
 
     /**
      * @var array
@@ -33,25 +33,36 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         'salsifyFetch',
     ];
 
+    /**
+     * @return string
+     */
+    protected function getImporterKey()
+    {
+        return 'single';
+    }
+
+    /**
+     *
+     */
     public function onBeforeInit()
     {
-        if (!Injector::inst()->has($this::MAPPER_INSTANCE)) {
-            Injector::inst()->load([
-                $this::MAPPER_INSTANCE => [
-                    'class' => Mapper::class,
-                ],
-            ]);
-        }
+        $this->createServices();
     }
 
     /**
      * @return boolean
+     * @throws \Exception
      */
     public function canFetchSalsify()
     {
         $className = $this->owner->currentPage()->getClassName();
 
-        if (Injector::inst()->has($this::MAPPER_INSTANCE) && $this->configContainsMapping($className)) {
+        // Only allow when product has a salsify id and has a single mapping config
+        if ($this->owner->currentPage()->SalsifyID &&
+            $this->hasService(Mapper::class) &&
+            $this->configContainsMapping($className) &&
+            $this->getFetcher()->config()->get('organizationID')
+        ) {
             return true;
         }
         return false;
@@ -61,10 +72,11 @@ class SalsifyFetchExtension extends LeftAndMainExtension
      * @param string $className
      *
      * @return boolean
+     * @throws \Exception
      */
     private function configContainsMapping($className)
     {
-        if (!Config::forClass($this::MAPPER_INSTANCE)->get('mapping')) {
+        if (!$this->getMapper()->config()->get('mapping')) {
             return false;
         }
 
@@ -78,10 +90,11 @@ class SalsifyFetchExtension extends LeftAndMainExtension
     /**
      * @param string $className
      * @return bool|array
+     * @throws \Exception
      */
     private function getClassMapping($className)
     {
-        $mapping = Config::forClass($this::MAPPER_INSTANCE)->get('mapping');
+        $mapping = $this->getMapper()->config()->get('mapping');
         if (array_key_exists($className, $mapping)) {
             return $mapping[$className];
         }
@@ -126,12 +139,14 @@ class SalsifyFetchExtension extends LeftAndMainExtension
     /**
      * @param string $salsifyID
      * @return array|NULL
+     * @throws \Exception
      */
     private function fetchProduct($salsifyID)
     {
-        $apiKey = Config::inst()->get(Fetcher::class, 'apiKey');
-        $timeout = Config::inst()->get(Fetcher::class, 'timeout');
-        $orgID = Config::inst()->get(Fetcher::class, 'organizationID');
+
+        $apiKey = $this->getFetcher()->config()->get('apiKey');
+        $timeout = $this->getFetcher()->config()->get('timeout');
+        $orgID = $this->getFetcher()->config()->get('organizationID');
 
         $url = "v1/orgs/{$orgID}/products/{$salsifyID}";
 
@@ -157,11 +172,10 @@ class SalsifyFetchExtension extends LeftAndMainExtension
      */
     private function mapData($record, $data)
     {
-        /** @var Mapper $mapper */
-        $mapper = Injector::inst()->createWithArgs($this::MAPPER_INSTANCE, [
-            'importerKey' => 'single',
-        ]);
-
-        $mapper->mapToObject($record->getClassName(), $this->getClassMapping($record->getClassName()), $data);
+        $this->getMapper()->mapToObject(
+            $record->getClassName(),
+            $this->getClassMapping($record->getClassName()),
+            $data
+        );
     }
 }
