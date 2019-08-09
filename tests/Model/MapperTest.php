@@ -82,7 +82,7 @@ class MapperTest extends SapphireTest
     {
         Config::modify()->remove(Mapper::class . '.' . $this->importerKey, 'mapping');
         $this->expectException(Exception::class);
-        new Mapper($this->importerKey , __DIR__ . '/../data.json');
+        new Mapper($this->importerKey, __DIR__ . '/../data.json');
     }
 
     /**
