@@ -69,7 +69,7 @@ class ImportTask extends BuildTask
     /**
      * @param $string
      */
-    public static function echo($string)
+    public static function output($string)
     {
         if (static::config()->get('output')) {
             echo $string . static::$lineEnding;

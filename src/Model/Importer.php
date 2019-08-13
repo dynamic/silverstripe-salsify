@@ -80,6 +80,7 @@ class Importer
 
     /**
      * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function run()
     {
@@ -90,36 +91,36 @@ class Importer
         /** @var string|Configurable $mapperService */
         $mapperService = Mapper::class . '.' . $this->getImporterKey();
 
-        ImportTask::echo('-------------------');
-        ImportTask::echo('Now running import for ' . $this->getImporterKey());
+        ImportTask::output('-------------------');
+        ImportTask::output('Now running import for ' . $this->getImporterKey());
 
         if (!Config::forClass($fetcherService)->get('apiKey') &&
             !Config::forClass(Fetcher::class)->get('apiKey')) {
-            ImportTask::echo('No api key found');
+            ImportTask::output('No api key found');
             return;
         }
 
         if (!Config::forClass($fetcherService)->get('channel')) {
-            ImportTask::echo('No channel found');
+            ImportTask::output('No channel found');
             return;
         }
 
         if (!Config::forClass($mapperService)->get('mapping')) {
-            ImportTask::echo('No mappings found');
+            ImportTask::output('No mappings found');
             return;
         }
 
         $fetcher = $this->getFetcher();
 
         $fetcher->startExportRun();
-        ImportTask::echo('Started Salsify export.');
+        ImportTask::output('Started Salsify export.');
         $fetcher->waitForExportRunToComplete();
-        ImportTask::echo('Salsify export complete');
+        ImportTask::output('Salsify export complete');
 
         $this->file = $fetcher->getExportUrl();
 
-        ImportTask::echo('Staring data import');
-        ImportTask::echo('-------------------');
+        ImportTask::output('Staring data import');
+        ImportTask::output('-------------------');
         $this->getMapper()->map();
     }
 }

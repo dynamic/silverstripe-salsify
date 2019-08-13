@@ -144,6 +144,10 @@ Dynamic\Salsify\Model\Mapper.example:
 If the mapping is specified as an image and it is not a valid image extension, 
 salsify will be used to try and convert the file into a png.
 
+#### Advanced
+##### [Custom Field Types](docs/en/custom-types.md)
+##### [Modify Field Data](docs/en/mapper-field-modifier.md)
+
 ### Single Object Import
 Adding a re-fetch button in the cms requires some configuration. 
 An organization is required to fetch a single product.
@@ -165,6 +169,15 @@ Dynamic\Salsify\Model\Mapper.single:
       FrontImage:
         salsifyField: Front Image
         type: Image
+```
+
+To use the single object mapper as a normal importer, when running the task, an `Importer` service.
+```yaml
+SilverStripe\Core\Injector\Injector:
+  Dynamic\Salsify\Model\Importer.single:
+    class: Dynamic\Salsify\Model\Importer
+    constructor:
+      importerKey: single
 ```
 
 ## Maintainers

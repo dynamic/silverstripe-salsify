@@ -79,7 +79,7 @@ class Mapper extends Service
                 $this->currentUniqueFields = [];
             }
         }
-        ImportTask::echo("Imported and updated $this->importCount products.");
+        ImportTask::output("Imported and updated $this->importCount products.");
     }
 
     /**
@@ -99,26 +99,31 @@ class Mapper extends Service
 
         $firstUniqueKey = array_keys($this->uniqueFields($mappings))[0];
         $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
-        ImportTask::echo("Updating $firstUniqueKey $firstUniqueValue");
+        ImportTask::output("Updating $firstUniqueKey $firstUniqueValue");
 
         foreach ($mappings as $dbField => $salsifyField) {
             $field = $salsifyField;
             $value = null;
             // default to raw
             $type = $this->getFieldType($salsifyField);
+            $objectData = $data;
 
             if (is_array($salsifyField)) {
                 if (!array_key_exists('salsifyField', $salsifyField)) {
                     continue;
                 }
                 $field = $salsifyField['salsifyField'];
+
+                if (array_key_exists('modification', $salsifyField)) {
+                    $objectData = $this->handleModification($salsifyField['modification'], $dbField, $salsifyField, $data);
+                }
             }
 
-            if (!array_key_exists($field, $data)) {
+            if (!array_key_exists($field, $objectData)) {
                 continue;
             }
 
-            $value = $this->handleType($type, $data, $field, $salsifyField, $dbField, $class);
+            $value = $this->handleType($type, $objectData, $field, $salsifyField, $dbField, $class);
             $this->writeValue($object, $dbField, $value);
         }
 
@@ -126,7 +131,7 @@ class Mapper extends Service
             $object->write();
             $this->importCount++;
         } else {
-            ImportTask::echo("$firstUniqueKey $firstUniqueValue was not changed.");
+            ImportTask::output("$firstUniqueKey $firstUniqueValue was not changed.");
         }
         return $object;
     }
@@ -144,8 +149,20 @@ class Mapper extends Service
         // creates a filter
         $filter = [];
         foreach ($uniqueFields as $dbField => $salsifyField) {
+
+            $modifiedData = $data;
+            $fieldMapping = $mappings[$dbField];
+            if (array_key_exists('modification', $fieldMapping)) {
+                $modifiedData = $this->handleModification(
+                    $fieldMapping['modification'],
+                    $dbField,
+                    $fieldMapping,
+                    $modifiedData
+                );
+            }
+
             // adds unique fields to filter
-            $filter[$dbField] = $data[$salsifyField];
+            $filter[$dbField] = $modifiedData[$salsifyField];
         }
 
         return DataObject::get($class)->filter($filter)->first();
@@ -187,6 +204,22 @@ class Mapper extends Service
     }
 
     /**
+     * @param string $mod
+     * @param string $dbField
+     * @param array $config
+     * @param array $data
+     * @return array
+     */
+    private function handleModification($mod, $dbField, $config, $data)
+    {
+        if ($this->hasMethod($mod)) {
+            return $this->{$mod}($dbField, $config, $data);
+        }
+        ImportTask::output("{$mod} is not a valid field modifier. skipping modification for field {$dbField}.");
+        return $data;
+    }
+
+    /**
      * @param string|array $field
      * @return string
      */
@@ -210,15 +243,13 @@ class Mapper extends Service
      * @param string $class
      *
      * @return mixed
-     * @throws \Exception
      */
     private function handleType($type, $salsifyData, $salsifyField, $dbFieldConfig, $dbField, $class)
     {
         if ($this->hasMethod("handle{$type}Type")) {
             return $this->{"handle{$type}Type"}($salsifyData, $salsifyField, $dbFieldConfig, $dbField, $class);
-        } else {
-            ImportTask::echo("{$type} is not a valid type. skipping field {$dbField}.");
         }
+        ImportTask::output("{$type} is not a valid type. skipping field {$dbField}.");
         return '';
     }
 

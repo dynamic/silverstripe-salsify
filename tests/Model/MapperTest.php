@@ -4,7 +4,6 @@ namespace Dynamic\Salsify\Tests\Model\Mapper;
 
 use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
-use Dynamic\Salsify\Tests\TestOnly\ImageExtension;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
 use Exception;
 use SilverStripe\Assets\Image;
