@@ -13,6 +13,7 @@ use SilverStripe\ORM\DataObject;
  * @property string $Unique
  * @property string $Title
  * @property string $Seller
+ * @property string $Modified
  */
 class MappedObject extends DataObject implements TestOnly
 {
@@ -28,6 +29,7 @@ class MappedObject extends DataObject implements TestOnly
         'Unique' => 'Varchar',
         'Title' => 'Varchar',
         'Seller' => 'Varchar',
+        'Modified' => 'Varchar',
     ];
 
     /**

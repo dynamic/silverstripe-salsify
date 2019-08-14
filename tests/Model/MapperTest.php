@@ -5,6 +5,7 @@ namespace Dynamic\Salsify\Tests\Model\Mapper;
 use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
+use Dynamic\Salsify\Tests\TestOnly\MapperModification;
 use Exception;
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
@@ -21,6 +22,15 @@ class MapperTest extends SapphireTest
      * @var string
      */
     protected static $fixture_file = '../fixtures.yml';
+
+    /**
+     * @var array
+     */
+    protected static $required_extensions = [
+        Mapper::class => [
+            MapperModification::class,
+        ],
+    ];
 
     /**
      * @var array
@@ -52,6 +62,10 @@ class MapperTest extends SapphireTest
                     'Seller' => [
                         'salsifyField' => 'custom-field-seller',
                         'unique' => false,
+                    ],
+                    'Modified' => [
+                        'salsifyField' => 'custom-field-modified',
+                        'modification' => 'testModification'
                     ],
                     'MainImage' => [
                         'salsifyField' => 'custom-field-front-image',
@@ -111,7 +125,11 @@ class MapperTest extends SapphireTest
         // tests for unchanged
         $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
         $mapper->map();
+
         $this->assertEquals(7, MappedObject::get()->count());
+        $this->assertEquals('modified TEST_MOD', MappedObject::get()->find('Unique', '2')->Modified);
+
+        // test images
         $this->assertEquals(9, Image::get()->count());
         $this->assertEquals(2, MappedObject::get()->find('Unique', '3')->Images()->count());
         $this->assertTrue(MappedObject::get()->first()->MainImageID > 0);
