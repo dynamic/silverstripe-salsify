@@ -115,7 +115,12 @@ class Mapper extends Service
                 $field = $salsifyField['salsifyField'];
 
                 if (array_key_exists('modification', $salsifyField)) {
-                    $objectData = $this->handleModification($salsifyField['modification'], $dbField, $salsifyField, $data);
+                    $objectData = $this->handleModification(
+                        $salsifyField['modification'],
+                        $dbField,
+                        $salsifyField,
+                        $data
+                    );
                 }
             }
 
@@ -149,9 +154,9 @@ class Mapper extends Service
         // creates a filter
         $filter = [];
         foreach ($uniqueFields as $dbField => $salsifyField) {
-
             $modifiedData = $data;
             $fieldMapping = $mappings[$dbField];
+
             if (array_key_exists('modification', $fieldMapping)) {
                 $modifiedData = $this->handleModification(
                     $fieldMapping['modification'],

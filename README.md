@@ -25,6 +25,12 @@ It is recommended to add `Dyanmic\Salsify\ORM\SalsifyIDExtension` as an extensio
 It will add a `SalsifyID` and `SalsifyUpdatedAt` field that can be mapped to.
 The `SalsifyID` field is used in single object updates.
 
+```yaml
+MyObject:
+  extensions:
+    - Dyanmic\Salsify\ORM\SalsifyIDExtension
+```
+
 ### Importer
 Importers will run fetchers and mappers. Each importer needs to be passed an importerKey to its constructor.
 For the rest of the readme `example` will be used for the services.
