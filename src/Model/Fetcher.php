@@ -100,6 +100,7 @@ class Fetcher extends Service
      * @return array|string
      *
      * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function salsifyRequest($url, $method = 'GET', $postBody = null)
     {
@@ -143,7 +144,7 @@ class Fetcher extends Service
 
     /**
      * @return $this
-     * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function startExportRun()
     {
@@ -155,7 +156,8 @@ class Fetcher extends Service
     }
 
     /**
-     * @throws Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     private function checkExportUrl()
     {
@@ -174,7 +176,8 @@ class Fetcher extends Service
      * Throws an exception if anything funky occurs.
      *
      * @return $this
-     * @throws Exception
+     * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function waitForExportRunToComplete()
     {

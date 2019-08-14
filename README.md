@@ -25,6 +25,12 @@ It is recommended to add `Dyanmic\Salsify\ORM\SalsifyIDExtension` as an extensio
 It will add a `SalsifyID` and `SalsifyUpdatedAt` field that can be mapped to.
 The `SalsifyID` field is used in single object updates.
 
+```yaml
+MyObject:
+  extensions:
+    - Dyanmic\Salsify\ORM\SalsifyIDExtension
+```
+
 ### Importer
 Importers will run fetchers and mappers. Each importer needs to be passed an importerKey to its constructor.
 For the rest of the readme `example` will be used for the services.
@@ -144,6 +150,10 @@ Dynamic\Salsify\Model\Mapper.example:
 If the mapping is specified as an image and it is not a valid image extension, 
 salsify will be used to try and convert the file into a png.
 
+#### Advanced
+##### [Custom Field Types](docs/en/custom-types.md)
+##### [Modify Field Data](docs/en/mapper-field-modifier.md)
+
 ### Single Object Import
 Adding a re-fetch button in the cms requires some configuration. 
 An organization is required to fetch a single product.
@@ -165,6 +175,15 @@ Dynamic\Salsify\Model\Mapper.single:
       FrontImage:
         salsifyField: Front Image
         type: Image
+```
+
+To use the single object mapper as a normal importer, when running the task, an `Importer` service.
+```yaml
+SilverStripe\Core\Injector\Injector:
+  Dynamic\Salsify\Model\Importer.single:
+    class: Dynamic\Salsify\Model\Importer
+    constructor:
+      importerKey: single
 ```
 
 ## Maintainers
