@@ -152,6 +152,7 @@ salsify will be used to try and convert the file into a png.
 
 #### Advanced
 ##### [Custom Field Types](docs/en/custom-types.md)
+##### [Skipping Objects](docs/en/mapper-skip-object.md)
 ##### [Modify Field Data](docs/en/mapper-field-modifier.md)
 
 ### Single Object Import

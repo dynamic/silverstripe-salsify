@@ -114,6 +114,18 @@ class Mapper extends Service
                 }
                 $field = $salsifyField['salsifyField'];
 
+                if (array_key_exists('shouldSkip', $salsifyField)) {
+                    if ($this->handleShouldSkip(
+                        $salsifyField['shouldSkip'],
+                        $dbField,
+                        $salsifyField,
+                        $data
+                    )) {
+                        ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
+                        return null;
+                    };
+                }
+
                 if (array_key_exists('modification', $salsifyField)) {
                     $objectData = $this->handleModification(
                         $salsifyField['modification'],
@@ -222,6 +234,22 @@ class Mapper extends Service
         }
         ImportTask::output("{$mod} is not a valid field modifier. skipping modification for field {$dbField}.");
         return $data;
+    }
+
+    /**
+     * @param string $skipMethod
+     * @param string $dbField
+     * @param array $config
+     * @param array $data
+     * @return boolean
+     */
+    private function handleShouldSkip($skipMethod, $dbField, $config, $data)
+    {
+        if ($this->hasMethod($skipMethod)) {
+            return $this->{$skipMethod}($dbField, $config, $data);
+        }
+        ImportTask::output("{$skipMethod} is not a valid skip test method. skipping skip test for field {$dbField}.");
+        return false;
     }
 
     /**
