@@ -6,6 +6,7 @@ use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
 use Dynamic\Salsify\Tests\TestOnly\MapperModification;
+use Dynamic\Salsify\Tests\TestOnly\MapperSkipper;
 use Exception;
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
@@ -29,6 +30,7 @@ class MapperTest extends SapphireTest
     protected static $required_extensions = [
         Mapper::class => [
             MapperModification::class,
+            MapperSkipper::class,
         ],
     ];
 
@@ -57,6 +59,7 @@ class MapperTest extends SapphireTest
                     'Unique' => [
                         'salsifyField' => 'custom-field-unique',
                         'unique' => true,
+                        'shouldSkip' => 'testSkip',
                     ],
                     'Title' => 'custom-field-title',
                     'Seller' => [
