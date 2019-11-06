@@ -18,17 +18,36 @@ composer require dynamic/silverstripe-salsify
 ## License
 See [License](license.md)
 
+## Running the task
+The task can be run from a browser window or the command line. 
+To run the task in the browser go to `dev/tasks` and find `Import products from salsify` or visit `dev/tasks/SalsifyImportTask`.
+
+It is recommended to use the command line, because the task can easily time out in a browser.
+To run the task in the command line sake must be installed and the command `sake dev/tasks/SalsifyImportTask` must be run.
+
 ## Example configuration
 ### Extensions
 #### SalsifyIDExtension
 It is recommended to add `Dyanmic\Salsify\ORM\SalsifyIDExtension` as an extension of any object being mapped to.
 It will add a `SalsifyID` and `SalsifyUpdatedAt` field that can be mapped to.
-The `SalsifyID` field is used in single object updates.
+The `SalsifyID` field is used in single object updates. 
 
 ```yaml
 MyObject:
   extensions:
     - Dyanmic\Salsify\ORM\SalsifyIDExtension
+```
+
+The `SalsifyID` and `SalsifyUpdatedAt` fields will stil need to be explicitly mapped in the mapper config.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      SalsifyID:
+        salsifyField: 'salsify:id'
+        unique: true
+      SalsifyUpdatedAt: 'salsify:updated_at'
 ```
 
 ### Importer
