@@ -115,12 +115,7 @@ class Mapper extends Service
                 $field = $salsifyField['salsifyField'];
 
                 if (array_key_exists('shouldSkip', $salsifyField)) {
-                    if ($this->handleShouldSkip(
-                        $salsifyField['shouldSkip'],
-                        $dbField,
-                        $salsifyField,
-                        $data
-                    )) {
+                    if ($this->handleShouldSkip($salsifyField['shouldSkip'], $dbField, $salsifyField, $data)) {
                         ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
                         return null;
                     };
@@ -204,8 +199,10 @@ class Mapper extends Service
                 continue;
             }
 
-            if (!array_key_exists('unique', $salsifyField) ||
-                !array_key_exists('salsifyField', $salsifyField)) {
+            if (
+                !array_key_exists('unique', $salsifyField) ||
+                !array_key_exists('salsifyField', $salsifyField)
+            ) {
                 continue;
             }
 

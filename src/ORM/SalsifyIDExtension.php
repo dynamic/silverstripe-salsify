@@ -3,7 +3,9 @@
 namespace Dyanmic\Salsify\ORM;
 
 use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
+use SilverStripe\Forms\DatetimeField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextField;
@@ -31,7 +33,7 @@ class SalsifyIDExtension extends DataExtension
     /**
      * @param \SilverStripe\Forms\FieldList $fields
      */
-    public function updateCMSFields(FieldList $fields)
+    protected function updateFields(FieldList $fields)
     {
         $salsifyID = $fields->dataFieldByName('SalsifyID');
         if (!$salsifyID) {
@@ -40,15 +42,34 @@ class SalsifyIDExtension extends DataExtension
 
         $salsifyUpdatedAt = $fields->dataFieldByName('SalsifyUpdatedAt');
         if (!$salsifyUpdatedAt) {
-            $fields->push($salsifyUpdatedAt = TextField::create('SalsifyUpdatedAt'));
+            $fields->push($salsifyUpdatedAt = DatetimeField::create('SalsifyUpdatedAt'));
         }
 
         if ($this->owner->SalsifyID) {
             $salsifyID->setReadonly(true);
         }
         $salsifyUpdatedAt->setReadonly(true);
+    }
 
+    /**
+     * @param \SilverStripe\Forms\FieldList $fields
+     */
+    public function updateCMSFields(FieldList $fields)
+    {
+        if ($this->owner instanceof SiteTree) {
+            return parent::updateCMSFields($fields);
+        }
+
+        $this->updateFields($fields);
         return parent::updateCMSFields($fields);
+    }
+
+    /**
+     * @param \SilverStripe\Forms\FieldList $fields
+     */
+    public function updateSettingsFields(FieldList $fields)
+    {
+        $this->updateFields($fields);
     }
 
     /**

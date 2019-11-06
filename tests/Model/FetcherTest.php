@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\Tests\Model\Mapper;
 
-use \Exception;
+use Exception;
 use Dynamic\Salsify\Model\Fetcher;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
