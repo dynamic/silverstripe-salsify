@@ -67,7 +67,8 @@ class SalsifyIDExtension extends DataExtension
     /**
      * @param \SilverStripe\Forms\FieldList $fields
      */
-    public function updateSettingsFields(FieldList $fields) {
+    public function updateSettingsFields(FieldList $fields)
+    {
         $this->updateFields($fields);
     }
 

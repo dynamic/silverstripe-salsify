@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler;
 
-use \SilverStripe\Core\Extension;
+use SilverStripe\Core\Extension;
 
 /**
  * Class RawHandler

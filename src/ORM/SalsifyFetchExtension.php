@@ -58,7 +58,8 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         $className = $this->owner->currentPage()->getClassName();
 
         // Only allow when product has a salsify id and has a single mapping config
-        if ($this->owner->currentPage()->SalsifyID &&
+        if (
+            $this->owner->currentPage()->SalsifyID &&
             $this->hasService(Mapper::class) &&
             $this->configContainsMapping($className) &&
             $this->getFetcher()->config()->get('organizationID')
