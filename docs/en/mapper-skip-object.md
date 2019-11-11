@@ -10,7 +10,7 @@ Dynamic\Salsify\Model\Mapper.example:
     \Page:
       FrontImageID:
         salsifyField: Front Image
-        type: IMAGE
+        type: Image
       Title:
           salsifyField: GTIN Name
           shouldSkip: shouldSkip
@@ -47,3 +47,19 @@ class ExampleSkipExtension extends Extension
 ```
 
 All objects with title fields that use this mapping for `\Page` will skip when equal to `TEST`.
+
+## Prevent Skipping for Up To Date Objects
+To prevent automatically skipping up to date objects `skipUpToDate` needs to be set to false in the mapper's config.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  extensions:
+    - ExampleSkipExtension
+  skipUpToDate: false
+  mapping:
+    \Page:
+      FrontImageID:
+        salsifyField: Front Image
+        type: Image
+      Title:  GTIN Name
+```

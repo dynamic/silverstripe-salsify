@@ -5,8 +5,10 @@ Dynamic\Salsify\Model\Fetcher:
   timeout: 2000
 
 Dynamic\Salsify\Model\Mapper:
+  skipUpToDate: true
   extensions:
     - Dynamic\Salsify\TypeHandler\RawHandler
+    - Dynamic\Salsify\TypeHandler\LiteralHandler
     - Dynamic\Salsify\TypeHandler\Asset\FileHandler
     - Dynamic\Salsify\TypeHandler\Asset\ImageHandler
     - Dynamic\Salsify\TypeHandler\Relation\HasOneHandler

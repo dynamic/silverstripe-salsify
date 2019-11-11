@@ -10,7 +10,7 @@ Dynamic\Salsify\Model\Mapper.example:
     \Page:
       FrontImageID:
         salsifyField: Front Image
-        type: IMAGE
+        type: Image
       Title:
           salsifyField: GTIN Name
           modification: exampleModification

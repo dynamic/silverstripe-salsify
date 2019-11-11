@@ -142,9 +142,25 @@ Dynamic\Salsify\Model\Mapper.example:
 The unique fields will be added to an array, with the values for each product and will be used as a filter to find existing.
 This allows for multiple compound unique fields.
 
-#### Files and Images
+#### Field Types
+Field types can be `Raw`, `Literal`, `File`, `Image`, `HasOne`, `HasMany`.
+By default the `Raw` type is used. More types can also be added.
+
+##### Literal
+To set a field that doesn't have a salsify field a literal field can be used.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  example:
+    mapping:
+      \Page:
+        Author:
+          value: 'Chris P. Bacon'
+          type: Literal
+```
+The above example will set the Author field to `Chris P. Bacon` for all mapped pages.
+
+##### Files and Images
 To get an image or file from salsify to map to an object a type needs to be specified.
-Types can be `RAW`, `FILE`, and `IMAGE`.
 
 ```yaml
 Dynamic\Salsify\Model\Mapper.example:
@@ -153,7 +169,7 @@ Dynamic\Salsify\Model\Mapper.example:
       \Page:
         FrontImage:
           salsifyField: Front Image
-          type: IMAGE
+          type: Image
 ```
 
 Images and files can also be mapped by ID.
@@ -163,11 +179,52 @@ Dynamic\Salsify\Model\Mapper.example:
     \Page:
       FrontImageID:
         salsifyField: Front Image
-        type: IMAGE
+        type: Image
 ```
 
 If the mapping is specified as an image and it is not a valid image extension, 
 salsify will be used to try and convert the file into a png.
+
+##### HasOne and HasMany
+has_one and has_many relations can be done just about the same.
+The `HasOne`'s `salsifyField` doesn't matter.
+The `Many` type requires a salsify field that is an array.
+All modifications to the data will be passed through to the mapping realtion.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      Document:
+        salsifyField: 'salsify:id'
+        type: 'HasOne'
+        relation:
+          \Documentobject:
+            Title: Document Title
+```
+
+#### Field Fallback
+A fallback field can be specified for salsify.
+The fallback will be used when the normal `salsifyField` is not in the data from salsify for the object being mapped.
+The fallback can be a string or array.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      Title:
+        salsifyField: 'Product Web Title'
+        fallback: 'Product Title'
+```
+or
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      Title:
+        salsifyField: 'Product Web Title'
+        fallback: 
+          - 'Product Title'
+          - 'SKU'
+```
 
 #### Advanced
 ##### [Custom Field Types](docs/en/custom-types.md)
