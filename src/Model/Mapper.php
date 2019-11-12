@@ -185,7 +185,7 @@ class Mapper extends Service
 
         if (array_key_exists($salsifyField['salsifyField'], $data)) {
             return $salsifyField['salsifyField'];
-        } else if (array_key_exists('fallback', $salsifyField)) {
+        } elseif (array_key_exists('fallback', $salsifyField)) {
             // make fallback an array
             if (!is_array($salsifyField['fallback'])) {
                 $salsifyField['fallback'] = [$salsifyField['fallback']];
@@ -294,7 +294,9 @@ class Mapper extends Service
             if ($this->hasMethod($skipMethod)) {
                 return $this->{$skipMethod}($dbField, $config, $data);
             }
-            ImportTask::output("{$skipMethod} is not a valid skip test method. Skipping skip test for field {$dbField}.");
+            ImportTask::output(
+                "{$skipMethod} is not a valid skip test method. Skipping skip test for field {$dbField}."
+            );
         }
         return false;
     }
