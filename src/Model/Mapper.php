@@ -101,38 +101,27 @@ class Mapper extends Service
         $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
         ImportTask::output("Updating $firstUniqueKey $firstUniqueValue");
 
+        if ($this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
+            return $object;
+        }
+
         foreach ($mappings as $dbField => $salsifyField) {
-            $field = $salsifyField;
+            $field = $this->getField($salsifyField, $data);
+            if ($field === false) {
+                continue;
+            }
+            
             $value = null;
-            // default to raw
             $type = $this->getFieldType($salsifyField);
             $objectData = $data;
 
             if (is_array($salsifyField)) {
-                if (!array_key_exists('salsifyField', $salsifyField)) {
-                    continue;
-                }
-                $field = $salsifyField['salsifyField'];
+                if ($this->handleShouldSkip($dbField, $salsifyField, $data)) {
+                    ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
+                    return null;
+                };
 
-                if (array_key_exists('shouldSkip', $salsifyField)) {
-                    if ($this->handleShouldSkip($salsifyField['shouldSkip'], $dbField, $salsifyField, $data)) {
-                        ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
-                        return null;
-                    };
-                }
-
-                if (array_key_exists('modification', $salsifyField)) {
-                    $objectData = $this->handleModification(
-                        $salsifyField['modification'],
-                        $dbField,
-                        $salsifyField,
-                        $data
-                    );
-                }
-            }
-
-            if (!array_key_exists($field, $objectData)) {
-                continue;
+                $objectData = $this->handleModification($dbField, $salsifyField, $data);
             }
 
             $value = $this->handleType($type, $objectData, $field, $salsifyField, $dbField, $class);
@@ -146,6 +135,70 @@ class Mapper extends Service
             ImportTask::output("$firstUniqueKey $firstUniqueValue was not changed.");
         }
         return $object;
+    }
+
+    /**
+     * @param DataObject $object
+     * @param array $data
+     * @param string $firstUniqueKey
+     * @param string $firstUniqueValue
+     * @return bool
+     */
+    private function objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)
+    {
+        if (
+            $this->config()->get('skipUpToDate') == true &&
+            $object->hasField('SalsifyUpdatedAt') &&
+            $data['salsify:updated_at'] == $object->getField('SalsifyUpdatedAt')
+        ) {
+            ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param array $salsifyField
+     * @param array $data
+     *
+     * @return string|false
+     */
+    private function getField($salsifyField, $data)
+    {
+        if (!is_array($salsifyField)) {
+            return array_key_exists($salsifyField, $data) ? $salsifyField : false;
+        }
+
+        $hasSalsifyField = array_key_exists('salsifyField', $salsifyField);
+        $isLiteralField = (
+            $this->getFieldType($salsifyField) === 'Literal' &&
+            array_key_exists('value', $salsifyField)
+        );
+
+        if ($isLiteralField) {
+            return $salsifyField['value'];
+        }
+
+        if (!$hasSalsifyField) {
+            return false;
+        }
+
+        if (array_key_exists($salsifyField['salsifyField'], $data)) {
+            return $salsifyField['salsifyField'];
+        } elseif (array_key_exists('fallback', $salsifyField)) {
+            // make fallback an array
+            if (!is_array($salsifyField['fallback'])) {
+                $salsifyField['fallback'] = [$salsifyField['fallback']];
+            }
+
+            foreach ($salsifyField['fallback'] as $fallback) {
+                if (array_key_exists($fallback, $data)) {
+                    return $fallback;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -164,14 +217,7 @@ class Mapper extends Service
             $modifiedData = $data;
             $fieldMapping = $mappings[$dbField];
 
-            if (array_key_exists('modification', $fieldMapping)) {
-                $modifiedData = $this->handleModification(
-                    $fieldMapping['modification'],
-                    $dbField,
-                    $fieldMapping,
-                    $modifiedData
-                );
-            }
+            $modifiedData = $this->handleModification($dbField, $fieldMapping, $modifiedData);
 
             // adds unique fields to filter
             $filter[$dbField] = $modifiedData[$salsifyField];
@@ -218,34 +264,40 @@ class Mapper extends Service
     }
 
     /**
-     * @param string $mod
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return array
      */
-    private function handleModification($mod, $dbField, $config, $data)
+    private function handleModification($dbField, $config, $data)
     {
-        if ($this->hasMethod($mod)) {
-            return $this->{$mod}($dbField, $config, $data);
+        if (array_key_exists('modification', $config)) {
+            $mod = $config['modification'];
+            if ($this->hasMethod($mod)) {
+                return $this->{$mod}($dbField, $config, $data);
+            }
+            ImportTask::output("{$mod} is not a valid field modifier. skipping modification for field {$dbField}.");
         }
-        ImportTask::output("{$mod} is not a valid field modifier. skipping modification for field {$dbField}.");
         return $data;
     }
 
     /**
-     * @param string $skipMethod
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return boolean
      */
-    private function handleShouldSkip($skipMethod, $dbField, $config, $data)
+    private function handleShouldSkip($dbField, $config, $data)
     {
-        if ($this->hasMethod($skipMethod)) {
-            return $this->{$skipMethod}($dbField, $config, $data);
+        if (array_key_exists('shouldSkip', $config)) {
+            $skipMethod = $config['shouldSkip'];
+            if ($this->hasMethod($skipMethod)) {
+                return $this->{$skipMethod}($dbField, $config, $data);
+            }
+            ImportTask::output(
+                "{$skipMethod} is not a valid skip test method. Skipping skip test for field {$dbField}."
+            );
         }
-        ImportTask::output("{$skipMethod} is not a valid skip test method. skipping skip test for field {$dbField}.");
         return false;
     }
 
@@ -261,6 +313,7 @@ class Mapper extends Service
                 return $field['type'];
             }
         }
+        // default to raw
         return 'Raw';
     }
 
