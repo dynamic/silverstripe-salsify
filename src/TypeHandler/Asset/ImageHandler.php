@@ -89,6 +89,11 @@ class ImageHandler extends AssetHandler
     {
         $files = [];
         $fieldData = $data[$dataField];
+        // convert to array to prevent problems
+        if (!is_array($fieldData)) {
+            $fieldData = [$fieldData];
+        }
+
         foreach ($fieldData as $fileID) {
             $entryData = array_merge($data, [
                 $dataField => $fileID
