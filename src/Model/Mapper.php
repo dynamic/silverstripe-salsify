@@ -179,6 +179,10 @@ class Mapper extends Service
             return $salsifyField['value'];
         }
 
+        if (!$hasSalsifyField) {
+            return false;
+        }
+
         if (array_key_exists($salsifyField['salsifyField'], $data)) {
             return $salsifyField['salsifyField'];
         } else if (array_key_exists('fallback', $salsifyField)) {
