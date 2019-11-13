@@ -40,6 +40,11 @@ class Mapper extends Service
     private $importCount = 0;
 
     /**
+     * @var bool
+     */
+    public $skipSiliently = false;
+
+    /**
      * Mapper constructor.
      * @param string $importerKey
      * @param $file
@@ -117,7 +122,10 @@ class Mapper extends Service
 
             if (is_array($salsifyField)) {
                 if ($this->handleShouldSkip($dbField, $salsifyField, $data)) {
-                    ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
+                    if (!$this->skipSiliently) {
+                        ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
+                        $this->skipSiliently = false;
+                    }
                     return null;
                 };
 
