@@ -12,12 +12,13 @@ use SilverStripe\Dev\TestOnly;
 class MapperModification extends Extension implements TestOnly
 {
     /**
+     * @param string|\SilverStripe\ORM\DataObject $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return array
      */
-    public function testModification($dbField, $config, $data)
+    public function testModification($class, $dbField, $config, $data)
     {
         $salsifyField = $config['salsifyField'];
         if (array_key_exists($salsifyField, $data)) {
