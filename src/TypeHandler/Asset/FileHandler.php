@@ -21,16 +21,16 @@ class FileHandler extends AssetHandler
     ];
 
     /**
+     * @param string|DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |DataObject $class
      * @return string|int
      *
      * @throws \Exception
      */
-    public function handleFileType($data, $dataField, $config, $dbField, $class)
+    public function handleFileType($class, $data, $dataField, $config, $dbField)
     {
         $data = $this->getAssetBySalsifyID($data[$dataField]);
         if (!$data) {
@@ -47,16 +47,16 @@ class FileHandler extends AssetHandler
     }
 
     /**
+     * @param string|DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |DataObject $class
      * @return array
      *
      * @throws \Exception
      */
-    public function handleManyFilesType($data, $dataField, $config, $dbField, $class)
+    public function handleManyFilesType($class, $data, $dataField, $config, $dbField)
     {
         $files = [];
         $fieldData = $data[$dataField];
@@ -64,7 +64,7 @@ class FileHandler extends AssetHandler
             $entryData = array_merge($data, [
                 $dataField => $fileID
             ]);
-            $files[] = $this->owner->handleFileType($entryData, $dataField, $config, $dbField, $class);
+            $files[] = $this->owner->handleFileType($class, $entryData, $dataField, $config, $dbField, $class);
         }
         return $files;
     }

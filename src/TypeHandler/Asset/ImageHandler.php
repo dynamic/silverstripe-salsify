@@ -28,16 +28,16 @@ class ImageHandler extends AssetHandler
     private static $defaultImageType = 'png';
 
     /**
+     * @param string|DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |DataObject $class
      * @return string|int
      *
      * @throws \Exception
      */
-    public function handleImageType($data, $dataField, $config, $dbField, $class)
+    public function handleImageType($class, $data, $dataField, $config, $dbField)
     {
         $assetData = $this->getAssetBySalsifyID($data[$dataField]);
         if (!$assetData) {
@@ -76,16 +76,16 @@ class ImageHandler extends AssetHandler
     }
 
     /**
+     * @param string|DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |DataObject $class
      * @return array
      *
      * @throws \Exception
      */
-    public function handleManyImagesType($data, $dataField, $config, $dbField, $class)
+    public function handleManyImagesType($class, $data, $dataField, $config, $dbField)
     {
         $files = [];
         $fieldData = $data[$dataField];
@@ -98,7 +98,7 @@ class ImageHandler extends AssetHandler
             $entryData = array_merge($data, [
                 $dataField => $fileID
             ]);
-            $files[] = $this->owner->handleImageType($entryData, $dataField, $config, $dbField, $class);
+            $files[] = $this->owner->handleImageType($class, $entryData, $dataField, $config, $dbField, $class);
         }
         return $files;
     }

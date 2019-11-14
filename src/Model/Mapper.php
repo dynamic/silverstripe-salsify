@@ -121,7 +121,7 @@ class Mapper extends Service
             $objectData = $data;
 
             if (is_array($salsifyField)) {
-                if ($this->handleShouldSkip($dbField, $salsifyField, $data)) {
+                if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
                     if (!$this->skipSiliently) {
                         ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
                         $this->skipSiliently = false;
@@ -129,10 +129,10 @@ class Mapper extends Service
                     return null;
                 };
 
-                $objectData = $this->handleModification($dbField, $salsifyField, $data);
+                $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
             }
 
-            $value = $this->handleType($type, $objectData, $field, $salsifyField, $dbField, $class);
+            $value = $this->handleType($type, $class, $objectData, $field, $salsifyField, $dbField);
             $this->writeValue($object, $dbField, $value);
         }
 
@@ -225,7 +225,7 @@ class Mapper extends Service
             $modifiedData = $data;
             $fieldMapping = $mappings[$dbField];
 
-            $modifiedData = $this->handleModification($dbField, $fieldMapping, $modifiedData);
+            $modifiedData = $this->handleModification($class, $dbField, $fieldMapping, $modifiedData);
 
             // adds unique fields to filter
             $filter[$dbField] = $modifiedData[$salsifyField];
@@ -272,17 +272,18 @@ class Mapper extends Service
     }
 
     /**
+     * @param string $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return array
      */
-    private function handleModification($dbField, $config, $data)
+    private function handleModification($class, $dbField, $config, $data)
     {
         if (array_key_exists('modification', $config)) {
             $mod = $config['modification'];
             if ($this->hasMethod($mod)) {
-                return $this->{$mod}($dbField, $config, $data);
+                return $this->{$mod}($class, $dbField, $config, $data);
             }
             ImportTask::output("{$mod} is not a valid field modifier. skipping modification for field {$dbField}.");
         }
@@ -290,17 +291,18 @@ class Mapper extends Service
     }
 
     /**
+     * @param string $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return boolean
      */
-    private function handleShouldSkip($dbField, $config, $data)
+    private function handleShouldSkip($class, $dbField, $config, $data)
     {
         if (array_key_exists('shouldSkip', $config)) {
             $skipMethod = $config['shouldSkip'];
             if ($this->hasMethod($skipMethod)) {
-                return $this->{$skipMethod}($dbField, $config, $data);
+                return $this->{$skipMethod}($class, $dbField, $config, $data);
             }
             ImportTask::output(
                 "{$skipMethod} is not a valid skip test method. Skipping skip test for field {$dbField}."
@@ -327,18 +329,18 @@ class Mapper extends Service
 
     /**
      * @param int $type
+     * @param string|DataObject $class
      * @param array $salsifyData
      * @param string $salsifyField
      * @param array $dbFieldConfig
      * @param string $dbField
-     * @param string $class
      *
      * @return mixed
      */
-    private function handleType($type, $salsifyData, $salsifyField, $dbFieldConfig, $dbField, $class)
+    private function handleType($type, $class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField)
     {
         if ($this->hasMethod("handle{$type}Type")) {
-            return $this->{"handle{$type}Type"}($salsifyData, $salsifyField, $dbFieldConfig, $dbField, $class);
+            return $this->{"handle{$type}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
         }
         ImportTask::output("{$type} is not a valid type. skipping field {$dbField}.");
         return '';

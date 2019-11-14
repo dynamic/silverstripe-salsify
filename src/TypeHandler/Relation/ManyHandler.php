@@ -21,16 +21,16 @@ class ManyHandler extends Extension
     ];
 
     /**
+     * @param string|DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |\SilverStripe\ORM\DataObject $class
      *
      * @return int|DataObject|array
      * @throws \Exception
      */
-    public function handleManyRelationType($data, $dataField, $config, $dbField, $class)
+    public function handleManyRelationType($class, $data, $dataField, $config, $dbField)
     {
         if (!array_key_exists('relation', $config) || !is_array($config['relation'])) {
             return [];
