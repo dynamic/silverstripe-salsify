@@ -17,7 +17,7 @@ Dynamic\Salsify\Model\Mapper.example:
 ```
 
 ## Modification Method
-The modification function is passed the database field, filed configuration, and the object data.
+The modification function is passed the class, database field, filed configuration, and the object data.
 The data will only be modified for the field it is applied to and will not carry over to other fields.
 ```php
 <?php
@@ -29,12 +29,13 @@ use SilverStripe\Core\Extension;
 class ExampleModificationExtension extends Extension
 {
     /**
+     * @param string|SilverStripe\ORM\DataObject $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return array
      */
-    public function exampleModification($dbField, $config, $data) {
+    public function exampleModification($class, $dbField, $config, $data) {
         if ($dbField === 'Title') {
             // the salsify field in the config for te field
             $salsifyField = $config['salsifyField'];

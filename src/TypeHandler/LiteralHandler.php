@@ -20,16 +20,15 @@ class LiteralHandler extends Extension
     ];
 
     /**
+     * @param string|SilverStripe\ORM\DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |\SilverStripe\ORM\DataObject $class
-     * @return string|int
      *
      * @return string|boolean|int|double
      */
-    public function handleLiteralType($data, $dataField, $config, $dbField, $class)
+    public function handleLiteralType($class, $data, $dataField, $config, $dbField)
     {
         return $dataField;
     }

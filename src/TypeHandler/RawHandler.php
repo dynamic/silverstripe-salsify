@@ -17,16 +17,16 @@ class RawHandler extends Extension
     ];
 
     /**
+     * @param string|SilverStripe\ORM\DataObject $class
      * @param $data
      * @param $dataField
      * @param $config
      * @param $dbField
-     * @param string |\SilverStripe\ORM\DataObject $class
      * @return string|int
      *
      * @return string|boolean|int|double
      */
-    public function handleRawType($data, $dataField, $config, $dbField, $class)
+    public function handleRawType($class, $data, $dataField, $config, $dbField)
     {
         $value = $data[$dataField];
         if (!is_array($value)) {

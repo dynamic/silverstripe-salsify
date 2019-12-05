@@ -17,7 +17,7 @@ Dynamic\Salsify\Model\Mapper.example:
 ```
 
 ## Should Skip Method
-The skip function is passed the database field, filed configuration, and the object data.
+The skip function is passed the class, database field, filed configuration, and the object data.
 The skip function should return false if the object should not be skipped, true if it should.
 
 ```php
@@ -30,12 +30,13 @@ use SilverStripe\Core\Extension;
 class ExampleSkipExtension extends Extension
 {
     /**
+     * @param string|SilverStripe\ORM\DataObject $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return boolean
      */
-    public function shouldSkip($dbField, $config, $data) {
+    public function shouldSkip($class, $dbField, $config, $data) {
         if ($dbField === 'Title') {
             // the salsify field in the config for te field
             $salsifyField = $config['salsifyField'];
@@ -62,12 +63,13 @@ use SilverStripe\Core\Extension;
 class ExampleSkipExtension extends Extension
 {
     /**
+     * @param string|SilverStripe\ORM\DataObject $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return boolean
      */
-    public function shouldSkip($dbField, $config, $data) {
+    public function shouldSkip($class, $dbField, $config, $data) {
         if ($dbField === 'Title') {
             // the salsify field in the config for te field
             $salsifyField = $config['salsifyField'];
