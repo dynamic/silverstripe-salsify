@@ -32,7 +32,7 @@ class Mapper extends Service
     /**
      * @var array
      */
-    private $currentUniqueFields;
+    private $currentUniqueFields = [];
 
     /**
      * @var int
@@ -102,9 +102,13 @@ class Mapper extends Service
             $object = $class::create();
         }
 
-        $firstUniqueKey = array_keys($this->uniqueFields($mappings))[0];
-        $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
-        ImportTask::output("Updating $firstUniqueKey $firstUniqueValue");
+        $firstUniqueKey = array_keys($this->uniqueFields($class, $mappings))[0];
+        if (array_key_exists($mappings[$firstUniqueKey]['salsifyField'], $data)) {
+            $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
+        } else {
+            $firstUniqueValue = 'NULL';
+        }
+        ImportTask::output("Updating $class $firstUniqueKey $firstUniqueValue");
 
         if ($this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
             return $object;
@@ -115,7 +119,7 @@ class Mapper extends Service
             if ($field === false) {
                 continue;
             }
-            
+
             $value = null;
             $type = $this->getFieldType($salsifyField);
             $objectData = $data;
@@ -123,7 +127,7 @@ class Mapper extends Service
             if (is_array($salsifyField)) {
                 if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
                     if (!$this->skipSiliently) {
-                        ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue");
+                        ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue");
                         $this->skipSiliently = false;
                     }
                     return null;
@@ -140,7 +144,7 @@ class Mapper extends Service
             $object->write();
             $this->importCount++;
         } else {
-            ImportTask::output("$firstUniqueKey $firstUniqueValue was not changed.");
+            ImportTask::output("$class $firstUniqueKey $firstUniqueValue was not changed.");
         }
         return $object;
     }
@@ -218,7 +222,7 @@ class Mapper extends Service
      */
     private function findObjectByUnique($class, $mappings, $data)
     {
-        $uniqueFields = $this->uniqueFields($mappings);
+        $uniqueFields = $this->uniqueFields($class, $mappings);
         // creates a filter
         $filter = [];
         foreach ($uniqueFields as $dbField => $salsifyField) {
@@ -228,7 +232,9 @@ class Mapper extends Service
             $modifiedData = $this->handleModification($class, $dbField, $fieldMapping, $modifiedData);
 
             // adds unique fields to filter
-            $filter[$dbField] = $modifiedData[$salsifyField];
+            if (array_key_exists($salsifyField, $modifiedData)) {
+                $filter[$dbField] = $modifiedData[$salsifyField];
+            }
         }
 
         return DataObject::get($class)->filter($filter)->first();
@@ -237,14 +243,15 @@ class Mapper extends Service
     /**
      * Gets a list of all the unique field keys
      *
+     * @param string class
      * @param array $mappings
      * @return array
      */
-    private function uniqueFields($mappings)
+    private function uniqueFields($class, $mappings)
     {
         // cached after first map
-        if (!empty($this->currentUniqueFields)) {
-            return $this->currentUniqueFields;
+        if (array_key_exists($class, $this->currentUniqueFields) && !empty($this->currentUniqueFields[$class])) {
+            return $this->currentUniqueFields[$class];
         }
 
         $uniqueFields = [];
@@ -267,7 +274,7 @@ class Mapper extends Service
             $uniqueFields[$dbField] = $salsifyField['salsifyField'];
         }
 
-        $this->currentUniqueFields = $uniqueFields;
+        $this->currentUniqueFields[$class] = $uniqueFields;
         return $uniqueFields;
     }
 
