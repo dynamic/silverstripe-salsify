@@ -29,7 +29,7 @@ class HasOneHandler extends Extension
      * @return int|DataObject
      * @throws \Exception
      */
-    public function handleHasOneHandlerType($class, $data, $dataField, $config, $dbField)
+    public function handleHasOneType($class, $data, $dataField, $config, $dbField)
     {
         if (!array_key_exists('relation', $config) || !is_array($config['relation'])) {
             return preg_match('/ID$/', $dbField) ? 0 : null;
