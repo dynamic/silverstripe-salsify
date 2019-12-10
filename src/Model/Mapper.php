@@ -136,6 +136,10 @@ class Mapper extends Service
                 $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
             }
 
+            if (!array_key_exists($field, $objectData)) {
+                continue;
+            }
+
             $value = $this->handleType($type, $class, $objectData, $field, $salsifyField, $dbField);
             $this->writeValue($object, $dbField, $value);
         }
@@ -208,6 +212,8 @@ class Mapper extends Service
                     return $fallback;
                 }
             }
+        } elseif (array_key_exists('modification', $salsifyField)) {
+            return $salsifyField['salsifyField'];
         }
 
         return false;
