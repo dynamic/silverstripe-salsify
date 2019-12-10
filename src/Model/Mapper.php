@@ -136,7 +136,7 @@ class Mapper extends Service
                 $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
             }
 
-            if (!array_key_exists($salsifyField, $data)) {
+            if (!array_key_exists($field, $objectData)) {
                 continue;
             }
 
