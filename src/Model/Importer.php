@@ -123,6 +123,9 @@ class Importer
 
         ImportTask::output('Staring data import');
         ImportTask::output('-------------------');
+
+        $this->changeToSalsifyUser();
         $this->getMapper()->map();
+        $this->changeToPreviousUser();
     }
 }

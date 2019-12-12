@@ -5,6 +5,8 @@ namespace Dynamic\Salsify\Traits;
 use Dynamic\Salsify\Model\Fetcher;
 use Dynamic\Salsify\Model\Mapper;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 
 /**
  * Trait InstanceCreator
@@ -20,6 +22,11 @@ trait InstanceCreator
      * @var Mapper
      */
     private $mapper;
+
+    /**
+     * @var Member
+     */
+    private $previousUser;
 
     /**
      * @return string
@@ -40,6 +47,43 @@ trait InstanceCreator
     protected function getFetcherInstanceString()
     {
         return Fetcher::class . '.' . $this->getImporterKey();
+    }
+
+    /**
+     * @return \SilverStripe\ORM\DataObject|Member
+     * @throws \SilverStripe\ORM\ValidationException
+     */
+    protected function findOrCreateSalsifyUser()
+    {
+        if ($member = Member::get()->filter('Email', 'salsify')->first()) {
+            return $member;
+        }
+
+        $member = Member::create();
+        $member->FirstName = 'Salsify';
+        $member->Surname = 'Integration';
+        $member->Email = 'salsify';
+        $member->write();
+
+        return $member;
+    }
+
+    /**
+     *
+     */
+    protected function changeToSalsifyUser()
+    {
+        $this->previousUser = Security::getCurrentUser();
+        return Security::setCurrentUser($this->findOrCreateSalsifyUser());
+    }
+
+    /**
+     *
+     */
+    protected function changeToPreviousUser()
+    {
+        Security::setCurrentUser($this->previousUser);
+        $this->previousUser = null;
     }
 
     /**
