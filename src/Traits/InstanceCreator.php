@@ -53,7 +53,8 @@ trait InstanceCreator
      * @return \SilverStripe\ORM\DataObject|Member
      * @throws \SilverStripe\ORM\ValidationException
      */
-    protected function findOrCreateSalsifyUser() {
+    protected function findOrCreateSalsifyUser()
+    {
         if ($member = Member::get()->filter('Email', 'salsify')->first()) {
             return $member;
         }
