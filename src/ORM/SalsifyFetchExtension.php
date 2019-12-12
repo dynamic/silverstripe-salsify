@@ -128,7 +128,10 @@ class SalsifyFetchExtension extends LeftAndMainExtension
 
         ImportTask::config()->remove('output');
         $data = $this->fetchProduct($record->SalsifyID);
+
+        $this->changeToSalsifyUser();
         $this->mapData($record, $data);
+        $this->changeToPreviousUser();
 
         $this->owner->getResponse()->addHeader(
             'X-Status',
