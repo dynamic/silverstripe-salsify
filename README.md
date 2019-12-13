@@ -19,7 +19,7 @@ composer require dynamic/silverstripe-salsify
 See [License](license.md)
 
 ## Running the task
-The task can be run from a browser window or the command line. 
+The task can be run from a browser window or the command line.
 To run the task in the browser go to `dev/tasks` and find `Import products from salsify` or visit `dev/tasks/SalsifyImportTask`.
 
 It is recommended to use the command line, because the task can easily time out in a browser.
@@ -30,7 +30,7 @@ To run the task in the command line sake must be installed and the command `sake
 #### SalsifyIDExtension
 It is recommended to add `Dyanmic\Salsify\ORM\SalsifyIDExtension` as an extension of any object being mapped to.
 It will add a `SalsifyID` and `SalsifyUpdatedAt` field that can be mapped to.
-The `SalsifyID` field is used in single object updates. 
+The `SalsifyID` field is used in single object updates.
 
 ```yaml
 MyObject:
@@ -182,7 +182,7 @@ Dynamic\Salsify\Model\Mapper.example:
         type: Image
 ```
 
-If the mapping is specified as an image and it is not a valid image extension, 
+If the mapping is specified as an image and it is not a valid image extension,
 salsify will be used to try and convert the file into a png.
 
 ##### HasOne and HasMany
@@ -221,9 +221,47 @@ Dynamic\Salsify\Model\Mapper.example:
     \Page:
       Title:
         salsifyField: 'Product Web Title'
-        fallback: 
+        fallback:
           - 'Product Title'
           - 'SKU'
+```
+
+#### Extending afterObjectWrite
+To publish an object after mapping the `afterObjectWrite` method can be extended.
+It is passed the DataObject that was written, if the object was in the database, and if the object was published.
+If the object does not have the versioned extension applied `$wasPublished` will be false.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  extensions:
+    - ExamplePublishExtension
+```
+
+```php
+<?php
+
+use SilverStripe\Core\Extension;
+
+/**
+ * Class TestModification
+ */
+class ExamplePublishExtension extends Extension
+{
+    /**
+     * This will publish all new mapped objects and mapped objects that are already published.
+     * @param DataObject|Versioned $object
+     * @param bool $wasWritten
+     * @param bool $wasPublished
+     */
+    public function afterObjectWrite($object, $wasWritten, $wasPublished)
+    {
+        if ($object->hasExtension(Versioned::class)) {
+            if (!$wasWritten || $wasPublished) {
+                $object->publishRecursive();
+            }
+        }
+    }
+}
 ```
 
 #### Advanced
@@ -232,7 +270,7 @@ Dynamic\Salsify\Model\Mapper.example:
 ##### [Modify Field Data](docs/en/mapper-field-modifier.md)
 
 ### Single Object Import
-Adding a re-fetch button in the cms requires some configuration. 
+Adding a re-fetch button in the cms requires some configuration.
 An organization is required to fetch a single product.
 A `SalsifyID` field is also required for single object imports.
 Only a mapping service with the name of `single` is required and will act just like a normal mapper config; however, a fetcher service config can also be defined to specify the organization.
@@ -265,20 +303,20 @@ SilverStripe\Core\Injector\Injector:
 
 ## Maintainers
  * Dynamic <dev@dynamicagency.com>
- 
+
 ## Bugtracker
-Bugs are tracked in the issues section of this repository. Before submitting an issue please read over 
-existing issues to ensure yours is unique. 
- 
+Bugs are tracked in the issues section of this repository. Before submitting an issue please read over
+existing issues to ensure yours is unique.
+
 If the issue does look like a new bug:
- 
+
  - Create a new issue
- - Describe the steps required to reproduce your issue, and the expected outcome. Unit tests, screenshots 
+ - Describe the steps required to reproduce your issue, and the expected outcome. Unit tests, screenshots
  and screencasts can help here.
- - Describe your environment as detailed as possible: SilverStripe version, Browser, PHP version, 
+ - Describe your environment as detailed as possible: SilverStripe version, Browser, PHP version,
  Operating System, any installed SilverStripe modules.
- 
+
 Please report security issues to the module maintainers directly. Please don't file security issues in the bugtracker.
- 
+
 ## Development and contribution
 If you would like to make contributions to the module please ensure you raise a pull request and discuss with the module maintainers.
