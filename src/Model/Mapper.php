@@ -6,6 +6,7 @@ use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Class Mapper
@@ -102,6 +103,9 @@ class Mapper extends Service
             $object = $class::create();
         }
 
+        $wasPublished = $object->hasExtension(Versioned::class) ? $object->isPublished() : false;
+        $wasWritten = $object->isInDB();
+
         $firstUniqueKey = array_keys($this->uniqueFields($class, $mappings))[0];
         if (array_key_exists($mappings[$firstUniqueKey]['salsifyField'], $data)) {
             $firstUniqueValue = $data[$mappings[$firstUniqueKey]['salsifyField']];
@@ -147,6 +151,7 @@ class Mapper extends Service
         if ($object->isChanged()) {
             $object->write();
             $this->importCount++;
+            $this->extend('afterObjectWrite', $object, $wasWritten, $wasPublished);
         } else {
             ImportTask::output("$class $firstUniqueKey $firstUniqueValue was not changed.");
         }
