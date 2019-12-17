@@ -92,15 +92,20 @@ class Mapper extends Service
      * @param string|DataObject $class
      * @param array $mappings The mapping for a specific class
      * @param array $data
+     * @param DataObject|null $object
      *
      * @return DataObject
      * @throws \Exception
      */
-    public function mapToObject($class, $mappings, $data)
+    public function mapToObject($class, $mappings, $data, $object = null)
     {
-        $object = $this->findObjectByUnique($class, $mappings, $data);
-        if (!$object) {
-            $object = $class::create();
+        // if object was not passed
+        if ($object === null) {
+            $object = $this->findObjectByUnique($class, $mappings, $data);
+            // if no existing object was found
+            if (!$object) {
+                $object = $class::create();
+            }
         }
 
         $wasPublished = $object->hasExtension(Versioned::class) ? $object->isPublished() : false;
