@@ -179,7 +179,8 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         $this->getMapper()->mapToObject(
             $record->getClassName(),
             $this->getClassMapping($record->getClassName()),
-            $data
+            $data,
+            $record
         );
     }
 }
