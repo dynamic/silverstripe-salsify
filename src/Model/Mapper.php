@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\Task\ImportTask;
+use Dynamic\Salsify\Traits\Yieldable;
 use Exception;
 use JsonMachine\JsonMachine;
 use SilverStripe\ORM\DataObject;
@@ -14,6 +15,7 @@ use SilverStripe\Versioned\Versioned;
  */
 class Mapper extends Service
 {
+    use Yieldable;
 
     /**
      * @var
@@ -79,8 +81,8 @@ class Mapper extends Service
      */
     public function map()
     {
-        foreach ($this->productStream as $name => $data) {
-            foreach ($this->config()->get('mapping') as $class => $mappings) {
+        foreach ($this->yieldKeyVal($this->productStream) as $name => $data) {
+            foreach ($this->yieldKeyVal($this->config()->get('mapping')) as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
             }
@@ -123,7 +125,7 @@ class Mapper extends Service
             return $object;
         }
 
-        foreach ($mappings as $dbField => $salsifyField) {
+        foreach ($this->yieldKeyVal($mappings) as $dbField => $salsifyField) {
             $field = $this->getField($salsifyField, $data);
             if ($field === false) {
                 continue;
@@ -217,7 +219,7 @@ class Mapper extends Service
                 $salsifyField['fallback'] = [$salsifyField['fallback']];
             }
 
-            foreach ($salsifyField['fallback'] as $fallback) {
+            foreach ($this->yieldSingle($salsifyField['fallback']) as $fallback) {
                 if (array_key_exists($fallback, $data)) {
                     return $fallback;
                 }
@@ -241,7 +243,7 @@ class Mapper extends Service
         $uniqueFields = $this->uniqueFields($class, $mappings);
         // creates a filter
         $filter = [];
-        foreach ($uniqueFields as $dbField => $salsifyField) {
+        foreach ($this->yieldKeyVal($uniqueFields) as $dbField => $salsifyField) {
             $modifiedData = $data;
             $fieldMapping = $mappings[$dbField];
 
@@ -271,7 +273,7 @@ class Mapper extends Service
         }
 
         $uniqueFields = [];
-        foreach ($mappings as $dbField => $salsifyField) {
+        foreach ($this->yieldKeyVal($mappings) as $dbField => $salsifyField) {
             if (!is_array($salsifyField)) {
                 continue;
             }

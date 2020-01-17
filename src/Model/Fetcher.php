@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Dynamic\Salsify\Traits\Yieldable;
 use Exception;
 use GuzzleHttp\Client;
 use SilverStripe\Core\Config\Configurable;
@@ -20,6 +21,8 @@ use SilverStripe\Core\Injector\Injectable;
  */
 class Fetcher extends Service
 {
+    use Yieldable;
+
     /**
      * @var string
      */
@@ -133,7 +136,7 @@ class Fetcher extends Service
 
             // throw exceptions for salsify errors
             if (array_key_exists('errors', $response)) {
-                foreach ($response['errors'] as $error) {
+                foreach ($this->yieldSingle($response['errors']) as $error) {
                     throw new Exception($error);
                 }
             }

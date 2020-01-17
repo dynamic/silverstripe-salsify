@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\Task;
 
 use Dynamic\Salsify\Model\Importer;
+use Dynamic\Salsify\Traits\Yieldable;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
@@ -14,6 +15,8 @@ use SilverStripe\Dev\BuildTask;
  */
 class ImportTask extends BuildTask
 {
+    use Yieldable;
+
     /**
      * @var string
      */
@@ -60,7 +63,7 @@ class ImportTask extends BuildTask
             }
         );
 
-        foreach ($importers as $importerClass) {
+        foreach ($this->yieldSingle($importers) as $importerClass) {
             $importer = Injector::inst()->create($importerClass);
             $importer->run();
         }

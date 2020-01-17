@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
 use Dynamic\Salsify\Model\Fetcher;
+use Dynamic\Salsify\Traits\Yieldable;
 use GuzzleHttp\Client;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Extension;
@@ -16,6 +17,8 @@ use SilverStripe\ORM\DataObject;
  */
 class AssetHandler extends Extension
 {
+    use Yieldable;
+
     /**
      * @param $id
      * @return array
@@ -60,7 +63,7 @@ class AssetHandler extends Extension
         }
 
         $asset = false;
-        foreach ($this->owner->getAssetStream() as $name => $data) {
+        foreach ($this->yieldKeyVal($this->owner->getAssetStream()) as $name => $data) {
             if ($data['salsify:id'] == $id) {
                 $asset = $data;
             }

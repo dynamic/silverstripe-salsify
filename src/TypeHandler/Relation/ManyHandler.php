@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler\Relation;
 
+use Dynamic\Salsify\Traits\Yieldable;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 
@@ -13,6 +14,8 @@ use SilverStripe\ORM\DataObject;
  */
 class ManyHandler extends Extension
 {
+    use Yieldable;
+
     /**
      * @var array
      */
@@ -39,7 +42,7 @@ class ManyHandler extends Extension
         $fieldData = $data[$dataField];
         $related = [];
 
-        foreach ($fieldData as $entry) {
+        foreach ($this->yieldSingle($fieldData) as $entry) {
             $entryData = array_merge($data, $entry);
             $relationConfig = $config['relation'];
             $relatedClass = array_key_first($relationConfig);

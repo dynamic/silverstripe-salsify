@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
+use Dynamic\Salsify\Traits\Yieldable;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -12,6 +13,8 @@ use SilverStripe\ORM\DataObject;
  */
 class FileHandler extends AssetHandler
 {
+    use Yieldable;
+
     /**
      * @var array
      */
@@ -60,7 +63,7 @@ class FileHandler extends AssetHandler
     {
         $files = [];
         $fieldData = $data[$dataField];
-        foreach ($fieldData as $fileID) {
+        foreach ($this->yieldSingle($fieldData) as $fileID) {
             $entryData = array_merge($data, [
                 $dataField => $fileID
             ]);

@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Dynamic\Salsify\Traits\Yieldable;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
@@ -22,6 +23,7 @@ abstract class Service
         defineMethods as extensibleDefineMethods;
     }
     use Injectable;
+    use Yieldable;
 
     /**
      * @var string
@@ -40,11 +42,11 @@ abstract class Service
         $this->serviceName = static::class . '.' . $this->importerKey;
 
         $serviceConfig = Config::inst()->get($this->serviceName);
-        foreach ($serviceConfig as $key => $value) {
+        foreach ($this->yieldKeyVal($serviceConfig) as $key => $value) {
             $this->config()->merge($key, $value);
 
             if ($key === 'extensions') {
-                foreach ($value as $extension) {
+                foreach ($this->yieldSingle($value) as $extension) {
                     static::add_extension($extension);
                 }
             }

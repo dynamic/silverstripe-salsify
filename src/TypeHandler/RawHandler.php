@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler;
 
+use Dynamic\Salsify\Traits\Yieldable;
 use SilverStripe\Core\Extension;
 
 /**
@@ -9,6 +10,8 @@ use SilverStripe\Core\Extension;
  */
 class RawHandler extends Extension
 {
+    use Yieldable;
+
     /**
      * @var array
      */
@@ -34,7 +37,7 @@ class RawHandler extends Extension
         }
 
         $db = $class::config()->get('db');
-        foreach ($db as $fieldTitle => $fieldType) {
+        foreach ($this->yieldKeyVal($db) as $fieldTitle => $fieldType) {
             if ($dbField === $fieldTitle && $fieldType === 'HTMLText') {
                 return '<p>' . implode('<p></p>', $value) . '</p>';
             }

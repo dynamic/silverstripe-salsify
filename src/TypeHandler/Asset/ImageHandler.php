@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
 use Dynamic\Salsify\Task\ImportTask;
+use Dynamic\Salsify\Traits\Yieldable;
 use SilverStripe\Assets\Image;
 use SilverStripe\ORM\DataObject;
 
@@ -14,6 +15,8 @@ use SilverStripe\ORM\DataObject;
  */
 class ImageHandler extends AssetHandler
 {
+    use Yieldable;
+
     /**
      * @var array
      */
@@ -94,7 +97,7 @@ class ImageHandler extends AssetHandler
             $fieldData = [$fieldData];
         }
 
-        foreach ($fieldData as $fileID) {
+        foreach ($this->yieldSingle($fieldData) as $fileID) {
             $entryData = array_merge($data, [
                 $dataField => $fileID
             ]);
