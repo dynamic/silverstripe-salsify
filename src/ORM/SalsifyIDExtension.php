@@ -35,12 +35,12 @@ class SalsifyIDExtension extends DataExtension
      */
     protected function updateFields(FieldList $fields)
     {
-        $salsifyID = $fields->dataFieldByName('SalsifyID');
+        $salsifyID = $fields->fieldByName('SalsifyID');
         if (!$salsifyID) {
             $fields->push($salsifyID = TextField::create('SalsifyID'));
         }
 
-        $salsifyUpdatedAt = $fields->dataFieldByName('SalsifyUpdatedAt');
+        $salsifyUpdatedAt = $fields->fieldByName('SalsifyUpdatedAt');
         if (!$salsifyUpdatedAt) {
             $fields->push($salsifyUpdatedAt = DatetimeField::create('SalsifyUpdatedAt'));
         }
@@ -78,7 +78,6 @@ class SalsifyIDExtension extends DataExtension
     public function updateCMSActions(FieldList $actions)
     {
         parent::updateCMSActions($actions);
-
         if (!$this->owner->SalsifyID) {
             return;
         }

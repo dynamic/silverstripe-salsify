@@ -18,6 +18,25 @@ composer require dynamic/silverstripe-salsify
 ## License
 See [License](license.md)
 
+## Table of Contents
+- [Example configuration](#example-configuration)
+    - [Extensions](#extensions)
+      - [SalsifyIDExtension](#salsifyidextension)
+    - [Importer](#importer)
+    - [Fetcher](#fetcher)
+    - [Mapper](#mapper)
+      - [Unique Fields](#unique-fields)
+      - [Files and Images](#files-and-images)
+      - [Advanced](#advanced)
+         - [Custom Field Types](#custom-field-types)
+         - [Skipping Objects](#skipping-objects)
+         - [Modify Field Data](#modify-field-data)
+  - [Single Object Import](#single-object-import)
+- [Maintainers](#maintainers)
+- [Bugtracker](#bugtracker)
+- [Development and contribution](#development-and-contribution)
+
+
 ## Running the task
 The task can be run from a browser window or the command line.
 To run the task in the browser go to `dev/tasks` and find `Import products from salsify` or visit `dev/tasks/SalsifyImportTask`.

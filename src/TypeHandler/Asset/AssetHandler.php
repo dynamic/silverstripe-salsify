@@ -59,15 +59,14 @@ class AssetHandler extends Extension
             return $this->fetchAsset($id);
         }
 
-        $asset = false;
-        $assetGenerator = $this->owner->getAssests();
+        $assetGenerator = $this->owner->getAssets();
         foreach ($assetGenerator as $name => $data) {
             if ($data['salsify:id'] == $id) {
-                $asset = $data;
+                $assetGenerator->send($this->owner::STOP_GENERATOR);
+                return $data;
             }
         }
-        $assetGenerator->send($this->owner::STOP_GENERATOR);
-        return $asset;
+        return false;
     }
 
     /**

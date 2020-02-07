@@ -2,9 +2,11 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Dyanmic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
@@ -62,34 +64,51 @@ class Mapper extends Service
 
         if ($file !== null) {
             $this->file = $file;
-            $this->productStream = JsonMachine::fromFile($file, '/4/products');
-            $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
+            $this->resetProductSteam();
+            $this->resetAssetStream();
         }
     }
 
     /**
-     * @return \Generator|void
+     *
      */
-    public function getAssests()
+    protected function resetAssetStream()
+    {
+        $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
+    }
+
+    /**
+     *
+     */
+    protected function resetProductSteam()
+    {
+        $this->productStream = JsonMachine::fromFile($this->file, '/4/products');
+    }
+
+    /**
+     * @return \Generator|void
+     * @throws Exception
+     */
+    public function getAssets()
     {
         foreach ($this->assetStream as $name => $data) {
-            $injected = yield $name => $data;
-            if ($injected === static::STOP_GENERATOR) {
-                $this->assetStream->getIterator()->getIterator()->rewind();
-                return;
-            }
+            $injected = (yield $name => $data);
+            if ($injected === static::STOP_GENERATOR) break;
         }
+        $this->resetAssetStream();
     }
 
     /**
      * @return \Generator|void
+     * @throws Exception
      */
     public function getProducts()
     {
         foreach ($this->productStream as $name => $data) {
             $injected = yield $name => $data;
-            if ($injected === static::STOP_GENERATOR) return;
+            if ($injected === static::STOP_GENERATOR) break;
         }
+        $this->resetProductSteam();
     }
 
     /**
@@ -257,6 +276,22 @@ class Mapper extends Service
      */
     private function findObjectByUnique($class, $mappings, $data)
     {
+        /** @var DataObject $genericObject */
+        $genericObject = Injector::inst()->get($class);
+        if (
+            $genericObject->hasExtension(SalsifyIDExtension::class) ||
+            $genericObject->hasField('SalsifyID')
+        ) {
+            $modifiedData = $data;
+            $modifiedData = $this->handleModification($class, 'salsify:id', $mappings['salsify:id'], $modifiedData);
+            $obj = DataObject::get($class)->filter([
+                'SalsifyID' => $modifiedData['salsify:id'],
+            ])->first();
+            if ($obj) {
+                return $obj;
+            }
+        }
+
         $uniqueFields = $this->uniqueFields($class, $mappings);
         // creates a filter
         $filter = [];
@@ -411,11 +446,16 @@ class Mapper extends Service
         }
 
         if (is_array($value)) {
+            $value = array_filter($value);
+            if (empty($value)) return;
+
             $object->{$dbField}()->addMany($value);
             return;
         }
 
-        $object->{$dbField}()->add($value);
+        if ($value) {
+            $object->{$dbField}()->add($value);
+        }
     }
 
     /**

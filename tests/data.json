@@ -120,7 +120,7 @@
     "products": [
       {
         "salsify:id": "00000000000001",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-10T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
@@ -133,7 +133,7 @@
       },
       {
         "salsify:id": "00000000000002",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-11T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
@@ -149,7 +149,7 @@
       },
       {
         "salsify:id": "00000000000003",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-12T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
@@ -173,7 +173,7 @@
       },
       {
         "salsify:id": "00000000000005",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-14T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
@@ -185,7 +185,7 @@
       },
       {
         "salsify:id": "00000000000006",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-15T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
@@ -197,7 +197,7 @@
       },
       {
         "salsify:id": "00000000000007",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-16T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
@@ -209,7 +209,7 @@
       },
       {
         "salsify:id": "00000000000000",
-        "salsify:created_at": "2018-07-13T13:25:03.022Z",
+        "salsify:created_at": "2018-07-17T13:25:03.022Z",
         "salsify:updated_at": "2019-04-03T22:30:56.306Z",
         "salsify:version": 1,
         "salsify:profile_asset_id": null,
