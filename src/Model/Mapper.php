@@ -15,6 +15,8 @@ use SilverStripe\Versioned\Versioned;
 class Mapper extends Service
 {
 
+    public const STOP_GENERATOR = 'stop';
+
     /**
      * @var
      */
@@ -61,16 +63,33 @@ class Mapper extends Service
         if ($file !== null) {
             $this->file = $file;
             $this->productStream = JsonMachine::fromFile($file, '/4/products');
-            $this->resetAssetStream();
+            $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
         }
     }
 
     /**
-     *
+     * @return \Generator|void
      */
-    public function resetAssetStream()
+    public function getAssests()
     {
-        $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
+        foreach ($this->assetStream as $name => $data) {
+            $injected = yield $name => $data;
+            if ($injected === static::STOP_GENERATOR) {
+                $this->assetStream->getIterator()->getIterator()->rewind();
+                return;
+            }
+        }
+    }
+
+    /**
+     * @return \Generator|void
+     */
+    public function getProducts()
+    {
+        foreach ($this->productStream as $name => $data) {
+            $injected = yield $name => $data;
+            if ($injected === static::STOP_GENERATOR) return;
+        }
     }
 
     /**
@@ -79,7 +98,7 @@ class Mapper extends Service
      */
     public function map()
     {
-        foreach ($this->productStream as $name => $data) {
+        foreach ($this->getProducts() as $name => $data) {
             foreach ($this->config()->get('mapping') as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
@@ -397,14 +416,6 @@ class Mapper extends Service
         }
 
         $object->{$dbField}()->add($value);
-    }
-
-    /**
-     * @return \JsonMachine\JsonMachine
-     */
-    public function getAssetStream()
-    {
-        return $this->assetStream;
     }
 
     /**

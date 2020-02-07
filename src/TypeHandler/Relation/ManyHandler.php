@@ -38,9 +38,15 @@ class ManyHandler extends Extension
 
         $fieldData = $data[$dataField];
         $related = [];
-
         foreach ($fieldData as $entry) {
-            $entryData = array_merge($data, $entry);
+            $entryData = array_merge($data, [
+                $dataField => $entry,
+            ]);
+
+            if (is_array($entry)) {
+                $entryData = array_merge($entryData, $entry);
+            }
+
             $relationConfig = $config['relation'];
             $relatedClass = array_key_first($relationConfig);
             $related[] = $this->owner->mapToObject($relatedClass, $relationConfig[$relatedClass], $entryData);

@@ -52,7 +52,7 @@ class AssetHandler extends Extension
     protected function getAssetBySalsifyID($id)
     {
         if (is_array($id)) {
-            $id = $id[count($id) - 1];
+            $id = $id[0];
         }
 
         if ($this->owner->hasFile() === false) {
@@ -60,12 +60,13 @@ class AssetHandler extends Extension
         }
 
         $asset = false;
-        foreach ($this->owner->getAssetStream() as $name => $data) {
+        $assetGenerator = $this->owner->getAssests();
+        foreach ($assetGenerator as $name => $data) {
             if ($data['salsify:id'] == $id) {
                 $asset = $data;
             }
         }
-        $this->owner->resetAssetStream();
+        $assetGenerator->send($this->owner::STOP_GENERATOR);
         return $asset;
     }
 
