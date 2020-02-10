@@ -476,6 +476,9 @@ class Mapper extends Service
             $object->write();
         }
 
+        // empty relation
+        $object->{$dbField}()->removeAll();
+
         if (is_array($value)) {
             $value = array_filter($value);
             if (empty($value)) return;
