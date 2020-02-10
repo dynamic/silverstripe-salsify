@@ -112,18 +112,39 @@ class Mapper extends Service
     }
 
     /**
+     * @return \Generator
+     */
+    protected function getMappings()
+    {
+        foreach ($this->config()->get('mapping') as $class => $mappings) {
+            yield $class => $mappings;
+        }
+    }
+
+    /**
      * Maps the data
      * @throws \Exception
      */
     public function map()
     {
         foreach ($this->getProducts() as $name => $data) {
-            foreach ($this->config()->get('mapping') as $class => $mappings) {
+            foreach ($this->getMappings() as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
                 $this->currentUniqueFields = [];
             }
         }
         ImportTask::output("Imported and updated $this->importCount products.");
+    }
+
+    /**
+     * @param $mappings
+     * @return \Generator
+     */
+    protected function getFieldMappings($mappings)
+    {
+        foreach ($mappings as $dbField => $salsifyField) {
+            yield $dbField => $salsifyField;
+        }
     }
 
     /**
@@ -161,7 +182,7 @@ class Mapper extends Service
             return $object;
         }
 
-        foreach ($mappings as $dbField => $salsifyField) {
+        foreach ($this->getFieldMappings($mappings) as $dbField => $salsifyField) {
             $field = $this->getField($salsifyField, $data);
             if ($field === false) {
                 continue;
@@ -283,7 +304,9 @@ class Mapper extends Service
             $genericObject->hasField('SalsifyID')
         ) {
             $modifiedData = $data;
-            $modifiedData = $this->handleModification($class, 'salsify:id', $mappings['salsify:id'], $modifiedData);
+            if (array_key_exists('salsify:id', $mappings)) {
+                $modifiedData = $this->handleModification($class, 'salsify:id', $mappings['salsify:id'], $modifiedData);
+            }
             $obj = DataObject::get($class)->filter([
                 'SalsifyID' => $modifiedData['salsify:id'],
             ])->first();
@@ -325,7 +348,7 @@ class Mapper extends Service
         }
 
         $uniqueFields = [];
-        foreach ($mappings as $dbField => $salsifyField) {
+        foreach ($this->getFieldMappings($mappings) as $dbField => $salsifyField) {
             if (!is_array($salsifyField)) {
                 continue;
             }
@@ -357,6 +380,10 @@ class Mapper extends Service
      */
     private function handleModification($class, $dbField, $config, $data)
     {
+        if (!is_array($config)) {
+            return $data;
+        }
+
         if (array_key_exists('modification', $config)) {
             $mod = $config['modification'];
             if ($this->hasMethod($mod)) {
@@ -376,6 +403,10 @@ class Mapper extends Service
      */
     private function handleShouldSkip($class, $dbField, $config, $data)
     {
+        if (!is_array($config)) {
+            return false;
+        }
+
         if (array_key_exists('shouldSkip', $config)) {
             $skipMethod = $config['shouldSkip'];
             if ($this->hasMethod($skipMethod)) {
