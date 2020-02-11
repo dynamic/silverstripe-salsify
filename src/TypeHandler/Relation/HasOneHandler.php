@@ -8,7 +8,7 @@ use SilverStripe\ORM\DataObject;
 /**
  * Class HasOneRelationHandler
  *
- * @property-read \Dynamic\Salsify\TypeHandler\Relation\HasOneHandler|\Dynamic\Salsify\Model\Mapper $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|HasOneHandler $owner
  */
 class HasOneHandler extends Extension
 {

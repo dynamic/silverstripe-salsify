@@ -13,13 +13,10 @@ use SilverStripe\Core\Injector\Injectable;
  * @package Dynamic\Salsify\Model
  *
  * Based off https://github.com/XinV/salsify-php-api/blob/master/lib/Salsify/API.php
- *
- * @mixin Configurable
- * @mixin Extensible
- * @mixin Injectable
  */
 class Fetcher extends Service
 {
+
     /**
      * @var string
      */
@@ -133,7 +130,7 @@ class Fetcher extends Service
 
             // throw exceptions for salsify errors
             if (array_key_exists('errors', $response)) {
-                foreach ($response['errors'] as $error) {
+                foreach ($this->yieldSingle($response['errors']) as $error) {
                     throw new Exception($error);
                 }
             }

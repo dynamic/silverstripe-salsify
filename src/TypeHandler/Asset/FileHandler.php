@@ -8,10 +8,11 @@ use SilverStripe\ORM\DataObject;
  * Class FileHandler
  * @package Dynamic\Salsify\TypeHandler
  *
- * @property-read \Dynamic\Salsify\Model\Mapper|\Dynamic\Salsify\TypeHandler\Asset\FileHandler $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|FileHandler $owner
  */
 class FileHandler extends AssetHandler
 {
+
     /**
      * @var array
      */
@@ -60,7 +61,7 @@ class FileHandler extends AssetHandler
     {
         $files = [];
         $fieldData = $data[$dataField];
-        foreach ($fieldData as $fileID) {
+        foreach ($this->owner->yieldSingle($fieldData) as $fileID) {
             $entryData = array_merge($data, [
                 $dataField => $fileID
             ]);

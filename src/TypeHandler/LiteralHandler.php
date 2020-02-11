@@ -8,7 +8,7 @@ use SilverStripe\Core\Extension;
  * Class LiteralHandler
  * @package Dynamic\Salsify\TypeHandler
  *
- * @property-read \Dynamic\Salsify\TypeHandler\LiteralHandler|\Dynamic\Salsify\Model\Mapper $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|LiteralHandler $owner
  */
 class LiteralHandler extends Extension
 {

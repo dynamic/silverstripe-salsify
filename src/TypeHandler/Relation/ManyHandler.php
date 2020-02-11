@@ -9,10 +9,11 @@ use SilverStripe\ORM\DataObject;
  * Class RelationHandler
  * @package Dynamic\Salsify\TypeHandler
  *
- * @property-read \Dynamic\Salsify\TypeHandler\Relation\ManyHandler|\Dynamic\Salsify\Model\Mapper $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|ManyHandler $owner
  */
 class ManyHandler extends Extension
 {
+
     /**
      * @var array
      */
@@ -38,7 +39,7 @@ class ManyHandler extends Extension
 
         $fieldData = $data[$dataField];
         $related = [];
-        foreach ($fieldData as $entry) {
+        foreach ($this->owner->yieldSingle($fieldData) as $entry) {
             $entryData = array_merge($data, [
                 $dataField => $entry,
             ]);
