@@ -54,7 +54,7 @@ class AssetHandler extends Extension
     protected function getAssetBySalsifyID($id)
     {
         if (is_array($id)) {
-            $id = $id[count($id) - 1];
+            $id = $id[0];
         }
 
         if ($this->owner->hasFile() === false) {

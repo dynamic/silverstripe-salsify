@@ -115,21 +115,22 @@ class MapperTest extends SapphireTest
      */
     public function testMap()
     {
-        $this->assertEquals(1, MappedObject::get()->count());
-
         $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
         $mapper->map();
 
-        // check to see if added
-        $this->assertEquals(7, MappedObject::get()->count());
-        // check to see if existing object was modified
+        // check to see if existing added
+        $this->assertEquals(8, MappedObject::get()->count());
+        // check to see if existing object with unique was modified
         $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->Seller);
+
+        // check to see if existing object with salsify id was modified
+        $this->assertEquals('Victor Lustig', MappedObject::get()->find('Unique', '2')->Seller);
 
         // tests for unchanged
         $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
         $mapper->map();
 
-        $this->assertEquals(7, MappedObject::get()->count());
+        $this->assertEquals(8, MappedObject::get()->count());
         $this->assertEquals('modified TEST_MOD', MappedObject::get()->find('Unique', '2')->Modified);
 
         // test images
