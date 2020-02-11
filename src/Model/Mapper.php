@@ -7,6 +7,7 @@ use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
@@ -472,24 +473,40 @@ class Mapper extends Service
             return;
         }
 
+        // write the object so relations can be written
         if (!$object->exists()) {
             $object->write();
         }
 
-        // empty relation
-        $object->{$dbField}()->removeAll();
+        // change to an array and filter out empty values
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+        $value = array_filter($value);
 
-        if (is_array($value)) {
-            $value = array_filter($value);
-            if (empty($value)) return;
+        // get the ids
+        $ids = [];
+        foreach ($value as $v) {
+            $ids[] = $v->ID;
+        }
 
-            $object->{$dbField}()->addMany($value);
+        /** @var DataList $relation */
+        $relation = $object->{$dbField}();
+        // remove all unrelated - removeAll had an odd side effect (relations only got added back half the time)
+        $relation->removeMany(
+            $relation->exclude([
+                'ID' => $ids,
+            ])->column('ID')
+        );
+
+        if (empty($value)) {
             return;
         }
 
-        if ($value) {
-            $object->{$dbField}()->add($value);
-        }
+        // only add ones that haven't been added
+        $relationArray = $relation->column('ID');
+        $toAdd = array_diff($ids, $relationArray);
+        $relation->addMany($toAdd);
     }
 
     /**
