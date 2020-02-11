@@ -10,10 +10,11 @@ use SilverStripe\ORM\DataObject;
  * Class ImageHandler
  * @package Dynamic\Salsify\TypeHandler
  *
- * @property-read \Dynamic\Salsify\Model\Mapper|\Dynamic\Salsify\TypeHandler\Asset\ImageHandler $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|ImageHandler $owner
  */
 class ImageHandler extends AssetHandler
 {
+
     /**
      * @var array
      */
@@ -94,7 +95,7 @@ class ImageHandler extends AssetHandler
             $fieldData = [$fieldData];
         }
 
-        foreach ($fieldData as $fileID) {
+        foreach ($this->owner->yieldSingle($fieldData) as $fileID) {
             $entryData = array_merge($data, [
                 $dataField => $fileID
             ]);

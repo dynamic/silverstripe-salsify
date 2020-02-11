@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
 use Dynamic\Salsify\Model\Fetcher;
+use Dynamic\Salsify\Traits\Yieldable;
 use GuzzleHttp\Client;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Extension;
@@ -12,10 +13,11 @@ use SilverStripe\ORM\DataObject;
  * Class AssetHandler
  * @package Dynamic\Salsify\TypeHandler\Asset
  *
- * @property-read \Dynamic\Salsify\TypeHandler\Asset\AssetHandler|\Dynamic\Salsify\Model\Mapper $owner
+ * @property-read \Dynamic\Salsify\Model\Mapper|AssetHandler $owner
  */
 class AssetHandler extends Extension
 {
+
     /**
      * @param $id
      * @return array
@@ -60,12 +62,13 @@ class AssetHandler extends Extension
         }
 
         $asset = false;
-        foreach ($this->owner->getAssetStream() as $name => $data) {
+        $assetGenerator = $this->owner->yieldKeyVal($this->owner->getAssetStream(), $this->owner->resetAssetStream());
+        foreach ($assetGenerator as $name => $data) {
             if ($data['salsify:id'] == $id) {
                 $asset = $data;
+                $assetGenerator->send(Yieldable::$STOP_GENERATOR);
             }
         }
-        $this->owner->resetAssetStream();
         return $asset;
     }
 
