@@ -15,6 +15,7 @@ use SilverStripe\Core\Injector\Injectable;
  * @mixin Configurable
  * @mixin Extensible
  * @mixin Injectable
+ * @mixin Yieldable
  */
 abstract class Service
 {

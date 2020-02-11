@@ -12,6 +12,7 @@ use SilverStripe\Dev\BuildTask;
 /**
  * Class ImportTask
  * @package Dynamic\Salsify\Task
+ * @mixin Yieldable
  */
 class ImportTask extends BuildTask
 {

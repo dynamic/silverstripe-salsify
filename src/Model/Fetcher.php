@@ -2,7 +2,6 @@
 
 namespace Dynamic\Salsify\Model;
 
-use Dynamic\Salsify\Traits\Yieldable;
 use Exception;
 use GuzzleHttp\Client;
 use SilverStripe\Core\Config\Configurable;
@@ -14,14 +13,9 @@ use SilverStripe\Core\Injector\Injectable;
  * @package Dynamic\Salsify\Model
  *
  * Based off https://github.com/XinV/salsify-php-api/blob/master/lib/Salsify/API.php
- *
- * @mixin Configurable
- * @mixin Extensible
- * @mixin Injectable
  */
 class Fetcher extends Service
 {
-    use Yieldable;
 
     /**
      * @var string

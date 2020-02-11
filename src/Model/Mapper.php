@@ -3,7 +3,6 @@
 namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\Task\ImportTask;
-use Dynamic\Salsify\Traits\Yieldable;
 use Exception;
 use JsonMachine\JsonMachine;
 use SilverStripe\ORM\DataObject;
@@ -15,7 +14,6 @@ use SilverStripe\Versioned\Versioned;
  */
 class Mapper extends Service
 {
-    use Yieldable;
 
     /**
      * @var
