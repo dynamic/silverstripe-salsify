@@ -24,10 +24,14 @@ trait Yieldable
         foreach ($list as $item) {
             $injected = (yield $item);
 
-            if ($injected === static::$STOP_GENERATOR) break;
+            if ($injected === static::$STOP_GENERATOR) {
+                break;
+            }
         }
 
-        if (is_callable($callback)) $this->callback();
+        if (is_callable($callback)) {
+            $this->callback();
+        }
     }
 
     /**
@@ -40,9 +44,13 @@ trait Yieldable
         foreach ($list as $key => $val) {
             $injected = (yield $key => $val);
 
-            if ($injected === static::$STOP_GENERATOR) break;
+            if ($injected === static::$STOP_GENERATOR) {
+                break;
+            }
         }
 
-        if (is_callable($callback)) $this->callback();
+        if (is_callable($callback)) {
+            $this->callback();
+        }
     }
 }
