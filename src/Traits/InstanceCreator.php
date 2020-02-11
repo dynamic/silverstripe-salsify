@@ -95,6 +95,9 @@ trait InstanceCreator
         return Injector::inst()->has($className . '.' . $this->getImporterKey());
     }
 
+    /**
+     * Creates Injector services if they are not defined
+     */
     public function createServices()
     {
         if (!Injector::inst()->has($this->getMapperInstanceString())) {

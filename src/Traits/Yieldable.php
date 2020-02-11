@@ -8,25 +8,41 @@ namespace Dynamic\Salsify\Traits;
  */
 trait Yieldable
 {
+
     /**
-     * @param $list
+     * @var string
+     */
+    public static $STOP_GENERATOR = 'stop';
+
+    /**
+     * @param array|iterable $list
+     * @param callable|null $callback
      * @return \Generator
      */
-    public function yieldSingle($list)
+    public function yieldSingle($list, $callback = null)
     {
         foreach ($list as $item) {
-            yield $item;
+            $injected = (yield $item);
+
+            if ($injected === static::$STOP_GENERATOR) break;
         }
+
+        if (is_callable($callback)) $this->callback();
     }
 
     /**
-     * @param $list
+     * @param array|iterable $list
+     * @param callable|null $callback
      * @return \Generator
      */
-    public function yieldKeyVal($list)
+    public function yieldKeyVal($list, $callback = null)
     {
         foreach ($list as $key => $val) {
-            yield $key => $val;
+            $injected = (yield $key => $val);
+
+            if ($injected === static::$STOP_GENERATOR) break;
         }
+
+        if (is_callable($callback)) $this->callback();
     }
 }

@@ -305,6 +305,10 @@ class Mapper extends Service
      */
     private function handleModification($class, $dbField, $config, $data)
     {
+        if (!is_array($config)) {
+            return $data;
+        }
+
         if (array_key_exists('modification', $config)) {
             $mod = $config['modification'];
             if ($this->hasMethod($mod)) {
@@ -324,6 +328,10 @@ class Mapper extends Service
      */
     private function handleShouldSkip($class, $dbField, $config, $data)
     {
+        if (!is_array($config)) {
+            return false;
+        }
+
         if (array_key_exists('shouldSkip', $config)) {
             $skipMethod = $config['shouldSkip'];
             if ($this->hasMethod($skipMethod)) {
