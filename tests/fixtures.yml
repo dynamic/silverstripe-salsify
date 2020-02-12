@@ -3,3 +3,6 @@ Dynamic\Salsify\Tests\TestOnly\MappedObject:
     Unique: '3'
     Seller: 'George C. Parker'
     Title: 'Brooklyn Bridge'
+
+  existingWithSalsifyID:
+    SalsifyID: '00000000000001'

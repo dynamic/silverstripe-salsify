@@ -2,10 +2,15 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Dyanmic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\ManyManyList;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -133,24 +138,23 @@ class Mapper extends Service
             $type = $this->getFieldType($salsifyField);
             $objectData = $data;
 
-            if (is_array($salsifyField)) {
-                if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
-                    if (!$this->skipSiliently) {
-                        ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue");
-                        $this->skipSiliently = false;
-                    }
-                    return null;
-                };
+            if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
+                if (!$this->skipSiliently) {
+                    ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue");
+                    $this->skipSiliently = false;
+                }
+                return null;
+            };
 
-                $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
-            }
+            $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
+            $sortColumn = $this->getSortColumn($salsifyField);
 
             if (!array_key_exists($field, $objectData)) {
                 continue;
             }
 
             $value = $this->handleType($type, $class, $objectData, $field, $salsifyField, $dbField);
-            $this->writeValue($object, $dbField, $value);
+            $this->writeValue($object, $dbField, $value, $sortColumn);
         }
 
         if ($object->isChanged()) {
@@ -238,6 +242,10 @@ class Mapper extends Service
      */
     private function findObjectByUnique($class, $mappings, $data)
     {
+        if ($obj = $this->findBySalsifyID($class, $mappings, $data)) {
+            return $obj;
+        }
+
         $uniqueFields = $this->uniqueFields($class, $mappings);
         // creates a filter
         $filter = [];
@@ -254,6 +262,38 @@ class Mapper extends Service
         }
 
         return DataObject::get($class)->filter($filter)->first();
+    }
+
+    /**
+     * @param string $class
+     * @param array $mappings
+     * @param array $data
+     *
+     * @return \SilverStripe\ORM\DataObject|bool
+     */
+    private function findBySalsifyID($class, $mappings, $data)
+    {
+        /** @var DataObject $genericObject */
+        $genericObject = Injector::inst()->get($class);
+        if (
+            !$genericObject->hasExtension(SalsifyIDExtension::class) &&
+            !$genericObject->hasField('SalsifyID')
+        ) {
+            return false;
+        }
+
+        $modifiedData = $data;
+        if (array_key_exists('salsify:id', $mappings)) {
+            $modifiedData = $this->handleModification($class, 'salsify:id', $mappings['salsify:id'], $modifiedData);
+        }
+        $obj = DataObject::get($class)->filter([
+            'SalsifyID' => $modifiedData['salsify:id'],
+        ])->first();
+        if ($obj) {
+            return $obj;
+        }
+
+        return false;
     }
 
     /**
@@ -292,6 +332,22 @@ class Mapper extends Service
 
         $this->currentUniqueFields[$class] = $uniqueFields;
         return $uniqueFields;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    private function getSortColumn($salsifyField)
+    {
+        if (!is_array($salsifyField)) {
+            return false;
+        }
+
+        if (array_key_exists('sortColumn', $salsifyField)) {
+            return $salsifyField['sortColumn'];
+        }
+
+        return false;
     }
 
     /**
@@ -381,10 +437,11 @@ class Mapper extends Service
      * @param DataObject $object
      * @param string $dbField
      * @param mixed $value
+     * @param string|bool $sortColumn
      *
      * @throws \Exception
      */
-    private function writeValue($object, $dbField, $value)
+    private function writeValue($object, $dbField, $value, $sortColumn)
     {
         $isManyRelation = array_key_exists($dbField, $object->config()->get('has_many')) ||
             array_key_exists($dbField, $object->config()->get('many_many')) ||
@@ -395,16 +452,74 @@ class Mapper extends Service
             return;
         }
 
+        // write the object so relations can be written
         if (!$object->exists()) {
             $object->write();
         }
 
-        if (is_array($value)) {
-            $object->{$dbField}()->addMany($value);
+        // change to an array and filter out empty values
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+        $value = array_filter($value);
+
+        $this->removeUnrelated($object, $dbField, $value);
+        $this->writeManyRelation($object, $dbField, $value, $sortColumn);
+    }
+
+    /**
+     * @param DataObject $object
+     * @param string $dbField
+     * @param array $value
+     * @param string|bool $sortColumn
+     *
+     * @throws \Exception
+     */
+    private function writeManyRelation($object, $dbField, $value, $sortColumn)
+    {
+        /** @var DataList|HasManyList|ManyManyList $relation */
+        $relation = $object->{$dbField}();
+
+        if ($sortColumn && $relation instanceof ManyManyList) {
+            for ($i = 0; $i < count($value); $i++) {
+                $relation->add($value[$i], [$sortColumn => $i]);
+            }
             return;
         }
 
-        $object->{$dbField}()->add($value);
+        // HasManyList, so it exists on the value
+        if ($sortColumn) {
+            for ($i = 0; $i < count($value); $i++) {
+                $value[$i]->{$sortColumn} = $i;
+                $relation->add($value[$i]);
+            }
+            return;
+        }
+
+        $relation->addMany($value);
+    }
+
+    /**
+     * Removes unrelated objects in the relation that were previously related
+     * @param DataObject $object
+     * @param string $dbField
+     * @param array $value
+     */
+    private function removeUnrelated($object, $dbField, $value)
+    {
+        $ids = [];
+        foreach ($value as $v) {
+            $ids[] = $v->ID;
+        }
+
+        /** @var DataList $relation */
+        $relation = $object->{$dbField}();
+        // remove all unrelated - removeAll had an odd side effect (relations only got added back half the time)
+        $relation->removeMany(
+            $relation->exclude([
+                'ID' => $ids,
+            ])->column('ID')
+        );
     }
 
     /**

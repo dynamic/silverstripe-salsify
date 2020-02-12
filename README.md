@@ -18,6 +18,32 @@ composer require dynamic/silverstripe-salsify
 ## License
 See [License](license.md)
 
+## Table of Contents
+- [Running the task](#running-the-task)
+- [Example configuration](#example-configuration)
+    - [Extensions](#extensions)
+      - [SalsifyIDExtension](#salsifyidextension)
+    - [Importer](#importer)
+    - [Fetcher](#fetcher)
+    - [Mapper](#mapper)
+      - [Unique Fields](#unique-fields)
+      - [Field Types](#field-types)
+        - [Literal](#literal)
+        - [Files and Images](#files-and-images)
+        - [HasOne and HasMany](#hasone-and-hasmany)
+          - [HasOne Example](#hasone-example)
+          - [ManyRelation Example](#manyrelation-example)
+      - [Field Fallback](#field-fallback)
+      - [Extending afterObjectWrite](#extending-afterobjectwrite)
+      - [Advanced](#advanced)
+         - [Custom Field Types](#custom-field-types)
+         - [Skipping Objects](#skipping-objects)
+         - [Modify Field Data](#modify-field-data)
+  - [Single Object Import](#single-object-import)
+- [Maintainers](#maintainers)
+- [Bugtracker](#bugtracker)
+- [Development and contribution](#development-and-contribution)
+
 ## Running the task
 The task can be run from a browser window or the command line.
 To run the task in the browser go to `dev/tasks` and find `Import products from salsify` or visit `dev/tasks/SalsifyImportTask`.
@@ -188,8 +214,11 @@ salsify will be used to try and convert the file into a png.
 ##### HasOne and HasMany
 has_one and has_many relations can be done just about the same.
 The `HasOne`'s `salsifyField` doesn't matter.
-The `Many` type requires a salsify field that is an array.
+The `ManyRelation` type requires a salsify field that is an array.
+`ManyRelation` can also have a sort column specified.
 All modifications to the data will be passed through to the mapping realtion.
+
+###### HasOne example:
 ```yaml
 Dynamic\Salsify\Model\Mapper.example:
   mapping:
@@ -200,6 +229,157 @@ Dynamic\Salsify\Model\Mapper.example:
         relation:
           \Documentobject:
             Title: Document Title
+```
+
+###### ManyRelation example:
+```php
+namespace {
+    use SilverStripe\CMS\Model\SiteTree;
+
+    class Page extends SiteTree
+    {
+
+        /**
+         * @var array
+         */
+        private static $many_many = [
+            'Features' => Feature::class,
+        ];
+
+        private static $many_many_extraFields = [
+            'Features' => [
+                'SortOrder'=> 'Int',
+            ],
+        ];
+    }
+}
+```
+
+```php
+<?php
+
+namespace {
+    use \Page;
+    use SilverStripe\ORM\DataObject;
+
+    /**
+     * Class Feature
+     *
+     * @property string Name
+     */
+    class Feature extends DataObject
+    {
+        /**
+         * @var string
+         */
+        private static $table_name = 'Feature';
+
+        /**
+         * @var array
+         */
+        private static $db = [
+            'Name' => 'Varchar(100)',
+        ];
+
+        /**
+         * @var array
+         */
+        private static $belongs_many_many = [
+            'Pages' => Page::class,
+        ];
+
+        /**
+         * @var array
+         */
+        private static $indexes = [
+            'Name' => [
+                'type' => 'unique',
+                'columns' => ['Name'],
+            ],
+        ];
+    }
+}
+```
+
+```php
+<?php
+
+namespace {
+
+    use SilverStripe\Core\Extension;
+
+    /**
+     * Class SalsifyExtension
+     * @package Dynamic\ToiletSeats\Extension
+     */
+    class SalsifyExtension extends Extension
+    {
+        /**
+         * @param string|\SilverStripe\ORM\DataObject $class
+         * @param string $dbField
+         * @param array $config
+         * @param array $data
+         *
+         * @return array
+         */
+        public function featureModifier($class, $dbField, $config, $data)
+        {
+            $features = [];
+            foreach ($this->owner->config()->get('featureFields') as $featuredField) {
+                if (array_key_exists($featuredField, $data) && $this->is_true($data[$featuredField])) {
+                    $features[] = [
+                        'FeatureName' => $featuredField,
+                    ];
+                }
+            }
+            $data['Features'] = $features;
+            return $data;
+        }
+
+        /**
+         * @param $val
+         * @param bool $return_null
+         * @return bool|mixed|null
+         *
+         * FROM https://www.php.net/manual/en/function.boolval.php#116547
+         */
+        private function is_true($val, $return_null = false)
+        {
+            $boolval = (bool)$val;
+
+            if (is_string($val)) {
+                $boolval = filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            }
+
+            if ($boolval === null && !$return_null) {
+                return false;
+            }
+
+            return $boolval;
+        }
+    }
+}
+```
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  extensions:
+    - SalsifyExtension
+  featureFields:
+      - "Feature One"
+      - "Feature Two"
+  mapping:
+    \Page:
+      Features:
+        salsifyField: 'Features'
+        type: 'ManyRelation'
+        modification: 'featureModifier'
+        sortColumn: 'SortOrder'
+        relation:
+          Feature:
+            Name:
+              salsifyField: 'FeatureName'
+              unique: true
 ```
 
 #### Field Fallback

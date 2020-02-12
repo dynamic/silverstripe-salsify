@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Tests\Model\Mapper;
 
+use Dyanmic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
@@ -32,6 +33,9 @@ class MapperTest extends SapphireTest
             MapperModification::class,
             MapperSkipper::class,
         ],
+        MappedObject::class => [
+            SalsifyIDExtension::class,
+        ]
     ];
 
     /**
@@ -56,6 +60,10 @@ class MapperTest extends SapphireTest
             'mapping',
             [
                 MappedObject::class => [
+                    'SalsifyID' => [
+                        'salsifyField' => 'salsify:id',
+                    ],
+                    'SalsifyUpdatedAt' => 'salsify:updated_at',
                     'Unique' => [
                         'salsifyField' => 'custom-field-unique',
                         'unique' => true,
@@ -77,6 +85,7 @@ class MapperTest extends SapphireTest
                     'Images' => [
                         'salsifyField' => 'custom-field-images',
                         'type' => 'ManyImages',
+                        'sortColumn' => 'SortOrder',
                     ],
                     'Unknown' => [
                         'unique' => true,
@@ -115,15 +124,18 @@ class MapperTest extends SapphireTest
      */
     public function testMap()
     {
-        $this->assertEquals(1, MappedObject::get()->count());
-
         $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
         $mapper->map();
 
-        // check to see if added
+        // check to see if existing added
         $this->assertEquals(7, MappedObject::get()->count());
-        // check to see if existing object was modified
+        // check to see if existing object with unique was modified
         $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->Seller);
+        $this->assertEquals('00000000000002', MappedObject::get()->find('Unique', '3')->SalsifyID);
+
+        // check to see if existing object with salsify id was modified
+        $this->assertEquals('Victor Lustig', MappedObject::get()->find('Unique', '2')->Seller);
+        $this->assertEquals('00000000000001', MappedObject::get()->find('Unique', '2')->SalsifyID);
 
         // tests for unchanged
         $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
@@ -135,6 +147,13 @@ class MapperTest extends SapphireTest
         // test images
         $this->assertEquals(9, Image::get()->count());
         $this->assertEquals(2, MappedObject::get()->find('Unique', '3')->Images()->count());
+        // first in image array is actually first with sort column specified
+        $this->assertEquals(
+            'DA-002-002',
+            MappedObject::get()->find('Unique', '3')->Images()->sort('SortOrder')->first()->SalsifyID
+        );
+
         $this->assertTrue(MappedObject::get()->first()->MainImageID > 0);
+        $this->assertTrue(MappedObject::get()->last()->MainImageID > 0);
     }
 }

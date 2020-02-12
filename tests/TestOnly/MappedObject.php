@@ -45,4 +45,13 @@ class MappedObject extends DataObject implements TestOnly
     private static $many_many = [
         'Images' => Image::class,
     ];
+
+    /**
+     * @var array
+     */
+    private static $many_many_extraFields = [
+        'Images' => [
+            'SortOrder' => 'Int',
+        ],
+    ];
 }
