@@ -12,6 +12,11 @@ use SilverStripe\Dev\TestOnly;
 class TestController extends LeftAndMain implements TestOnly
 {
     /**
+     * @var string
+     */
+    private static $url_segment = 'test-contoller';
+
+    /**
      * @return bool
      */
     public function canFetchSalsify()
