@@ -3,6 +3,7 @@
 namespace Dyanmic\Salsify\ORM;
 
 use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\CMS\Forms\SiteTreeURLSegmentField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Forms\DatetimeField;
@@ -46,7 +47,7 @@ class SalsifyIDExtension extends DataExtension
         }
 
         if ($this->owner->SalsifyID) {
-            $salsifyID->setReadonly(true);
+            $salsifyID->setTemplate(SiteTreeURLSegmentField::class)->addExtraClass('urlsegment');
         }
         $salsifyUpdatedAt->setReadonly(true);
     }
@@ -92,5 +93,15 @@ class SalsifyIDExtension extends DataExtension
 
             $actions->push($action);
         }
+    }
+
+    /**
+     *
+     */
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+
+        $this->owner->SalsifyID = trim($this->owner->SalsifyID);
     }
 }

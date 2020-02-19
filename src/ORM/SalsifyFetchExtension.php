@@ -123,7 +123,7 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         }
 
         if (!$record || !$record->SalsifyID) {
-            $this->owner->httpError(404, "Bad salsify ID: " . (int)$id);
+            $this->owner->httpError(404, "Bad salsify ID: $id");
         }
 
         ImportTask::config()->remove('output');
@@ -166,6 +166,11 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         ]);
 
         $response = $client->get($url);
+
+        if ($response->getStatusCode() == 404) {
+            $this->owner->httpError(404, "Bad salsify ID: $salsifyID");
+        }
+
         return json_decode($response->getBody(), true);
     }
 

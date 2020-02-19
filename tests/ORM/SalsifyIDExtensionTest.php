@@ -5,6 +5,7 @@ namespace Dynamic\Salsify\Tests\Model\ORM;
 use Dyanmic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
 use Dynamic\Salsify\Tests\TestOnly\TestController;
+use SilverStripe\CMS\Forms\SiteTreeURLSegmentField;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Session;
 use SilverStripe\Dev\SapphireTest;
@@ -52,7 +53,7 @@ class SalsifyIDExtensionTest extends SapphireTest
         $fields = $object->getCMSFields();
         $this->assertInstanceOf(FieldList::class, $fields);
         $this->assertInstanceOf(FormField::class, $fields->fieldByName('SalsifyID'));
-        $this->assertTrue($fields->fieldByName('SalsifyID')->isReadonly());
+        $this->assertEquals(SiteTreeURLSegmentField::class, $fields->fieldByName('SalsifyID')->getTemplate());
     }
 
     /**
@@ -65,7 +66,7 @@ class SalsifyIDExtensionTest extends SapphireTest
         $fields = $object->getCMSFields();
         $this->assertInstanceOf(FieldList::class, $fields);
         $this->assertInstanceOf(FormField::class, $fields->fieldByName('SalsifyID'));
-        $this->assertFalse($fields->fieldByName('SalsifyID')->isReadonly());
+        $this->assertNotEquals(SiteTreeURLSegmentField::class, $fields->fieldByName('SalsifyID'));
     }
 
     /**
