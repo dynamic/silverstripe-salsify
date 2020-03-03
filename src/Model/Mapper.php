@@ -515,11 +515,13 @@ class Mapper extends Service
         /** @var DataList $relation */
         $relation = $object->{$dbField}();
         // remove all unrelated - removeAll had an odd side effect (relations only got added back half the time)
-        $relation->removeMany(
-            $relation->exclude([
-                'ID' => $ids,
-            ])->column('ID')
-        );
+        if (!empty($ids)) {
+            $relation->removeMany(
+                $relation->exclude([
+                    'ID' => $ids,
+                ])->column('ID')
+            );
+        }
     }
 
     /**
