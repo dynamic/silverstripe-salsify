@@ -75,11 +75,11 @@ class AssetHandler extends Extension
     /**
      * @param string $id
      * @param string|DataObject $class
-     * @return File|\Dyanmic\Salsify\ORM\SalsifyIDExtension
+     * @return File|\Dynamic\Salsify\ORM\SalsifyIDExtension
      */
     protected function findOrCreateFile($id, $class = File::class)
     {
-        /** @var File|\Dyanmic\Salsify\ORM\SalsifyIDExtension $file */
+        /** @var File|\Dynamic\Salsify\ORM\SalsifyIDExtension $file */
         if ($file = $class::get()->find('SalsifyID', $id)) {
             return $file;
         }

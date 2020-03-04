@@ -1,6 +1,6 @@
 <?php
 
-namespace Dyanmic\Salsify\ORM;
+namespace Dynamic\Salsify\ORM;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
@@ -8,7 +8,7 @@ use SilverStripe\Forms\ReadonlyField;
 
 /**
  * Class AssetFormFactoryExtension
- * @package Dyanmic\Salsify\ORM
+ * @package Dynamic\Salsify\ORM
  *
  * @property-read \SilverStripe\AssetAdmin\Forms\FileFormFactory $owner
  */

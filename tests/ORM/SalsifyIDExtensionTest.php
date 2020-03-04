@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\Tests\Model\ORM;
 
-use Dyanmic\Salsify\ORM\SalsifyIDExtension;
+use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;
 use Dynamic\Salsify\Tests\TestOnly\TestController;
 use SilverStripe\CMS\Forms\SiteTreeURLSegmentField;

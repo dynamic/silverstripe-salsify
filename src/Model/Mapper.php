@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
-use Dyanmic\Salsify\ORM\SalsifyIDExtension;
+use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
