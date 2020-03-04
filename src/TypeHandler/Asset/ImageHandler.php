@@ -29,6 +29,62 @@ class ImageHandler extends AssetHandler
     private static $defaultImageType = 'png';
 
     /**
+     * @param Image $image
+     * @param array $sizes
+     */
+    public function resizeImage($image, $sizes)
+    {
+        foreach ($sizes as $size) {
+            $backgroundColor = array_key_exists('backgroundColor', $size) ? $size['backgroundColor'] : '#FFFFFF';
+            $width = array_key_exists('width', $size) ? $size['width'] : 0;
+            $height = array_key_exists('height', $size) ? $size['height'] : $width;
+
+            if (!array_key_exists('type', $size)) {
+                if ($width !== 0 && $height !== 0) {
+                    $image->Fill($width, $height);
+                }
+                break;
+            }
+
+            $type = $size['type'];
+            switch ($type) {
+                case 'Resample':
+                    $image->Resampled();
+                    break;
+
+                case 'StripThumbnail':
+                case 'StripThumb':
+                    $image->StripThumbnail();
+                    break;
+
+                case 'CMSThumbnail':
+                case 'CMSThumb':
+                    $image->CMSThumbnail();
+                    break;
+
+                case 'Thumbnail':
+                case 'Thumb':
+                    if ($width !== 0 && $height !== 0) {
+                        $image->Thumbnail($width, $height);
+                    }
+                    break;
+
+                case 'Pad':
+                    if ($width !== 0 && $height !== 0) {
+                        $image->Pad($width, $height, $backgroundColor);
+                    }
+                    break;
+
+                case 'Fill':
+                default:
+                    if ($width !== 0 && $height !== 0) {
+                        $image->Fill($width, $height);
+                    }
+            }
+        }
+    }
+
+    /**
      * @param string|DataObject $class
      * @param $data
      * @param $dataField
@@ -55,6 +111,11 @@ class ImageHandler extends AssetHandler
             $name,
             Image::class
         );
+
+        if (array_key_exists('sizes', $config)) {
+            $this->resizeImage($asset, $config['sizes']);
+        }
+
         return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
     }
 

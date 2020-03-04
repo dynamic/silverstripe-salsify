@@ -30,6 +30,7 @@ See [License](license.md)
       - [Field Types](#field-types)
         - [Literal](#literal)
         - [Files and Images](#files-and-images)
+          - [Image Resizing](#image-resizing)
         - [HasOne and HasMany](#hasone-and-hasmany)
           - [HasOne Example](#hasone-example)
           - [ManyRelation Example](#manyrelation-example)
@@ -210,6 +211,45 @@ Dynamic\Salsify\Model\Mapper.example:
 
 If the mapping is specified as an image and it is not a valid image extension,
 salsify will be used to try and convert the file into a png.
+
+###### Image Resizing
+To cut down on 500 errors caused by trying to resize images when visiting a page images can be resized when created.
+The resized images will not replace what comes from salsify, but uses the built in SilverStripe image resize methods.
+
+The supported manipulations are:
+ - `Resample`
+ - `StripThumbnail` or `StripThumb`
+ - `CMSThumbnail` or `CMSThumb`
+ - `Thumbnail` or `Thumb`
+ - `Pad`
+ - `Fill`
+
+`Thumbnail`, `Pad`, and `Fill` require a width to generate resampled images.
+Height can also be specified for these, but will default to the width.
+If no type is specified it will default to `Fill`.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      FrontImageID:
+        salsifyField: Front Image
+        type: Image
+        sizes:
+          - type: CMSThumbnail # Thumbnail used in the CMS
+          - type: StripThumbnail # Thumbnail used in GridFields
+          - type: Thumbnail # Creates a Thumbnail with dimensions 200 x 200
+            width: 200
+          - type: Pad
+            width: 300
+            height: 700
+          - type: Fill
+            width: 300
+            height: 250
+          - width: 300 # Defaults to Fill(300, 300)
+```
+
+It is recomended to use this on the `ManyImages` type for the CMS Thumbnails and Strip Thumbnails to prevent the cms from throwing errors.
 
 ##### HasOne and HasMany
 has_one and has_many relations can be done just about the same.
