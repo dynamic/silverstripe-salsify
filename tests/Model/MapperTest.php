@@ -2,7 +2,7 @@
 
 namespace Dynamic\Salsify\Tests\Model\Mapper;
 
-use Dyanmic\Salsify\ORM\SalsifyIDExtension;
+use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Model\Mapper;
 use Dynamic\Salsify\Task\ImportTask;
 use Dynamic\Salsify\Tests\TestOnly\MappedObject;

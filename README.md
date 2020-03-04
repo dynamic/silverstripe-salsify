@@ -41,6 +41,7 @@ See [License](license.md)
          - [Skipping Objects](#skipping-objects)
          - [Modify Field Data](#modify-field-data)
   - [Single Object Import](#single-object-import)
+- [Troubleshooting](#troubleshooting)
 - [Maintainers](#maintainers)
 - [Bugtracker](#bugtracker)
 - [Development and contribution](#development-and-contribution)
@@ -55,17 +56,17 @@ To run the task in the command line sake must be installed and the command `sake
 ## Example configuration
 ### Extensions
 #### SalsifyIDExtension
-It is recommended to add `Dyanmic\Salsify\ORM\SalsifyIDExtension` as an extension of any object being mapped to.
+It is recommended to add `Dynamic\Salsify\ORM\SalsifyIDExtension` as an extension of any object being mapped to.
 It will add a `SalsifyID` and `SalsifyUpdatedAt` field that can be mapped to.
 The `SalsifyID` field is used in single object updates.
 
 ```yaml
 MyObject:
   extensions:
-    - Dyanmic\Salsify\ORM\SalsifyIDExtension
+    - Dynamic\Salsify\ORM\SalsifyIDExtension
 ```
 
-The `SalsifyID` and `SalsifyUpdatedAt` fields will stil need to be explicitly mapped in the mapper config.
+The `SalsifyID` and `SalsifyUpdatedAt` fields will still need to be explicitly mapped in the mapper config.
 
 ```yaml
 Dynamic\Salsify\Model\Mapper.example:
@@ -121,8 +122,8 @@ Dynamic\Salsify\Model\Fetcher.example:
 
 https://developers.salsify.com/docs/organization-id
 
-The fetcher can also have the timout changed for http requests.
-This is not a timout for Salsify to generate an export.
+The fetcher can also have the timeout changed for http requests.
+This is not a timeout for Salsify to generate an export.
 Timeout is in milliseconds and defaults to 2000 ms or 2 seconds.
 Like an `apiKey` the timeout can be set in the root fetcher config and be overridden by a service config.
 ```yaml
@@ -224,7 +225,7 @@ The supported manipulations are:
  - `Pad`
  - `Fill`
 
-`Thumbnail`, `Pad`, and `Fill` require a width to generate resampled images.
+`Thumbnail`, `Pad`, and `Fill` require a width to generate re-sampled images.
 Height can also be specified for these, but will default to the width.
 If no type is specified it will default to `Fill`.
 
@@ -249,14 +250,14 @@ Dynamic\Salsify\Model\Mapper.example:
           - width: 300 # Defaults to Fill(300, 300)
 ```
 
-It is recomended to use this on the `ManyImages` type for the CMS Thumbnails and Strip Thumbnails to prevent the cms from throwing errors.
+It is recommended to use this on the `ManyImages` type for the CMS Thumbnails and Strip Thumbnails to prevent the cms from throwing errors.
 
 ##### HasOne and HasMany
 has_one and has_many relations can be done just about the same.
 The `HasOne`'s `salsifyField` doesn't matter.
 The `ManyRelation` type requires a salsify field that is an array.
 `ManyRelation` can also have a sort column specified.
-All modifications to the data will be passed through to the mapping realtion.
+All modifications to the data will be passed through to the mapping relation.
 
 ###### HasOne example:
 ```yaml
@@ -350,7 +351,6 @@ namespace {
 
     /**
      * Class SalsifyExtension
-     * @package Dynamic\ToiletSeats\Extension
      */
     class SalsifyExtension extends Extension
     {
@@ -459,25 +459,26 @@ Dynamic\Salsify\Model\Mapper.example:
 
 ```php
 <?php
+namespace {
+    use SilverStripe\Core\Extension;
 
-use SilverStripe\Core\Extension;
-
-/**
- * Class TestModification
- */
-class ExamplePublishExtension extends Extension
-{
     /**
-     * This will publish all new mapped objects and mapped objects that are already published.
-     * @param DataObject|Versioned $object
-     * @param bool $wasWritten
-     * @param bool $wasPublished
+     * Class TestModification
      */
-    public function afterObjectWrite($object, $wasWritten, $wasPublished)
+    class ExamplePublishExtension extends Extension
     {
-        if ($object->hasExtension(Versioned::class)) {
-            if (!$wasWritten || $wasPublished) {
-                $object->publishRecursive();
+        /**
+         * This will publish all new mapped objects and mapped objects that are already published.
+         * @param DataObject|Versioned $object
+         * @param bool $wasWritten
+         * @param bool $wasPublished
+         */
+        public function afterObjectWrite($object, $wasWritten, $wasPublished)
+        {
+            if ($object->hasExtension(Versioned::class)) {
+                if (!$wasWritten || $wasPublished) {
+                    $object->publishRecursive();
+                }
             }
         }
     }
@@ -520,6 +521,11 @@ SilverStripe\Core\Injector\Injector:
     constructor:
       importerKey: single
 ```
+
+## Troubleshooting
+### Some fields are not importing
+If some fields are not importing please make sure they show up in the data.
+Occasionally properties will have a different id and name, in this case the data will show up under the property id.
 
 ## Maintainers
  * Dynamic <dev@dynamicagency.com>

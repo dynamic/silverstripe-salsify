@@ -1,6 +1,6 @@
 <?php
 
-namespace Dyanmic\Salsify\ORM;
+namespace Dynamic\Salsify\ORM;
 
 use Dynamic\Salsify\Model\Fetcher;
 use Dynamic\Salsify\Model\Mapper;
@@ -14,8 +14,8 @@ use SilverStripe\Security\Security;
 
 /**
  * Class LeftAndMainExtension
- * @package Dyanmic\Salsify\ORM
- * @property-read \SilverStripe\Admin\LeftAndMain|\Dyanmic\Salsify\ORM\SalsifyFetchExtension $owner
+ * @package Dynamic\Salsify\ORM
+ * @property-read \SilverStripe\Admin\LeftAndMain|\Dynamic\Salsify\ORM\SalsifyFetchExtension $owner
  */
 class SalsifyFetchExtension extends LeftAndMainExtension
 {
@@ -116,7 +116,7 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         $className = $this->owner->currentPage()->getClassName();
 
         $id = $data['ID'];
-        /** @var DataObject|\Dyanmic\Salsify\ORM\SalsifyIDExtension $record */
+        /** @var DataObject|\Dynamic\Salsify\ORM\SalsifyIDExtension $record */
         $record = DataObject::get_by_id($className, $id);
         if ($record && !$record->canEdit()) {
             return Security::permissionFailure();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Dyanmic\Salsify\ORM;
+namespace Dynamic\Salsify\ORM;
 
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\CMS\Forms\SiteTreeURLSegmentField;
@@ -18,7 +18,7 @@ use SilverStripe\ORM\DataExtension;
  * @property string SalsifyID
  * @property string SalsifyUpdatedAt
  *
- * @property-read \SilverStripe\ORM\DataObject|\Dyanmic\Salsify\ORM\SalsifyIDExtension $owner
+ * @property-read \SilverStripe\ORM\DataObject|\Dynamic\Salsify\ORM\SalsifyIDExtension $owner
  */
 class SalsifyIDExtension extends DataExtension
 {
