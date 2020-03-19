@@ -42,6 +42,15 @@ class SalsifyRelationHandler extends Extension
             }
         }
 
+        $related = array_filter($related);
+
+        if (array_key_exists('single', $config) && $config['single'] == true) {
+            if (count($related)) {
+                $object = $related[0];
+                return preg_match('/ID$/', $dbField) ? $object->ID : $object;
+            }
+            return preg_match('/ID$/', $dbField) ? 0 : null;
+        }
         return $related;
     }
 }
