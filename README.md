@@ -34,6 +34,7 @@ See [License](license.md)
         - [HasOne and HasMany](#hasone-and-hasmany)
           - [HasOne Example](#hasone-example)
           - [ManyRelation Example](#manyrelation-example)
+        - [Salsify Relations](#salsify-relations)
       - [Field Fallback](#field-fallback)
       - [Extending afterObjectWrite](#extending-afterobjectwrite)
       - [Advanced](#advanced)
@@ -420,6 +421,30 @@ Dynamic\Salsify\Model\Mapper.example:
             Name:
               salsifyField: 'FeatureName'
               unique: true
+```
+
+###### Salsify Relations
+Relationships between products can also be created in salsify.
+By default it will map to a `has_many` and `many_many` relation.
+The `salsifyField` is the name of the relation type.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      RelatedProducts:
+        salsifyField: 'You May Also Like'
+        type: 'SalsifyRelation'
+```
+
+To map to a `has_one` relation a single object can be returned.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      AlternateProduct:
+        salsifyField: 'Alternate'
+        type: 'SalsifyRelation'
+        single: true
 ```
 
 #### Field Fallback

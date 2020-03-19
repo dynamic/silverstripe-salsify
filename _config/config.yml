@@ -13,6 +13,7 @@ Dynamic\Salsify\Model\Mapper:
     - Dynamic\Salsify\TypeHandler\Asset\ImageHandler
     - Dynamic\Salsify\TypeHandler\Relation\HasOneHandler
     - Dynamic\Salsify\TypeHandler\Relation\ManyHandler
+    - Dynamic\Salsify\TypeHandler\Relation\SalsifyRelationHandler
 
 SilverStripe\Assets\File:
   extensions:

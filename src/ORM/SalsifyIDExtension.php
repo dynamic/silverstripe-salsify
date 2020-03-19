@@ -28,7 +28,15 @@ class SalsifyIDExtension extends DataExtension
      */
     private static $db = [
         'SalsifyID' => 'Varchar(255)',
-        'SalsifyUpdatedAt' => 'Varchar(255)'
+        'SalsifyUpdatedAt' => 'Varchar(255)',
+        'SalsifyRelationsUpdatedAt' => 'Varchar(255)',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $indexes = [
+        'SalsifyID' => true,
     ];
 
     /**
@@ -46,10 +54,16 @@ class SalsifyIDExtension extends DataExtension
             $fields->push($salsifyUpdatedAt = DatetimeField::create('SalsifyUpdatedAt'));
         }
 
+        $salsifyRelationsUpdatedAt = $fields->fieldByName('SalsifyRelationsUpdatedAt');
+        if (!$salsifyRelationsUpdatedAt) {
+            $fields->push($salsifyRelationsUpdatedAt = DatetimeField::create('SalsifyRelationsUpdatedAt'));
+        }
+
         if ($this->owner->SalsifyID) {
             $salsifyID->setTemplate(SiteTreeURLSegmentField::class)->addExtraClass('urlsegment');
         }
         $salsifyUpdatedAt->setReadonly(true);
+        $salsifyRelationsUpdatedAt->setReadonly(true);
     }
 
     /**

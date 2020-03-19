@@ -90,6 +90,15 @@ class Mapper extends Service
                 $this->currentUniqueFields = [];
             }
         }
+
+        if ($this->mappingHasSalsifyRelation()) {
+            foreach ($this->yieldKeyVal($this->productStream) as $name => $data) {
+                foreach ($this->yieldKeyVal($this->config()->get('mapping')) as $class => $mappings) {
+                    $this->mapToObject($class, $mappings, $data, null, true);
+                    $this->currentUniqueFields = [];
+                }
+            }
+        }
         ImportTask::output("Imported and updated $this->importCount products.");
     }
 
@@ -98,12 +107,19 @@ class Mapper extends Service
      * @param array $mappings The mapping for a specific class
      * @param array $data
      * @param DataObject|null $object
+     * @param bool $salsifyRelations
      *
-     * @return DataObject
+     * @return DataObject|null
      * @throws \Exception
      */
-    public function mapToObject($class, $mappings, $data, $object = null)
+    public function mapToObject($class, $mappings, $data, $object = null, $salsifyRelations = false)
     {
+        if ($salsifyRelations) {
+            if (!$this->classConfigHasSalsifyRelation($mappings)) {
+                return null;
+            }
+        }
+
         // if object was not passed
         if ($object === null) {
             $object = $this->findObjectByUnique($class, $mappings, $data);
@@ -124,7 +140,7 @@ class Mapper extends Service
         }
         ImportTask::output("Updating $class $firstUniqueKey $firstUniqueValue");
 
-        if ($this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
+        if ($this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)) {
             return $object;
         }
 
@@ -134,8 +150,12 @@ class Mapper extends Service
                 continue;
             }
 
-            $value = null;
             $type = $this->getFieldType($salsifyField);
+            if ($salsifyRelations && $type != 'SalsifyRelation') {
+                continue;
+            }
+
+            $value = null;
             $objectData = $data;
 
             if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
@@ -149,7 +169,7 @@ class Mapper extends Service
             $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
             $sortColumn = $this->getSortColumn($salsifyField);
 
-            if (!array_key_exists($field, $objectData)) {
+            if ($salsifyRelations == false && !array_key_exists($field, $objectData)) {
                 continue;
             }
 
@@ -172,17 +192,28 @@ class Mapper extends Service
      * @param array $data
      * @param string $firstUniqueKey
      * @param string $firstUniqueValue
+     * @param bool $salsifyRelations
      * @return bool
      */
-    private function objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)
+    private function objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations = false)
     {
-        if (
-            $this->config()->get('skipUpToDate') == true &&
-            $object->hasField('SalsifyUpdatedAt') &&
-            $data['salsify:updated_at'] == $object->getField('SalsifyUpdatedAt')
-        ) {
-            ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
-            return true;
+        if ($this->config()->get('skipUpToDate') == true) {
+            if (
+                $salsifyRelations == false &&
+                $object->hasField('SalsifyUpdatedAt') &&
+                $data['salsify:updated_at'] == $object->getField('SalsifyUpdatedAt')
+            ) {
+                ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
+                return true;
+            }
+
+            if (
+                $salsifyRelations == true &&
+                $object->hasField('SalsifyRelationsUpdatedAt') &&
+                $data['salsify:relations_updated_at'] == $object->getField('SalsifyRelationsUpdatedAt')
+            ) {
+                return true;
+            }
         }
         return false;
     }
@@ -204,9 +235,17 @@ class Mapper extends Service
             $this->getFieldType($salsifyField) === 'Literal' &&
             array_key_exists('value', $salsifyField)
         );
+        $isSalsifyRelationField = (
+            $this->getFieldType($salsifyField) === 'SalsifyRelation' &&
+            $hasSalsifyField
+        );
 
         if ($isLiteralField) {
             return $salsifyField['value'];
+        }
+
+        if ($isSalsifyRelationField) {
+            return $salsifyField['salsifyField'];
         }
 
         if (!$hasSalsifyField) {
@@ -347,6 +386,45 @@ class Mapper extends Service
             return $salsifyField['sortColumn'];
         }
 
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    private function mappingHasSalsifyRelation()
+    {
+        foreach ($this->yieldKeyVal($this->config()->get('mapping')) as $class => $mappings) {
+            if ($this->classConfigHasSalsifyRelation($mappings)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array $classConfig
+     * @return bool
+     */
+    private function classConfigHasSalsifyRelation($classConfig)
+    {
+        foreach ($this->yieldKeyVal($classConfig) as $field => $config) {
+            if (!is_array($config)) {
+                continue;
+            }
+
+            if (!array_key_exists('salsifyField', $config)) {
+                continue;
+            }
+
+            if (!array_key_exists('type', $config)) {
+                continue;
+            }
+
+            if ($config['type'] === 'SalsifyRelation') {
+                return true;
+            }
+        }
         return false;
     }
 
