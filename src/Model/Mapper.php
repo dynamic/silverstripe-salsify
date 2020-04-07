@@ -65,9 +65,17 @@ class Mapper extends Service
 
         if ($file !== null) {
             $this->file = $file;
-            $this->productStream = JsonMachine::fromFile($file, '/4/products');
+            $this->resetProductStream();
             $this->resetAssetStream();
         }
+    }
+
+    /**
+     *
+     */
+    public function resetProductStream()
+    {
+        $this->productStream = JsonMachine::fromFile($this->file, '/4/products');
     }
 
     /**
@@ -92,6 +100,8 @@ class Mapper extends Service
         }
 
         if ($this->mappingHasSalsifyRelation()) {
+            $this->resetProductStream();
+
             foreach ($this->yieldKeyVal($this->productStream) as $name => $data) {
                 foreach ($this->yieldKeyVal($this->config()->get('mapping')) as $class => $mappings) {
                     $this->mapToObject($class, $mappings, $data, null, true);
@@ -210,6 +220,7 @@ class Mapper extends Service
             if (
                 $salsifyRelations == true &&
                 $object->hasField('SalsifyRelationsUpdatedAt') &&
+                isset($data['salsify:relations_updated_at']) &&
                 $data['salsify:relations_updated_at'] == $object->getField('SalsifyRelationsUpdatedAt')
             ) {
                 return true;
