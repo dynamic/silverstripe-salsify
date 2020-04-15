@@ -130,8 +130,7 @@ class Mapper extends Service
         $object = null,
         $salsifyRelations = false,
         $forceUpdate = false
-    )
-    {
+    ) {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
                 return null;
