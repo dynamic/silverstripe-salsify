@@ -8,6 +8,7 @@ use Dynamic\Salsify\Task\ImportTask;
 use Dynamic\Salsify\Traits\InstanceCreator;
 use GuzzleHttp\Client;
 use SilverStripe\Admin\LeftAndMainExtension;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Security;
@@ -181,19 +182,30 @@ class SalsifyFetchExtension extends LeftAndMainExtension
      */
     private function mapData($record, $data)
     {
-        $this->getMapper()->mapToObject(
-            $record->getClassName(),
-            $this->getClassMapping($record->getClassName()),
-            $data,
-            $record
+        $forceUpdate = Config::inst()->get(
+            $this->owner->currentPage()->getClassName(),
+            'refetch_force_update'
         );
-
         $this->getMapper()->mapToObject(
             $record->getClassName(),
             $this->getClassMapping($record->getClassName()),
             $data,
             $record,
-            true
+            false,
+            $forceUpdate
+        );
+
+        $forceUpdateRelations = Config::inst()->get(
+            $this->owner->currentPage()->getClassName(),
+            'refetch_force_update_relations'
+        );
+        $this->getMapper()->mapToObject(
+            $record->getClassName(),
+            $this->getClassMapping($record->getClassName()),
+            $data,
+            $record,
+            true,
+            $forceUpdateRelations
         );
     }
 }

@@ -23,6 +23,7 @@ See [License](license.md)
 - [Example configuration](#example-configuration)
     - [Extensions](#extensions)
       - [SalsifyIDExtension](#salsifyidextension)
+      - [SalsifyFetchExtension](#salsifyfetchextension)
     - [Importer](#importer)
     - [Fetcher](#fetcher)
     - [Mapper](#mapper)
@@ -78,6 +79,22 @@ Dynamic\Salsify\Model\Mapper.example:
         unique: true
       SalsifyUpdatedAt: 'salsify:updated_at'
 ```
+
+#### SalsifyFetchExtension
+The `SalsifyFetchExtension` is automatically added to left and main.
+It will provide a button on data objects that have a salsify mapping to refetch.
+
+To have the button force update `refetch_force_update` and `refetch_force_update_relations` can be set to true on the data object being mapped to.
+When set to true `refetch_force_update` will force update any non-relation field in salsify.
+When set to true `refetch_force_update_relations` will force update any relation field in salsify.
+
+```yaml
+\Page:
+  refetch_force_update: true
+  refetch_force_update_relations: true
+```
+
+See the [Single Object Import](#single-object-import) section for more setup information.
 
 ### Importer
 Importers will run fetchers and mappers. Each importer needs to be passed an importerKey to its constructor.
@@ -546,6 +563,8 @@ SilverStripe\Core\Injector\Injector:
     constructor:
       importerKey: single
 ```
+
+For more configuration options see [SalsifyFetchExtension](#salsifyfetchextension)
 
 ## Troubleshooting
 ### Some fields are not importing
