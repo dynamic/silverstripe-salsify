@@ -182,7 +182,10 @@ class SalsifyFetchExtension extends LeftAndMainExtension
      */
     private function mapData($record, $data)
     {
-        $forceUpdate = Config::inst()->get($this->owner->currentPage()->getClassName(), 'refetch_force_update');
+        $forceUpdate = Config::inst()->get(
+            $this->owner->currentPage()->getClassName(),
+            'refetch_force_update'
+        );
         $this->getMapper()->mapToObject(
             $record->getClassName(),
             $this->getClassMapping($record->getClassName()),
@@ -192,7 +195,10 @@ class SalsifyFetchExtension extends LeftAndMainExtension
             $forceUpdate
         );
 
-        $forceUpdateRelations = Config::inst()->get($this->owner->currentPage()->getClassName(), 'refetch_force_update_relations');
+        $forceUpdateRelations = Config::inst()->get(
+            $this->owner->currentPage()->getClassName(),
+            'refetch_force_update_relations'
+        );
         $this->getMapper()->mapToObject(
             $record->getClassName(),
             $this->getClassMapping($record->getClassName()),

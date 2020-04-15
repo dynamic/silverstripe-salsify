@@ -123,7 +123,14 @@ class Mapper extends Service
      * @return DataObject|null
      * @throws \Exception
      */
-    public function mapToObject($class, $mappings, $data, $object = null, $salsifyRelations = false, $forceUpdate = false)
+    public function mapToObject(
+        $class,
+        $mappings,
+        $data,
+        $object = null,
+        $salsifyRelations = false,
+        $forceUpdate = false
+    )
     {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
@@ -151,7 +158,10 @@ class Mapper extends Service
         }
         ImportTask::output("Updating $class $firstUniqueKey $firstUniqueValue");
 
-        if (!$forceUpdate && $this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)) {
+        if (
+            !$forceUpdate &&
+            $this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)
+        ) {
             return $object;
         }
 
