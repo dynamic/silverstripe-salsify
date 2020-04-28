@@ -50,7 +50,7 @@ class ExampleSkipExtension extends Extension
 All objects with title fields that use this mapping for `\Page` will skip when equal to `TEST`.
 
 ### Silently Skip
-To silently skip `skipSiliently` should be set to true on the mapper object.
+To silently skip `skipSilently` should be set to true on the mapper object.
 It must be set per skipped object in the should skip method as it resets to false.
 
 ```php
@@ -74,7 +74,7 @@ class ExampleSkipExtension extends Extension
             // the salsify field in the config for te field
             $salsifyField = $config['salsifyField'];
             // skip silently
-            $this->owner->skipSiliently = true;
+            $this->owner->skipSilently = true;
             return $data[$salsifyField] === 'TEST';
         }
         return false;

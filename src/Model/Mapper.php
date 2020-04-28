@@ -48,7 +48,7 @@ class Mapper extends Service
     /**
      * @var bool
      */
-    public $skipSiliently = false;
+    public $skipSilently = false;
 
     /**
      * Mapper constructor.
@@ -100,6 +100,9 @@ class Mapper extends Service
         }
 
         if ($this->mappingHasSalsifyRelation()) {
+            ImportTask::output("----------------");
+            ImportTask::output("Setting up salsify relations");
+            ImportTask::output("----------------");
             $this->resetProductStream();
 
             foreach ($this->yieldKeyVal($this->productStream) as $name => $data) {
@@ -179,11 +182,11 @@ class Mapper extends Service
             $objectData = $data;
 
             if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
-                if (!$this->skipSiliently) {
+                if (!$this->skipSilently) {
                     ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue");
-                    $this->skipSiliently = false;
+                    $this->skipSilently = false;
                 }
-                return null;
+                return false;
             };
 
             $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
@@ -395,6 +398,7 @@ class Mapper extends Service
     }
 
     /**
+     * @param array|string $salsifyField
      * @return bool|mixed
      */
     private function getSortColumn($salsifyField)
@@ -479,7 +483,7 @@ class Mapper extends Service
      * @param array $data
      * @return boolean
      */
-    private function handleShouldSkip($class, $dbField, $config, $data)
+    public function handleShouldSkip($class, $dbField, $config, $data)
     {
         if (!is_array($config)) {
             return false;
@@ -546,8 +550,12 @@ class Mapper extends Service
             array_key_exists($dbField, $object->config()->get('many_many')) ||
             array_key_exists($dbField, $object->config()->get('belongs_many_many'));
 
+        $isSingleRelation = array_key_exists(rtrim($dbField, 'ID'), $object->config()->get('has_one'));
+
         if (!$isManyRelation) {
-            $object->$dbField = $value;
+            if (!$isSingleRelation || ($isSingleRelation && $value !== false)) {
+                $object->$dbField = $value;
+            }
             return;
         }
 
