@@ -37,6 +37,13 @@ class HasOneHandler extends Extension
 
         $relationConfig = $config['relation'];
         $relatedClass = array_key_first($relationConfig);
+
+        foreach ($this->owner->yieldKeyVal($relationConfig[$relatedClass]) as $dbField => $salsifyField) {
+            if ($this->owner->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
+                return false;
+            }
+        }
+
         $object = $this->owner->mapToObject($relatedClass, $relationConfig[$relatedClass], $data);
         return preg_match('/ID$/', $dbField) ? $object->ID : $object;
     }
