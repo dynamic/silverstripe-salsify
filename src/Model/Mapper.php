@@ -559,16 +559,21 @@ class Mapper extends Service
             return;
         }
 
-        // write the object so relations can be written
-        if (!$object->exists()) {
-            $object->write();
-        }
-
         // change to an array and filter out empty values
         if (!is_array($value)) {
             $value = [$value];
         }
         $value = array_filter($value);
+
+        // don't try to write an empty set
+        if (!count($value)) {
+            return;
+        }
+
+        // write the object so relations can be written
+        if (!$object->exists()) {
+            $object->write();
+        }
 
         $this->removeUnrelated($object, $dbField, $value);
         $this->writeManyRelation($object, $dbField, $value, $sortColumn);
