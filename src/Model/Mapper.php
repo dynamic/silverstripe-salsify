@@ -92,6 +92,8 @@ class Mapper extends Service
      */
     public function map()
     {
+        $this->extend('onBeforeMap', $this->file);
+
         foreach ($this->yieldKeyVal($this->productStream) as $name => $data) {
             foreach ($this->yieldKeyVal($this->config()->get('mapping')) as $class => $mappings) {
                 $this->mapToObject($class, $mappings, $data);
@@ -112,6 +114,8 @@ class Mapper extends Service
                 }
             }
         }
+
+        $this->extend('onAfterMap');
         ImportTask::output("Imported and updated $this->importCount products.");
     }
 
