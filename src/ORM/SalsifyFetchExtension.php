@@ -192,7 +192,7 @@ class SalsifyFetchExtension extends LeftAndMainExtension
         $this->getFetcher()->waitForExportRunToComplete();
         $file = $this->getFetcher()->getExportUrl();
 
-        $this->getMapper()->extend('onBeforeMap', $file);
+        $this->getMapper()->extend('onBeforeMap', $file, false);
 
         $this->getMapper()->mapToObject(
             $record->getClassName(),
@@ -216,6 +216,6 @@ class SalsifyFetchExtension extends LeftAndMainExtension
             $forceUpdateRelations
         );
 
-        $this->getMapper()->extend('onAfterMap');
+        $this->getMapper()->extend('onAfterMap', $this->file, false);
     }
 }
