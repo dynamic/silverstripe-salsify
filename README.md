@@ -503,7 +503,6 @@ Dynamic\Salsify\Model\Mapper.example:
 namespace {
     use SilverStripe\Core\Extension;
     use JsonMachine\JsonMachine;
-    use Dynamic\Salsify\Model\Mapper;
 
     /**
      * Class ExampleFeatureExtension
@@ -606,7 +605,7 @@ Dynamic\Salsify\Model\Mapper.example:
 <?php
 namespace {
     use SilverStripe\Core\Extension;
-    use Dynamic\Salsify\Model\Mapper;
+
     /**
      * Class ExamplePublishExtension
      */
