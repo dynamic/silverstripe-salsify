@@ -488,6 +488,108 @@ Dynamic\Salsify\Model\Mapper.example:
           - 'SKU'
 ```
 
+#### Extending onBeforeMap
+`onBeforeMap` is run after the fetcher runs, but before the mapper starts to map.
+It is passed the file url from the channel export and if the map is of multiple or a single product.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  extensions:
+    - ExampleFeatureExtension
+```
+
+```php
+<?php
+namespace {
+    use SilverStripe\Core\Extension;
+    use JsonMachine\JsonMachine;
+
+    /**
+     * Class ExampleFeatureExtension
+     */
+    class ExampleFeatureExtension extends Extension
+    {
+        /**
+         * Gets all the attributes that are in a field group and sets them in the mapper's config
+         * @param $file
+         * @param bool $multiple
+         */
+        public function onBeforeMap($file, $multiple)
+        {
+            $attributes = [];
+            $attributeStream = JsonMachine::fromFile($file, '/1/attributes');
+            foreach ($this->owner->yieldSingle($attributeStream) as $attribute) {
+                if (array_key_exists('salsify:attribute_group', $attribute)) {
+                    if ($attribute['salsify:attribute_group'] == 'Product Features') {
+                        $attributes[] = $attribute['salsify:id'];
+                    }
+                }
+            }
+
+            $this->owner->config()->set('featureFields', $attributes);
+        }
+    }
+}
+```
+
+#### Extending onAfterMap
+`onAfterMap` is run after the fetcher runs, but before the mapper starts to map.
+It is passed the file url from the channel export and if the map is of multiple or a single product.
+This extension point is good for cleaning up products that are not in the channel export.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  extensions:
+    - ExampleCleanUpExtension
+```
+
+```php
+<?php
+namespace {
+    use SilverStripe\Core\Extension;
+    use JsonMachine\JsonMachine;
+    use Dynamic\Salsify\Task\ImportTask;
+    use Dynamic\Salsify\Model\Mapper;
+
+    /**
+     * Class ExampleCleanUpExtension
+     */
+    class ExampleCleanUpExtension extends Extension
+    {
+        /**
+         * @param $file
+         * @param bool $multiple
+         */
+        public function onAfterMap($file, $multiple)
+        {
+            // don't clean up on a single product import
+            if ($multiple == Mapper::$SINGLE) {
+                return;
+            }
+
+            $productStream = JsonMachine::fromFile($file, '/4/products');
+            $productCodes = [];
+
+            foreach ($this->owner->yieldKeyVal($productStream) as $name => $data) {
+                $productCodes[] = $data['salsify:id'];
+            }
+
+            $invalidProducts = Product::get()->exclude([
+                'SalsifyID' => $productCodes,
+            ]);
+
+            $count = 0;
+            foreach ($this->owner->yieldSingle($invalidProducts) as $invalidProduct) {
+                /** @var Product $invalidProduct */
+                $invalidProduct->doArchive();
+                $count++;
+            }
+            ImportTask::output("Archived {$count} products");
+        }
+    }
+}
+```
+
 #### Extending afterObjectWrite
 To publish an object after mapping the `afterObjectWrite` method can be extended.
 It is passed the DataObject that was written, if the object was in the database, and if the object was published.
@@ -505,7 +607,7 @@ namespace {
     use SilverStripe\Core\Extension;
 
     /**
-     * Class TestModification
+     * Class ExamplePublishExtension
      */
     class ExamplePublishExtension extends Extension
     {
