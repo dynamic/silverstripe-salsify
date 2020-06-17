@@ -502,6 +502,8 @@ Dynamic\Salsify\Model\Mapper.example:
 <?php
 namespace {
     use SilverStripe\Core\Extension;
+    use JsonMachine\JsonMachine;
+    use Dynamic\Salsify\Model\Mapper;
 
     /**
      * Class ExampleFeatureExtension
@@ -546,6 +548,9 @@ Dynamic\Salsify\Model\Mapper.example:
 <?php
 namespace {
     use SilverStripe\Core\Extension;
+    use JsonMachine\JsonMachine;
+    use Dynamic\Salsify\Task\ImportTask;
+    use Dynamic\Salsify\Model\Mapper;
 
     /**
      * Class ExampleCleanUpExtension
@@ -559,7 +564,7 @@ namespace {
         public function onAfterMap($file, $multiple)
         {
             // don't clean up on a single product import
-            if (!$multiple) {
+            if ($multiple == Mapper::$SINGLE) {
                 return;
             }
 
@@ -601,7 +606,7 @@ Dynamic\Salsify\Model\Mapper.example:
 <?php
 namespace {
     use SilverStripe\Core\Extension;
-
+    use Dynamic\Salsify\Model\Mapper;
     /**
      * Class ExamplePublishExtension
      */

@@ -21,6 +21,16 @@ class Mapper extends Service
 {
 
     /**
+     * @var bool
+     */
+    public static $SINGLE = false;
+
+    /**
+     * @var bool
+     */
+    public static $MULTIPLE = true;
+
+    /**
      * @var
      */
     private $file = null;
@@ -92,7 +102,7 @@ class Mapper extends Service
      */
     public function map()
     {
-        $this->extend('onBeforeMap', $this->file, true);
+        $this->extend('onBeforeMap', $this->file, Mapper::$MULTIPLE);
 
         foreach ($this->yieldKeyVal($this->productStream) as $name => $data) {
             foreach ($this->yieldKeyVal($this->config()->get('mapping')) as $class => $mappings) {
@@ -116,7 +126,7 @@ class Mapper extends Service
         }
 
         ImportTask::output("Imported and updated $this->importCount products.");
-        $this->extend('onAfterMap', $this->file, true);
+        $this->extend('onAfterMap', $this->file, Mapper::$MULTIPLE);
     }
 
     /**
