@@ -184,6 +184,8 @@ class Mapper extends Service
         foreach ($this->yieldKeyVal($mappings) as $dbField => $salsifyField) {
             $field = $this->getField($salsifyField, $data);
             if ($field === false) {
+                // clear any existing value
+                $this->writeValue($object, $dbField, null, null);
                 continue;
             }
 
