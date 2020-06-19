@@ -45,6 +45,7 @@ class HasOneHandler extends Extension
         }
 
         $object = $this->owner->mapToObject($relatedClass, $relationConfig[$relatedClass], $data);
-        return preg_match('/ID$/', $dbField) ? $object->ID : $object;
+        $objectID = $object ? $object->ID : 0;
+        return preg_match('/ID$/', $dbField) ? $objectID : $object;
     }
 }
