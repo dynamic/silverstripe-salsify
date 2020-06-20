@@ -147,7 +147,8 @@ class Mapper extends Service
         $object = null,
         $salsifyRelations = false,
         $forceUpdate = false
-    ) {
+    )
+    {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
                 return null;
@@ -677,13 +678,15 @@ class Mapper extends Service
     private function clearValue($object, $dbField, $salsifyField)
     {
         if (
-            is_array($salsifyField)
-            && array_key_exists('clear', $salsifyField)
-            && $salsifyField['clear']
+            is_array($salsifyField) &&
+            array_key_exists('keepExistingValue', $salsifyField) &&
+            $salsifyField['keepExistingValue']
         ) {
-            // clear any existing value
-            $this->writeValue($object, $dbField, null, null);
+            return;
         }
+
+        // clear any existing value
+        $this->writeValue($object, $dbField, null, null);
     }
 
     /**
