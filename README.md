@@ -37,6 +37,7 @@ See [License](license.md)
           - [ManyRelation Example](#manyrelation-example)
         - [Salsify Relations](#salsify-relations)
       - [Field Fallback](#field-fallback)
+      - [Keeping Field Values Without a Salsify Field](#keeping-field-values-without-a-salsify-field)
       - [Extending afterObjectWrite](#extending-afterobjectwrite)
       - [Advanced](#advanced)
          - [Custom Field Types](#custom-field-types)
@@ -487,6 +488,20 @@ Dynamic\Salsify\Model\Mapper.example:
           - 'Product Title'
           - 'SKU'
 ```
+
+#### Keeping Field Values Without a Salsify Field
+By default all values that are to be mapped will wipe values if there is no salsify field in the data for an object.
+This can be changed so it keeps values for a field.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  mapping:
+    \Page:
+      Title:
+        salsifyField: 'Product Web Title'
+        keepExistingValue: true
+```
+
+This will keep the previous value of the title, even if the field is no longer in the data.
 
 #### Extending onBeforeMap
 `onBeforeMap` is run after the fetcher runs, but before the mapper starts to map.

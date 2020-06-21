@@ -147,7 +147,8 @@ class Mapper extends Service
         $object = null,
         $salsifyRelations = false,
         $forceUpdate = false
-    ) {
+    )
+    {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
                 return null;
@@ -157,7 +158,13 @@ class Mapper extends Service
         // if object was not passed
         if ($object === null) {
             $object = $this->findObjectByUnique($class, $mappings, $data);
-            // if no existing object was found
+
+            $filter = $this->getUniqueFilter($class, $mappings, $data);
+            if (count(array_filter($filter)) == 0) {
+                return null;
+            }
+
+            // if no existing object was found but a unique filter is valid (not empty)
             if (!$object) {
                 $object = $class::create();
             }
@@ -184,6 +191,7 @@ class Mapper extends Service
         foreach ($this->yieldKeyVal($mappings) as $dbField => $salsifyField) {
             $field = $this->getField($salsifyField, $data);
             if ($field === false) {
+                $this->clearValue($object, $dbField, $salsifyField);
                 continue;
             }
 
@@ -315,14 +323,10 @@ class Mapper extends Service
      * @param array $mappings
      * @param array $data
      *
-     * @return \SilverStripe\ORM\DataObject
+     * @return array
      */
-    private function findObjectByUnique($class, $mappings, $data)
+    private function getUniqueFilter($class, $mappings, $data)
     {
-        if ($obj = $this->findBySalsifyID($class, $mappings, $data)) {
-            return $obj;
-        }
-
         $uniqueFields = $this->uniqueFields($class, $mappings);
         // creates a filter
         $filter = [];
@@ -338,6 +342,23 @@ class Mapper extends Service
             }
         }
 
+        return $filter;
+    }
+
+    /**
+     * @param string $class
+     * @param array $mappings
+     * @param array $data
+     *
+     * @return \SilverStripe\ORM\DataObject
+     */
+    private function findObjectByUnique($class, $mappings, $data)
+    {
+        if ($obj = $this->findBySalsifyID($class, $mappings, $data)) {
+            return $obj;
+        }
+
+        $filter = $this->getUniqueFilter($class, $mappings, $data);
         return DataObject::get($class)->filter($filter)->first();
     }
 
@@ -648,6 +669,24 @@ class Mapper extends Service
                 ])->column('ID')
             );
         }
+    }
+
+    /**
+     * @param string|array $salsifyField
+     * @throws Exception
+     */
+    private function clearValue($object, $dbField, $salsifyField)
+    {
+        if (
+            is_array($salsifyField) &&
+            array_key_exists('keepExistingValue', $salsifyField) &&
+            $salsifyField['keepExistingValue']
+        ) {
+            return;
+        }
+
+        // clear any existing value
+        $this->writeValue($object, $dbField, null, null);
     }
 
     /**
