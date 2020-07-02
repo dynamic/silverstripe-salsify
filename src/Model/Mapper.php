@@ -196,7 +196,7 @@ class Mapper extends Service
             }
 
             $type = $this->getFieldType($salsifyField);
-            if ($salsifyRelations && $type != 'SalsifyRelation') {
+            if ($salsifyRelations && ($type != 'SalsifyRelation' && $type != 'SalsifyRelationTimeStamp')) {
                 continue;
             }
 
@@ -252,16 +252,42 @@ class Mapper extends Service
                 return true;
             }
 
-            if (
-                $salsifyRelations == true &&
-                $object->hasField('SalsifyRelationsUpdatedAt') &&
-                isset($data['salsify:relations_updated_at']) &&
-                $data['salsify:relations_updated_at'] == $object->getField('SalsifyRelationsUpdatedAt')
-            ) {
+            if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)) {
+                ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @param DataObject $object
+     * @param array $data
+     * @param string $firstUniqueKey
+     * @param string $firstUniqueValue
+     * @param bool $salsifyRelations
+     * @return bool
+     */
+    public function objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations = false)
+    {
+        if ($salsifyRelations != true) {
+            return true;
+        }
+
+        if (!$object->hasField('SalsifyRelationsUpdatedAt')) {
+            return true;
+        }
+
+        // relations were never updated, so its up to date
+        if (!isset($data['salsify:relations_updated_at'])) {
+            return true;
+        }
+
+        if ($data['salsify:relations_updated_at'] != $object->getField('SalsifyRelationsUpdatedAt')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -566,6 +592,16 @@ class Mapper extends Service
     {
         if ($this->hasMethod("handle{$type}Type")) {
             return $this->{"handle{$type}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
+        }
+
+        if ($fallbacks = $this->config()->get('typeFallbacks')) {
+            foreach ($fallbacks as $original => $fallback) {
+                if ($type == $original) {
+                    if ($this->hasMethod("handle{$fallback}Type")) {
+                        return $this->{"handle{$fallback}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
+                    }
+                }
+            }
         }
         ImportTask::output("{$type} is not a valid type. skipping field {$dbField}.");
         return '';
