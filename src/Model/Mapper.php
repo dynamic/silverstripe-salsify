@@ -196,7 +196,13 @@ class Mapper extends Service
             }
 
             $type = $this->getFieldType($salsifyField);
+            // skip all but salsify relations types if not doing relations
             if ($salsifyRelations && ($type != 'SalsifyRelation' && $type != 'SalsifyRelationTimeStamp')) {
+                continue;
+            }
+
+            // skip salsify relations types if not doing relations
+            if (!$salsifyRelations && ($type == 'SalsifyRelation' || $type == 'SalsifyRelationTimeStamp')) {
                 continue;
             }
 
@@ -242,21 +248,23 @@ class Mapper extends Service
      */
     private function objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations = false)
     {
-        if ($this->config()->get('skipUpToDate') == true) {
-            if (
-                $salsifyRelations == false &&
-                $object->hasField('SalsifyUpdatedAt') &&
-                $data['salsify:updated_at'] == $object->getField('SalsifyUpdatedAt')
-            ) {
+        if ($this->config()->get('skipUpToDate') == false) {
+            return false;
+        }
+
+        if ($salsifyRelations == false) {
+            if ($this->objectDataUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
                 ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
                 return true;
             }
 
-            if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)) {
+        } else {
+            if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
                 ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
                 return true;
             }
         }
+
         return false;
     }
 
@@ -265,17 +273,34 @@ class Mapper extends Service
      * @param array $data
      * @param string $firstUniqueKey
      * @param string $firstUniqueValue
-     * @param bool $salsifyRelations
      * @return bool
      */
-    public function objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations = false)
+    public function objectDataUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)
     {
-        if ($salsifyRelations != true) {
-            return true;
+        // assume not up to date if field does not exist on object
+        if (!$object->hasField('SalsifyUpdatedAt')) {
+            return false;
         }
 
+        if ($data['salsify:updated_at'] != $object->getField('SalsifyUpdatedAt')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param DataObject $object
+     * @param array $data
+     * @param string $firstUniqueKey
+     * @param string $firstUniqueValue
+     * @return bool
+     */
+    public function objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)
+    {
+        // assume not up to date if field does not exist on object
         if (!$object->hasField('SalsifyRelationsUpdatedAt')) {
-            return true;
+            return false;
         }
 
         // relations were never updated, so its up to date
