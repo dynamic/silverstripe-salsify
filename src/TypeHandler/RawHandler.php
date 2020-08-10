@@ -21,6 +21,12 @@ class RawHandler extends Extension
             'requiresSalsifyObjects' => false,
             'allowsModification' => true,
         ],
+        'SalsifyID' => [
+            'requiresWrite' => false,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => false,
+            'fallback' => 'Raw',
+        ],
         'SalsifyUpdatedAt' => [
             'requiresWrite' => false,
             'requiresSalsifyObjects' => false,

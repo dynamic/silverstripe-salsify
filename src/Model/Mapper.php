@@ -384,8 +384,8 @@ class Mapper extends Service
         foreach ($this->yieldKeyVal($uniqueFields) as $dbField => $salsifyField) {
             $modifiedData = $data;
             $fieldMapping = $mappings[$dbField];
-
-            $modifiedData = $this->handleModification($class, $dbField, $fieldMapping, $modifiedData);
+            $fieldType = $this->getFieldType($salsifyField);
+            $modifiedData = $this->handleModification($fieldType, $class, $dbField, $fieldMapping, $modifiedData);
 
             // adds unique fields to filter
             if (array_key_exists($salsifyField, $modifiedData)) {
@@ -431,12 +431,8 @@ class Mapper extends Service
             return false;
         }
 
-        $modifiedData = $data;
-        if (array_key_exists('salsify:id', $mappings)) {
-            $modifiedData = $this->handleModification($class, 'salsify:id', $mappings['salsify:id'], $modifiedData);
-        }
         $obj = DataObject::get($class)->filter([
-            'SalsifyID' => $modifiedData['salsify:id'],
+            'SalsifyID' => $data['salsify:id'],
         ])->first();
         if ($obj) {
             return $obj;
@@ -676,7 +672,8 @@ class Mapper extends Service
     {
         $fieldTypes = $this->config()->get('field_types');
         if (is_array($field) && array_key_exists('type', $field)) {
-            if (in_array($field['type'], $fieldTypes)) {
+            if (array_key_exists($field['type'], $fieldTypes)) {
+
                 return [
                     'type' => $field['type'],
                     'config' => $fieldTypes[$field['type']],
