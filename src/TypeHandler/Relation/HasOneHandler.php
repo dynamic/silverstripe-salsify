@@ -16,7 +16,11 @@ class HasOneHandler extends Extension
      * @var array
      */
     private static $field_types = [
-        'HasOne',
+        'HasOne' => [
+            'requiresWrite' => true,
+            'requiresSalsifyObject' => false,
+            'allowsModification' => true,
+        ],
     ];
 
     /**

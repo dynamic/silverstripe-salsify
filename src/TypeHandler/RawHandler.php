@@ -16,7 +16,17 @@ class RawHandler extends Extension
      * @var array
      */
     private static $field_types = [
-        'Raw'
+        'Raw' => [
+            'requiresWrite' => false,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => true,
+        ],
+        'SalsifyUpdatedAt' => [
+            'requiresWrite' => false,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => false,
+            'fallback' => 'Raw',
+        ],
     ];
 
     /**

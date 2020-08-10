@@ -15,7 +15,17 @@ class SalsifyRelationHandler extends Extension
      * @var array
      */
     private static $field_types = [
-        'SalsifyRelation'
+        'SalsifyRelation' => [
+            'requiresWrite' => false,
+            'requiresSalsifyObjects' => true,
+            'allowsModification' => false,
+        ],
+        'SalsifyRelationsUpdatedAt' => [
+            'requiresWrite' => false,
+            'requiresSalsifyObjects' => true,
+            'allowsModification' => false,
+            'fallback' => 'Raw',
+        ],
     ];
 
     /**

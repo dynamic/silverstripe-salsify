@@ -197,12 +197,12 @@ class Mapper extends Service
 
             $type = $this->getFieldType($salsifyField);
             // skip all but salsify relations types if not doing relations
-            if ($salsifyRelations && ($type != 'SalsifyRelation' && $type != 'SalsifyRelationTimeStamp')) {
+            if ($salsifyRelations && !$this->typeRequiresSalsifyObjects($type)) {
                 continue;
             }
 
             // skip salsify relations types if not doing relations
-            if (!$salsifyRelations && ($type == 'SalsifyRelation' || $type == 'SalsifyRelationTimeStamp')) {
+            if (!$salsifyRelations && $this->typeRequiresSalsifyObjects($type)) {
                 continue;
             }
 
@@ -217,7 +217,7 @@ class Mapper extends Service
                 return false;
             };
 
-            $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
+            $objectData = $this->handleModification($type, $class, $dbField, $salsifyField, $data);
             $sortColumn = $this->getSortColumn($salsifyField);
 
             if ($salsifyRelations == false && !array_key_exists($field, $objectData)) {
@@ -532,7 +532,7 @@ class Mapper extends Service
                 continue;
             }
 
-            if ($config['type'] === 'SalsifyRelation') {
+            if (in_array($config['type'], $this->getFieldsRequiringSalsifyObjects())) {
                 return true;
             }
         }
@@ -540,15 +540,96 @@ class Mapper extends Service
     }
 
     /**
+     * @return array
+     */
+    private function getFieldsRequiringSalsifyObjects()
+    {
+        $fieldTypes = $this->config()->get('field_types');
+        $types = [];
+        foreach ($this->yieldKeyVal($this->config()->get('field_types')) as $field => $config) {
+            if ($config['requiresSalsifyObjects']) {
+                $types[] = $field;
+            }
+        }
+
+        return $types;
+    }
+
+    /**
+     * @param array $type
+     * @return bool
+     */
+    private function typeRequiresWrite($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('requiresWrite', $config)) {
+            return $config['requiresWrite'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $type
+     * @return bool
+     */
+    private function typeRequiresSalsifyObjects($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('requiresSalsifyObjects', $config)) {
+            return $config['requiresSalsifyObjects'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $type
+     * @return string|bool
+     */
+    private function typeFallback($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('fallback', $config)) {
+            return $config['fallback'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $type
+     * @return bool
+     */
+    private function canModifyType($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('allowsModification', $config)) {
+            return $config['allowsModification'];
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $type
      * @param string $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return array
      */
-    private function handleModification($class, $dbField, $config, $data)
+    private function handleModification($type, $class, $dbField, $config, $data)
     {
         if (!is_array($config)) {
+            return $data;
+        }
+
+        if (!$this->canModifyType($type)) {
             return $data;
         }
 
@@ -589,22 +670,28 @@ class Mapper extends Service
 
     /**
      * @param string|array $field
-     * @return string
+     * @return array
      */
     public function getFieldType($field)
     {
         $fieldTypes = $this->config()->get('field_types');
         if (is_array($field) && array_key_exists('type', $field)) {
             if (in_array($field['type'], $fieldTypes)) {
-                return $field['type'];
+                return [
+                    'type' => $field['type'],
+                    'config' => $fieldTypes[$field['type']],
+                ];
             }
         }
         // default to raw
-        return 'Raw';
+        return [
+            'type' => 'Raw',
+            'config' => $fieldTypes['Raw'],
+        ];
     }
 
     /**
-     * @param int $type
+     * @param array $type
      * @param string|DataObject $class
      * @param array $salsifyData
      * @param string $salsifyField
@@ -615,20 +702,20 @@ class Mapper extends Service
      */
     private function handleType($type, $class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField)
     {
-        if ($this->hasMethod("handle{$type}Type")) {
-            return $this->{"handle{$type}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
+        $typeName = $type['type'];
+        $typeConfig = $type['config'];
+        if ($this->hasMethod("handle{$typeName}Type")) {
+            return $this->{"handle{$typeName}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
         }
 
-        if ($fallbacks = $this->config()->get('typeFallbacks')) {
-            foreach ($fallbacks as $original => $fallback) {
-                if ($type == $original) {
-                    if ($this->hasMethod("handle{$fallback}Type")) {
-                        return $this->{"handle{$fallback}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
-                    }
-                }
+        if (array_key_exists( 'fallback', $typeConfig)) {
+            $fallback = $typeConfig['fallback'];
+            if ($this->hasMethod("handle{$fallback}Type")) {
+                return $this->{"handle{$fallback}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
             }
         }
-        ImportTask::output("{$type} is not a valid type. skipping field {$dbField}.");
+
+        ImportTask::output("{$typeName} is not a valid type. skipping field {$dbField}.");
         return '';
     }
 

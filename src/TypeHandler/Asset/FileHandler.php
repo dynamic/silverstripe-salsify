@@ -17,8 +17,16 @@ class FileHandler extends AssetHandler
      * @var array
      */
     private static $field_types = [
-        'File',
-        'ManyFiles',
+        'File' => [
+            'requiresWrite' => true,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => true,
+        ],
+        'ManyFiles' => [
+            'requiresWrite' => true,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => true,
+        ],
     ];
 
     /**

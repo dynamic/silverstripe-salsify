@@ -6,10 +6,6 @@ Dynamic\Salsify\Model\Fetcher:
 
 Dynamic\Salsify\Model\Mapper:
   skipUpToDate: true
-  typeFallbacks:
-    SalsifyRelationTimeStamp: Raw
-  field_types:
-    - 'SalsifyRelationTimeStamp'
   extensions:
     - Dynamic\Salsify\TypeHandler\RawHandler
     - Dynamic\Salsify\TypeHandler\LiteralHandler
