@@ -225,7 +225,7 @@ class Mapper extends Service
             }
 
             $value = $this->handleType($type, $class, $objectData, $field, $salsifyField, $dbField);
-            $this->writeValue($object, $dbField, $value, $sortColumn);
+            $this->writeValue($object, $type, $dbField, $value, $sortColumn);
         }
 
         if ($object->isChanged()) {
@@ -721,19 +721,25 @@ class Mapper extends Service
 
     /**
      * @param DataObject $object
+     * @param array $type
      * @param string $dbField
      * @param mixed $value
      * @param string|bool $sortColumn
      *
      * @throws \Exception
      */
-    private function writeValue($object, $dbField, $value, $sortColumn)
+    private function writeValue($object, $type, $dbField, $value, $sortColumn)
     {
         $isManyRelation = array_key_exists($dbField, $object->config()->get('has_many')) ||
             array_key_exists($dbField, $object->config()->get('many_many')) ||
             array_key_exists($dbField, $object->config()->get('belongs_many_many'));
 
         $isSingleRelation = array_key_exists(rtrim($dbField, 'ID'), $object->config()->get('has_one'));
+
+        // write the object so relations can be written
+        if ($this->typeRequiresWrite($type) && !$object->exists()) {
+            $object->write();
+        }
 
         if (!$isManyRelation) {
             if (!$isSingleRelation || ($isSingleRelation && $value !== false)) {
@@ -751,11 +757,6 @@ class Mapper extends Service
         // don't try to write an empty set
         if (!count($value)) {
             return;
-        }
-
-        // write the object so relations can be written
-        if (!$object->exists()) {
-            $object->write();
         }
 
         $this->removeUnrelated($object, $dbField, $value);
@@ -833,8 +834,13 @@ class Mapper extends Service
             return;
         }
 
+        $type = [
+            'type' => 'null',
+            'config' => [],
+        ];
+
         // clear any existing value
-        $this->writeValue($object, $dbField, null, null);
+        $this->writeValue($object, $type, $dbField, null, null);
     }
 
     /**
