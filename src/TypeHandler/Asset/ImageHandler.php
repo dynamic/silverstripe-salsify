@@ -21,12 +21,12 @@ class ImageHandler extends AssetHandler
     private static $field_types = [
         'Image' => [
             'requiresWrite' => true,
-            'requiresSalsifyObject' => false,
+            'requiresSalsifyObjects' => false,
             'allowsModification' => true,
         ],
         'ManyImages' => [
             'requiresWrite' => true,
-            'requiresSalsifyObject' => false,
+            'requiresSalsifyObjects' => false,
             'allowsModification' => true,
         ],
     ];

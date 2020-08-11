@@ -541,7 +541,11 @@ class Mapper extends Service
         $fieldTypes = $this->config()->get('field_types');
         $types = [];
         foreach ($this->yieldKeyVal($this->config()->get('field_types')) as $field => $config) {
-            if ($config['requiresSalsifyObjects']) {
+            $type = [
+                'type' => $field,
+                'config' => $config,
+            ];
+            if ($this->typeRequiresSalsifyObjects($type)) {
                 $types[] = $field;
             }
         }
