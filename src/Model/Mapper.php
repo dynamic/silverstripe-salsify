@@ -147,8 +147,7 @@ class Mapper extends Service
         $object = null,
         $salsifyRelations = false,
         $forceUpdate = false
-    )
-    {
+    ) {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
                 return null;
@@ -257,7 +256,6 @@ class Mapper extends Service
                 ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
                 return true;
             }
-
         } else {
             if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
                 ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
@@ -673,7 +671,6 @@ class Mapper extends Service
         $fieldTypes = $this->config()->get('field_types');
         if (is_array($field) && array_key_exists('type', $field)) {
             if (array_key_exists($field['type'], $fieldTypes)) {
-
                 return [
                     'type' => $field['type'],
                     'config' => $fieldTypes[$field['type']],
@@ -705,7 +702,7 @@ class Mapper extends Service
             return $this->{"handle{$typeName}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
         }
 
-        if (array_key_exists( 'fallback', $typeConfig)) {
+        if (array_key_exists('fallback', $typeConfig)) {
             $fallback = $typeConfig['fallback'];
             if ($this->hasMethod("handle{$fallback}Type")) {
                 return $this->{"handle{$fallback}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
