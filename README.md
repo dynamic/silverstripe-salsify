@@ -29,6 +29,8 @@ See [License](license.md)
     - [Mapper](#mapper)
       - [Unique Fields](#unique-fields)
       - [Field Types](#field-types)
+        - [Raw](#raw)
+        - [SalsifyID, SalsifyUpdatedAt, and SalsifyRelationsUpdatedAt](#salsifyid-salsifyupdatedat-and-salsifyrelationsupdatedat)
         - [Literal](#literal)
         - [Files and Images](#files-and-images)
           - [Image Resizing](#image-resizing)
@@ -190,8 +192,37 @@ The unique fields will be added to an array, with the values for each product an
 This allows for multiple compound unique fields.
 
 #### Field Types
-Field types can be `Raw`, `Literal`, `File`, `Image`, `HasOne`, `HasMany`.
-By default the `Raw` type is used. More types can also be added.
+The built in field types are `Raw`, `Literal`, `File`, `Image`, `HasOne`, `HasMany`.
+There are some specialized field types that are `SalsifyID`, `SalsifyUpdatedAt`, `SalsifyRelationsUpdatedAt` that are meant for mapping to specific fields without modifications.
+More types can also be added.
+
+##### Raw
+By default the `Raw` type is used. It will write the salsify property value into the object field.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  example:
+    mapping:
+      \Page:
+        Title: 'Web Title'
+```
+
+#### SalsifyID, SalsifyUpdatedAt, and SalsifyRelationsUpdatedAt
+Fields that have these types cannot be modified, but will be handled like a raw type.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  example:
+    mapping:
+      \Page:
+        SalsifyID:
+          salsifyField: 'salsify:id'
+          type: SalsifyID
+        SalsifyUpdatedAt:
+          salsifyField: 'salsify:updated_at'
+          type: SalsifyUpdatedAt
+        SalsifyRelationsUpdatedAt:
+          salsifyField: 'salsify:relations_updated_at'
+          type: SalsifyRelationsUpdatedAt
+```
 
 ##### Literal
 To set a field that doesn't have a salsify field a literal field can be used.
