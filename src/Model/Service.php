@@ -36,7 +36,10 @@ abstract class Service
      */
     protected $serviceName;
 
-
+    /**
+     * Service constructor.
+     * @param stirng $importerKey
+     */
     public function __construct($importerKey)
     {
         $this->importerKey = $importerKey;
@@ -47,6 +50,9 @@ abstract class Service
             $this->config()->merge($key, $value);
 
             if ($key === 'extensions') {
+                if (!is_array($value)) {
+                    throw new \Exception("Extensions for {$this->serviceName} is not an array");
+                }
                 foreach ($this->yieldSingle($value) as $extension) {
                     static::add_extension($extension);
                 }
