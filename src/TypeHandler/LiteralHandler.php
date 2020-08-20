@@ -16,7 +16,11 @@ class LiteralHandler extends Extension
      * @var array
      */
     private static $field_types = [
-        'Literal',
+        'Literal' => [
+            'requiresWrite' => false,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => true,
+        ],
     ];
 
     /**

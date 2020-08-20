@@ -18,7 +18,11 @@ class ManyHandler extends Extension
      * @var array
      */
     private static $field_types = [
-        'ManyRelation'
+        'ManyRelation' => [
+            'requiresWrite' => true,
+            'requiresSalsifyObjects' => false,
+            'allowsModification' => true,
+        ],
     ];
 
     /**

@@ -147,8 +147,7 @@ class Mapper extends Service
         $object = null,
         $salsifyRelations = false,
         $forceUpdate = false
-    )
-    {
+    ) {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
                 return null;
@@ -197,12 +196,12 @@ class Mapper extends Service
 
             $type = $this->getFieldType($salsifyField);
             // skip all but salsify relations types if not doing relations
-            if ($salsifyRelations && ($type != 'SalsifyRelation' && $type != 'SalsifyRelationTimeStamp')) {
+            if ($salsifyRelations && !$this->typeRequiresSalsifyObjects($type)) {
                 continue;
             }
 
             // skip salsify relations types if not doing relations
-            if (!$salsifyRelations && ($type == 'SalsifyRelation' || $type == 'SalsifyRelationTimeStamp')) {
+            if (!$salsifyRelations && $this->typeRequiresSalsifyObjects($type)) {
                 continue;
             }
 
@@ -217,7 +216,7 @@ class Mapper extends Service
                 return false;
             };
 
-            $objectData = $this->handleModification($class, $dbField, $salsifyField, $data);
+            $objectData = $this->handleModification($type, $class, $dbField, $salsifyField, $data);
             $sortColumn = $this->getSortColumn($salsifyField);
 
             if ($salsifyRelations == false && !array_key_exists($field, $objectData)) {
@@ -225,7 +224,7 @@ class Mapper extends Service
             }
 
             $value = $this->handleType($type, $class, $objectData, $field, $salsifyField, $dbField);
-            $this->writeValue($object, $dbField, $value, $sortColumn);
+            $this->writeValue($object, $type, $dbField, $value, $sortColumn);
         }
 
         if ($object->isChanged()) {
@@ -257,7 +256,6 @@ class Mapper extends Service
                 ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
                 return true;
             }
-
         } else {
             if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
                 ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
@@ -384,8 +382,8 @@ class Mapper extends Service
         foreach ($this->yieldKeyVal($uniqueFields) as $dbField => $salsifyField) {
             $modifiedData = $data;
             $fieldMapping = $mappings[$dbField];
-
-            $modifiedData = $this->handleModification($class, $dbField, $fieldMapping, $modifiedData);
+            $fieldType = $this->getFieldType($salsifyField);
+            $modifiedData = $this->handleModification($fieldType, $class, $dbField, $fieldMapping, $modifiedData);
 
             // adds unique fields to filter
             if (array_key_exists($salsifyField, $modifiedData)) {
@@ -431,12 +429,8 @@ class Mapper extends Service
             return false;
         }
 
-        $modifiedData = $data;
-        if (array_key_exists('salsify:id', $mappings)) {
-            $modifiedData = $this->handleModification($class, 'salsify:id', $mappings['salsify:id'], $modifiedData);
-        }
         $obj = DataObject::get($class)->filter([
-            'SalsifyID' => $modifiedData['salsify:id'],
+            'SalsifyID' => $data['salsify:id'],
         ])->first();
         if ($obj) {
             return $obj;
@@ -532,7 +526,7 @@ class Mapper extends Service
                 continue;
             }
 
-            if ($config['type'] === 'SalsifyRelation') {
+            if (in_array($config['type'], $this->getFieldsRequiringSalsifyObjects())) {
                 return true;
             }
         }
@@ -540,15 +534,100 @@ class Mapper extends Service
     }
 
     /**
+     * @return array
+     */
+    private function getFieldsRequiringSalsifyObjects()
+    {
+        $fieldTypes = $this->config()->get('field_types');
+        $types = [];
+        foreach ($this->yieldKeyVal($this->config()->get('field_types')) as $field => $config) {
+            $type = [
+                'type' => $field,
+                'config' => $config,
+            ];
+            if ($this->typeRequiresSalsifyObjects($type)) {
+                $types[] = $field;
+            }
+        }
+
+        return $types;
+    }
+
+    /**
+     * @param array $type
+     * @return bool
+     */
+    private function typeRequiresWrite($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('requiresWrite', $config)) {
+            return $config['requiresWrite'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $type
+     * @return bool
+     */
+    private function typeRequiresSalsifyObjects($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('requiresSalsifyObjects', $config)) {
+            return $config['requiresSalsifyObjects'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $type
+     * @return string|bool
+     */
+    private function typeFallback($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('fallback', $config)) {
+            return $config['fallback'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $type
+     * @return bool
+     */
+    private function canModifyType($type)
+    {
+        $config = $type['config'];
+
+        if (array_key_exists('allowsModification', $config)) {
+            return $config['allowsModification'];
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $type
      * @param string $class
      * @param string $dbField
      * @param array $config
      * @param array $data
      * @return array
      */
-    private function handleModification($class, $dbField, $config, $data)
+    private function handleModification($type, $class, $dbField, $config, $data)
     {
         if (!is_array($config)) {
+            return $data;
+        }
+
+        if (!$this->canModifyType($type)) {
             return $data;
         }
 
@@ -589,22 +668,28 @@ class Mapper extends Service
 
     /**
      * @param string|array $field
-     * @return string
+     * @return array
      */
     public function getFieldType($field)
     {
         $fieldTypes = $this->config()->get('field_types');
         if (is_array($field) && array_key_exists('type', $field)) {
-            if (in_array($field['type'], $fieldTypes)) {
-                return $field['type'];
+            if (array_key_exists($field['type'], $fieldTypes)) {
+                return [
+                    'type' => $field['type'],
+                    'config' => $fieldTypes[$field['type']],
+                ];
             }
         }
         // default to raw
-        return 'Raw';
+        return [
+            'type' => 'Raw',
+            'config' => $fieldTypes['Raw'],
+        ];
     }
 
     /**
-     * @param int $type
+     * @param array $type
      * @param string|DataObject $class
      * @param array $salsifyData
      * @param string $salsifyField
@@ -615,38 +700,44 @@ class Mapper extends Service
      */
     private function handleType($type, $class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField)
     {
-        if ($this->hasMethod("handle{$type}Type")) {
-            return $this->{"handle{$type}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
+        $typeName = $type['type'];
+        $typeConfig = $type['config'];
+        if ($this->hasMethod("handle{$typeName}Type")) {
+            return $this->{"handle{$typeName}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
         }
 
-        if ($fallbacks = $this->config()->get('typeFallbacks')) {
-            foreach ($fallbacks as $original => $fallback) {
-                if ($type == $original) {
-                    if ($this->hasMethod("handle{$fallback}Type")) {
-                        return $this->{"handle{$fallback}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
-                    }
-                }
+        if (array_key_exists('fallback', $typeConfig)) {
+            $fallback = $typeConfig['fallback'];
+            if ($this->hasMethod("handle{$fallback}Type")) {
+                return $this->{"handle{$fallback}Type"}($class, $salsifyData, $salsifyField, $dbFieldConfig, $dbField);
             }
         }
-        ImportTask::output("{$type} is not a valid type. skipping field {$dbField}.");
+
+        ImportTask::output("{$typeName} is not a valid type. skipping field {$dbField}.");
         return '';
     }
 
     /**
      * @param DataObject $object
+     * @param array $type
      * @param string $dbField
      * @param mixed $value
      * @param string|bool $sortColumn
      *
      * @throws \Exception
      */
-    private function writeValue($object, $dbField, $value, $sortColumn)
+    private function writeValue($object, $type, $dbField, $value, $sortColumn)
     {
         $isManyRelation = array_key_exists($dbField, $object->config()->get('has_many')) ||
             array_key_exists($dbField, $object->config()->get('many_many')) ||
             array_key_exists($dbField, $object->config()->get('belongs_many_many'));
 
         $isSingleRelation = array_key_exists(rtrim($dbField, 'ID'), $object->config()->get('has_one'));
+
+        // write the object so relations can be written
+        if ($this->typeRequiresWrite($type) && !$object->exists()) {
+            $object->write();
+        }
 
         if (!$isManyRelation) {
             if (!$isSingleRelation || ($isSingleRelation && $value !== false)) {
@@ -664,11 +755,6 @@ class Mapper extends Service
         // don't try to write an empty set
         if (!count($value)) {
             return;
-        }
-
-        // write the object so relations can be written
-        if (!$object->exists()) {
-            $object->write();
         }
 
         $this->removeUnrelated($object, $dbField, $value);
@@ -746,8 +832,13 @@ class Mapper extends Service
             return;
         }
 
+        $type = [
+            'type' => 'null',
+            'config' => [],
+        ];
+
         // clear any existing value
-        $this->writeValue($object, $dbField, null, null);
+        $this->writeValue($object, $type, $dbField, null, null);
     }
 
     /**
