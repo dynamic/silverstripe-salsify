@@ -132,12 +132,19 @@ class ImageHandler extends AssetHandler
         $supportedImageExtensions = Image::get_category_extensions(
             Image::singleton()->File->getAllowedCategories()
         );
+
+        $pathinfo = pathinfo($string);
+        $defualtExtension = $this->owner->config()->get('defaultImageType');
+        if (!array_key_exists('extension', $pathinfo)) {
+            return "{$string}.{$defualtExtension}";
+        }
+
         $extension = pathinfo($string)['extension'];
 
         if (!in_array($extension, $supportedImageExtensions)) {
             return str_replace(
-                '.' . $extension,
-                '.' . $this->owner->config()->get('defaultImageType'),
+                ".{$extension}",
+                ".{$defualtExtension}",
                 $string
             );
         }
