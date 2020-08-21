@@ -8,6 +8,7 @@ Dynamic\Salsify\Model\Mapper:
   skipUpToDate: true
   extensions:
     - Dynamic\Salsify\TypeHandler\RawHandler
+    - Dynamic\Salsify\TypeHandler\BooleanHandler
     - Dynamic\Salsify\TypeHandler\LiteralHandler
     - Dynamic\Salsify\TypeHandler\Asset\FileHandler
     - Dynamic\Salsify\TypeHandler\Asset\ImageHandler

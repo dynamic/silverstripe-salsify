@@ -17,6 +17,7 @@ use SilverStripe\ORM\DataExtension;
  *
  * @property string SalsifyID
  * @property string SalsifyUpdatedAt
+ * @property string SalsifyRelationsUpdatedAt
  *
  * @property-read \SilverStripe\ORM\DataObject|\Dynamic\Salsify\ORM\SalsifyIDExtension $owner
  */

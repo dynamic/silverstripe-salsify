@@ -31,6 +31,8 @@ See [License](license.md)
       - [Field Types](#field-types)
         - [Raw](#raw)
         - [SalsifyID, SalsifyUpdatedAt, and SalsifyRelationsUpdatedAt](#salsifyid-salsifyupdatedat-and-salsifyrelationsupdatedat)
+        - [Boolean](#boolean)
+          - [isTrue](#isTrue)
         - [Literal](#literal)
         - [Files and Images](#files-and-images)
           - [Image Resizing](#image-resizing)
@@ -223,6 +225,22 @@ Dynamic\Salsify\Model\Mapper.example:
           salsifyField: 'salsify:relations_updated_at'
           type: SalsifyRelationsUpdatedAt
 ```
+
+##### Boolean
+Useful for mapping Yes/No value fields from salsify to the boolean database type.
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  example:
+    mapping:
+      \Page:
+        Obsolete:
+          salsifyField: 'obsolete'
+          type: Boolean
+```
+
+###### isTrue
+The boolean handler also comes with a handy `isTrue` helper method.
+This is helpful when modifications or skipping has to be done on a Yes/No formatted property.
 
 ##### Literal
 To set a field that doesn't have a salsify field a literal field can be used.
