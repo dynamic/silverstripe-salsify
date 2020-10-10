@@ -3,6 +3,7 @@
 namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\ORM\SalsifyIDExtension;
+use Dynamic\Salsify\ORM\SiteConfigExtension;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
@@ -11,6 +12,7 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -73,11 +75,55 @@ class Mapper extends Service
             throw  new Exception('A Mapper needs a mapping');
         }
 
+        /** @var SiteConfig|SiteConfigExtension $config */
+        $config = SiteConfig::current_site_config();
+        $mappingHash = $this->getMappingHash();
+
+        /** @var MapperHash $hash */
+        if ($hash = $config->MapperHashes()->find('MapperService', $importerKey)) {
+            if ($hash->MapperHash != $mappingHash) {
+                $this->updateMappingHash($mappingHash, $hash);
+            }
+        } else {
+            $this->updateMappingHash($mappingHash);
+        }
+
         if ($file !== null) {
             $this->file = $file;
             $this->resetProductStream();
             $this->resetAssetStream();
         }
+    }
+
+    /**
+     * Generates the current hash for the mapping
+     *
+     * @return string
+     */
+    private function getMappingHash()
+    {
+        return md5(serialize($this->config()->get('mapping')));
+    }
+
+    /**
+     * Updates the mapping hash for the mapper
+     * @param string $hash
+     * @param MapperHash|null $mapperHash
+     */
+    private function updateMappingHash($hash, $mapperHash = null)
+    {
+        if ($mapperHash == null) {
+            $mapperHash = MapperHash::create();
+            $mapperHash->SiteConfigID = SiteConfig::current_site_config()->ID;
+            $mapperHash->MapperService = $this->importerKey;
+        }
+
+        $mapperHash->MapperHash = $hash;
+        $mapperHash->write();
+
+        $this->config()->set('skipUpToDate', false);
+        ImportTask::output("mappings have updated, treating all objects as out of date");
+        ImportTask::output("----------------");
     }
 
     /**
@@ -147,7 +193,8 @@ class Mapper extends Service
         $object = null,
         $salsifyRelations = false,
         $forceUpdate = false
-    ) {
+    )
+    {
         if ($salsifyRelations) {
             if (!$this->classConfigHasSalsifyRelation($mappings)) {
                 return null;
