@@ -44,6 +44,7 @@ See [License](license.md)
       - [Keeping Field Values Without a Salsify Field](#keeping-field-values-without-a-salsify-field)
       - [Extending onBeforeMap](#extending-onbeforemap)
       - [Extending onAfterMap](#extending-onaftermap)
+      - [Extending beforeObjectWrite](#extending-beforeobjectwrite)
       - [Extending afterObjectWrite](#extending-afterobjectwrite)
       - [Advanced](#advanced)
          - [Custom Field Types](#custom-field-types)
@@ -656,6 +657,86 @@ namespace {
 }
 ```
 
+#### Extending beforeObjectWrite
+This extension point is good for detecting which fields were changed.
+This is helpful to create redirects for pages if a parent has changed during mapping.
+
+```yaml
+Dynamic\Salsify\Model\Mapper.example:
+  extensions:
+    - ExampleRedirectExtension
+```
+
+```php
+<?php
+namespace {
+    use SilverStripe\Core\Extension;
+    use SilverStripe\ORM\DataObject;
+    use SilverStripe\RedirectedURLs\Model\RedirectedURL;
+    use Dynamic\Salsify\Task\ImportTask;
+
+    /**
+     * Class ExampleRedirectExtension
+     */
+    class ExampleRedirectExtension extends Extension
+    {
+        /**
+         * This will create a redirect if a page's parent changes
+         * @param DataObject $object
+         */
+        public function beforeObjectWrite($object)
+        {
+            if (!$object instanceof \Page) {
+                return;
+            }
+
+            if (!$object->isChanged()) {
+                return;
+            }
+
+            $changed = $object->getChangedFields(false, DataObject::CHANGE_VALUE);
+
+            if (!array_key_exists('ParentID', $changed) && !array_key_exists('URLSegment', $changed)) {
+                return;
+            }
+
+            $oldParent = $object->ParentID;
+            $oldSegment = $object->URLSegment;
+            if (array_key_exists('ParentID', $changed)) {
+                $parent = $changed['ParentID'];
+                $oldParent = $parent['before'];
+            }
+
+            if (array_key_exists('URLSegment', $changed)) {
+                $segment = $changed['URLSegment'];
+                $oldSegment = $segment['before'];
+            }
+
+            $this->createRedirect($oldParent, $oldSegment, $object->ID);
+        }
+
+        /**
+         * @param \Page|int $oldParent
+         * @param string $oldSegment
+         * @param int $objectID
+         */
+        private function createRedirect($oldParent, $oldSegment, $objectID)
+        {
+            if (is_int($oldParent)) {
+                $oldParent = \Page::get()->byID($oldParent);
+            }
+
+            $redirect = RedirectedURL::create();
+            $redirect->RedirectCode = 301;
+            $redirect->FromBase = preg_replace('/\?.*/', '', $oldParent->Link($oldSegment));
+            $redirect->LinkToID = $objectID;
+            $redirect->write();
+            ImportTask::output("Created redirect from {$redirect->FromBase} to {$redirect->LinkTo()->Link()}");
+        }
+    }
+}
+```
+
 #### Extending afterObjectWrite
 To publish an object after mapping the `afterObjectWrite` method can be extended.
 It is passed the DataObject that was written, if the object was in the database, and if the object was published.
@@ -671,6 +752,7 @@ Dynamic\Salsify\Model\Mapper.example:
 <?php
 namespace {
     use SilverStripe\Core\Extension;
+    use SilverStripe\Versioned\Versioned;
 
     /**
      * Class ExamplePublishExtension
