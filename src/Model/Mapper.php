@@ -228,6 +228,7 @@ class Mapper extends Service
         }
 
         if ($object->isChanged()) {
+            $this->extend('beforeObjectWrite', $object);
             $object->write();
             $this->importCount++;
             $this->extend('afterObjectWrite', $object, $wasWritten, $wasPublished);
@@ -736,6 +737,7 @@ class Mapper extends Service
 
         // write the object so relations can be written
         if ($this->typeRequiresWrite($type) && !$object->exists()) {
+            $this->extend('beforeObjectWrite', $object);
             $object->write();
         }
 
