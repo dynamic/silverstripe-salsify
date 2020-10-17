@@ -3,7 +3,6 @@
 namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\ORM\SalsifyIDExtension;
-use Dynamic\Salsify\ORM\SiteConfigExtension;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
 use JsonMachine\JsonMachine;
@@ -12,7 +11,6 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
-use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 
 /**
