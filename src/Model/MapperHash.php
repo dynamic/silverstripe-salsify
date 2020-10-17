@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\Model;
 
+use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\SiteConfig\SiteConfig;
 
@@ -11,9 +12,12 @@ use SilverStripe\SiteConfig\SiteConfig;
  *
  * @property string MapperHash
  * @property string MapperService
+ * @property bool ForRelations
  *
- * @property int SiteConfigID
- * @method SiteConfig SiteConfig()
+ * @property int MappedObjectID
+ * @method DataObject|SalsifyIDExtension MappedObject()
+ *
+ * @property string MappedObjectClass
  */
 class MapperHash extends DataObject
 {
@@ -29,12 +33,13 @@ class MapperHash extends DataObject
     private static $db = [
         'MapperHash' => 'Varchar',
         'MapperService' => 'Varchar',
+        'ForRelations' => 'Boolean',
     ];
 
     /**
      * @var array
      */
     private static $has_one = [
-        'SiteConfig' => SiteConfig::class,
+        'MappedObject' => DataObject::class,
     ];
 }

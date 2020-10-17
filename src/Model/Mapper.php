@@ -75,19 +75,6 @@ class Mapper extends Service
             throw  new Exception('A Mapper needs a mapping');
         }
 
-        /** @var SiteConfig|SiteConfigExtension $config */
-        $config = SiteConfig::current_site_config();
-        $mappingHash = $this->getMappingHash();
-
-        /** @var MapperHash $hash */
-        if ($hash = $config->MapperHashes()->find('MapperService', $importerKey)) {
-            if ($hash->MapperHash != $mappingHash) {
-                $this->updateMappingHash($mappingHash, $hash);
-            }
-        } else {
-            $this->updateMappingHash($mappingHash);
-        }
-
         if ($file !== null) {
             $this->file = $file;
             $this->resetProductStream();
@@ -107,23 +94,27 @@ class Mapper extends Service
 
     /**
      * Updates the mapping hash for the mapper
-     * @param string $hash
-     * @param MapperHash|null $mapperHash
+     * @param DataObject|SalsifyIDExtension $object
+     * @param bool $relations
      */
-    private function updateMappingHash($hash, $mapperHash = null)
+    private function updateMappingHash($object, $relations)
     {
+        $filter = [
+            'MapperService' => $this->importerKey,
+            'ForRelations' => $relations,
+        ];
+        /** @var MapperHash $mapperHash */
+        $mapperHash = $object->MapperHashes()->filter($filter)->first();
         if ($mapperHash == null) {
             $mapperHash = MapperHash::create();
-            $mapperHash->SiteConfigID = SiteConfig::current_site_config()->ID;
+            $mapperHash->MappedObjectID = $object->ID;
+            $mapperHash->MappedObjectClass = $object->ClassName;
             $mapperHash->MapperService = $this->importerKey;
+            $mapperHash->ForRelations = $relations;
         }
 
-        $mapperHash->MapperHash = $hash;
+        $mapperHash->MapperHash = $this->getMappingHash();
         $mapperHash->write();
-
-        $this->config()->set('skipUpToDate', false);
-        ImportTask::output("mappings have updated, treating all objects as out of date");
-        ImportTask::output("----------------");
     }
 
     /**
@@ -273,8 +264,12 @@ class Mapper extends Service
             $this->writeValue($object, $type, $dbField, $value, $sortColumn);
         }
 
+        if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
+            $this->updateMappingHash($object, $salsifyRelations);
+        }
+
+        $this->extend('beforeObjectWrite', $object);
         if ($object->isChanged()) {
-            $this->extend('beforeObjectWrite', $object);
             $object->write();
             $this->importCount++;
             $this->extend('afterObjectWrite', $object, $wasWritten, $wasPublished);
@@ -295,6 +290,11 @@ class Mapper extends Service
     private function objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations = false)
     {
         if ($this->config()->get('skipUpToDate') == false) {
+            return false;
+        }
+
+        if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
+            ImportTask::output("Forcing update for $firstUniqueKey $firstUniqueValue. Mappings changed.");
             return false;
         }
 
@@ -903,5 +903,27 @@ class Mapper extends Service
     public function hasFile()
     {
         return $this->file !== null;
+    }
+
+    /**
+     * @param DataObject|SalsifyIDExtension $object
+     * @return bool
+     */
+    private function isMapperHashUpToDate($object, $relations)
+    {
+        $filter = [
+            'MapperService' => $this->importerKey,
+            'ForRelations' => $relations,
+        ];
+        /** @var MapperHash $hash */
+        if ($hash = $object->MapperHashes()->filter($filter)->first()) {
+            if ($hash->MapperHash != $this->getMappingHash()) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return true;
     }
 }

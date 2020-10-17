@@ -28,6 +28,3 @@ SilverStripe\Admin\LeftAndMain:
   extensions:
     - Dynamic\Salsify\ORM\SalsifyFetchExtension
 
-Silverstripe\SiteConfig\SiteConfig:
-  extensions:
-    - Dynamic\Salsify\ORM\SiteConfigExtension
