@@ -4,7 +4,6 @@ namespace Dynamic\Salsify\Model;
 
 use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class MapperHash
