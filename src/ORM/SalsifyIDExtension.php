@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\ORM;
 
+use Dynamic\Salsify\Model\MapperHash;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\CMS\Forms\SiteTreeURLSegmentField;
 use SilverStripe\CMS\Model\SiteTree;
@@ -11,6 +12,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\HasManyList;
 
 /**
  * Class FileExtension
@@ -18,6 +20,8 @@ use SilverStripe\ORM\DataExtension;
  * @property string SalsifyID
  * @property string SalsifyUpdatedAt
  * @property string SalsifyRelationsUpdatedAt
+ *
+ * @method HasManyList MapperHashes()
  *
  * @property-read \SilverStripe\ORM\DataObject|\Dynamic\Salsify\ORM\SalsifyIDExtension $owner
  */
@@ -31,6 +35,13 @@ class SalsifyIDExtension extends DataExtension
         'SalsifyID' => 'Varchar(255)',
         'SalsifyUpdatedAt' => 'Varchar(255)',
         'SalsifyRelationsUpdatedAt' => 'Varchar(255)',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $has_many = [
+        'MapperHashes' => MapperHash::class,
     ];
 
     /**
