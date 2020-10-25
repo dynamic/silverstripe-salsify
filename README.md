@@ -284,7 +284,7 @@ Dynamic\Salsify\Model\Mapper.example:
 If the mapping is specified as an image and it is not a valid image extension,
 salsify will be used to try and convert the file into a png.
 
-###### Image Resizing
+###### Image Transformation
 To cut down on 500 errors caused by trying to resize images when visiting a page images can be transformed by salsify.
 When an image transformation is update in the config it will also re-download the image with the new transformations.
 
