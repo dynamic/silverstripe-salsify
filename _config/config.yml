@@ -20,6 +20,10 @@ SilverStripe\Assets\File:
   extensions:
     - Dynamic\Salsify\ORM\SalsifyIDExtension
 
+SilverStripe\Assets\Image:
+  extensions:
+    - Dynamic\Salsify\ORM\ImageDataExtension
+
 SilverStripe\AssetAdmin\Forms\FileFormFactory:
   extensions:
     - Dynamic\Salsify\ORM\AssetFormFactoryExtension

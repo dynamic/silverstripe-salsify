@@ -3,9 +3,11 @@
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
 use Dynamic\Salsify\Model\Fetcher;
+use Dynamic\Salsify\ORM\ImageDataExtension;
 use Dynamic\Salsify\Traits\Yieldable;
 use GuzzleHttp\Client;
 use SilverStripe\Assets\File;
+use SilverStripe\Assets\Image;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 
@@ -95,21 +97,53 @@ class AssetHandler extends Extension
      * @param string $url
      * @param string $name
      * @param string|DataObject $class
+     * @param string $transformation
      *
      * @return File|bool
      * @throws \Exception
      */
-    protected function updateFile($id, $updatedAt, $url, $name, $class = File::class)
+    protected function updateFile($id, $updatedAt, $url, $name, $class = File::class, $transformation = '')
     {
         $file = $this->findOrCreateFile($id, $class);
         if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $updatedAt) {
-            return $file;
+            if (!$this->isTransformOutOfDate($file, $class, $transformation)) {
+                return $file;
+            }
         }
 
         $file->SalsifyUpdatedAt = $updatedAt;
+        if ($file->hasField('Transformation')) {
+            $file->Transformation = $transformation;
+        }
         $file->setFromStream(fopen($url, 'r'), $name);
 
+        $published = $file->isPublished();
         $file->write();
+
+        if ($published) {
+            $file->publishSingle();
+        }
         return $file;
+    }
+
+    /**
+     * @param DataObject $file
+     * @param string $class
+     * @param string $transformation
+     *
+     * @return bool
+     */
+    private function isTransformOutOfDate($file, $class, $transformation)
+    {
+        if (!$file instanceof Image) {
+            return false;
+        }
+
+        /** @var Image|ImageDataExtension $file */
+        if ($file->Transformation == $transformation) {
+            return false;
+        }
+
+        return true;
     }
 }
