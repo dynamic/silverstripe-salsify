@@ -305,7 +305,8 @@ Dynamic\Salsify\Model\Mapper.example:
 
 The above will download `http://a1.images.salsify.com/image/upload/c_fit,w_1000,h_1000,dn_300,cs_srgb/sample.jpg` instead of `http://a1.images.salsify.com/image/upload/sample.jpg`.
 
-To see what transformations salsify supports please visit https://getstarted.salsify.com/help/transforming-image-files
+To see what transformations salsify supports please visit https://getstarted.salsify.com/help/transforming-image-files.
+
 It is recommended to do this to all large files.
 
 ##### HasOne and HasMany
