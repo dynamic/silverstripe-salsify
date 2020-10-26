@@ -35,7 +35,7 @@ See [License](license.md)
           - [isTrue](#isTrue)
         - [Literal](#literal)
         - [Files and Images](#files-and-images)
-          - [Image Resizing](#image-resizing)
+          - [Image Transformation](#image-transformation)
         - [HasOne and HasMany](#hasone-and-hasmany)
           - [HasOne Example](#hasone-example)
           - [ManyRelation Example](#manyrelation-example)
@@ -284,21 +284,9 @@ Dynamic\Salsify\Model\Mapper.example:
 If the mapping is specified as an image and it is not a valid image extension,
 salsify will be used to try and convert the file into a png.
 
-###### Image Resizing
-To cut down on 500 errors caused by trying to resize images when visiting a page images can be resized when created.
-The resized images will not replace what comes from salsify, but uses the built in SilverStripe image resize methods.
-
-The supported manipulations are:
- - `Resample`
- - `StripThumbnail` or `StripThumb`
- - `CMSThumbnail` or `CMSThumb`
- - `Thumbnail` or `Thumb`
- - `Pad`
- - `Fill`
-
-`Thumbnail`, `Pad`, and `Fill` require a width to generate re-sampled images.
-Height can also be specified for these, but will default to the width.
-If no type is specified it will default to `Fill`.
+###### Image Transformation
+To cut down on 500 errors caused by trying to resize images when visiting a page images can be transformed by salsify.
+When an image transformation is updated in the config it will also re-download the image with the new transformations.
 
 ```yaml
 Dynamic\Salsify\Model\Mapper.example:
@@ -307,21 +295,19 @@ Dynamic\Salsify\Model\Mapper.example:
       FrontImageID:
         salsifyField: Front Image
         type: Image
-        sizes:
-          - type: CMSThumbnail # Thumbnail used in the CMS
-          - type: StripThumbnail # Thumbnail used in GridFields
-          - type: Thumbnail # Creates a Thumbnail with dimensions 200 x 200
-            width: 200
-          - type: Pad
-            width: 300
-            height: 700
-          - type: Fill
-            width: 300
-            height: 250
-          - width: 300 # Defaults to Fill(300, 300)
+        transform:
+          - 'c_fit'
+          - 'w_1000'
+          - 'h_1000'
+          - 'dn_300'
+          - 'cs_srgb'
 ```
 
-It is recommended to use this on the `ManyImages` type for the CMS Thumbnails and Strip Thumbnails to prevent the cms from throwing errors.
+The above will download `http://a1.images.salsify.com/image/upload/c_fit,w_1000,h_1000,dn_300,cs_srgb/sample.jpg` instead of `http://a1.images.salsify.com/image/upload/sample.jpg`.
+
+To see what transformations salsify supports please visit https://getstarted.salsify.com/help/transforming-image-files.
+
+It is recommended to do this to all large files.
 
 ##### HasOne and HasMany
 has_one and has_many relations can be done just about the same.

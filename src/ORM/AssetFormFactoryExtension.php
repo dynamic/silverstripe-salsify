@@ -22,6 +22,7 @@ class AssetFormFactoryExtension extends Extension
         $record = isset($context['Record']) ? $context['Record'] : null;
         if ($record && $record->SalsifyID) {
             $fields->insertAfter('LastEdited', ReadonlyField::create('SalsifyID', 'Salsify ID'));
+            $fields->insertAfter('SalsifyID', ReadonlyField::create('Transformation', 'Salsify Transformation'));
         }
     }
 }

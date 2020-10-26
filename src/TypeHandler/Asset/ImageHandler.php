@@ -37,59 +37,28 @@ class ImageHandler extends AssetHandler
     private static $defaultImageType = 'png';
 
     /**
-     * @param Image $image
-     * @param array $sizes
+     * @param string $url
+     * @param array|string $transformations
      */
-    public function resizeImage($image, $sizes)
+    public function getImageTransformation($url, $transformations)
     {
-        foreach ($sizes as $size) {
-            $backgroundColor = array_key_exists('backgroundColor', $size) ? $size['backgroundColor'] : '#FFFFFF';
-            $width = array_key_exists('width', $size) ? $size['width'] : 0;
-            $height = array_key_exists('height', $size) ? $size['height'] : $width;
-
-            if (!array_key_exists('type', $size)) {
-                if ($width !== 0 && $height !== 0) {
-                    $image->Fill($width, $height);
-                }
-                break;
-            }
-
-            $type = $size['type'];
-            switch ($type) {
-                case 'Resample':
-                    $image->Resampled();
-                    break;
-
-                case 'StripThumbnail':
-                case 'StripThumb':
-                    $image->StripThumbnail();
-                    break;
-
-                case 'CMSThumbnail':
-                case 'CMSThumb':
-                    $image->CMSThumbnail();
-                    break;
-
-                case 'Thumbnail':
-                case 'Thumb':
-                    if ($width !== 0 && $height !== 0) {
-                        $image->Thumbnail($width, $height);
-                    }
-                    break;
-
-                case 'Pad':
-                    if ($width !== 0 && $height !== 0) {
-                        $image->Pad($width, $height, $backgroundColor);
-                    }
-                    break;
-
-                case 'Fill':
-                default:
-                    if ($width !== 0 && $height !== 0) {
-                        $image->Fill($width, $height);
-                    }
-            }
+        if (!is_array($transformations)) {
+            $transformations = [$transformations];
         }
+
+        return implode(',', $transformations);
+    }
+
+    /**
+     * @param string $url
+     * @param string $transform
+     */
+    public function getImageTransformationURL($url, $transform)
+    {
+        $filePath = preg_split('|^(.*[\\\/])|', $url, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY)[0];
+        $fileName = basename($url);
+
+        return "{$filePath}{$transform}/{$fileName}";
     }
 
     /**
@@ -111,18 +80,21 @@ class ImageHandler extends AssetHandler
 
         $url = $this->fixExtension($assetData['salsify:url']);
         $name = $this->fixExtension($assetData['salsify:name']);
+        $transformation = '';
+
+        if (array_key_exists('transform', $config)) {
+            $transformation = $this->getImageTransformation($url, $config['transform']);
+            $url = $this->getImageTransformationURL($url, $transformation);
+        }
 
         $asset = $this->updateFile(
             $assetData['salsify:id'],
             $assetData['salsify:updated_at'],
             $url,
             $name,
-            Image::class
+            Image::class,
+            $transformation
         );
-
-        if (array_key_exists('sizes', $config)) {
-            $this->resizeImage($asset, $config['sizes']);
-        }
 
         return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
     }
