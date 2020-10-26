@@ -140,10 +140,6 @@ class AssetHandler extends Extension
         }
 
         /** @var Image|ImageDataExtension $file */
-        if ($file->Transformation == $transformation) {
-            return false;
-        }
-
-        return true;
+        return $file->Transformation != $transformation;
     }
 }
