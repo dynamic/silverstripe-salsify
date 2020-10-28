@@ -62,7 +62,7 @@ jobs:
         run: "if [[ $COMPOSER_TOKEN ]]; then composer config --global --auth http-basic.repo.packagist.com token $COMPOSER_TOKEN; fi"
 
       - name: "Install dependencies with composer"
-        run: "composer update --no-ansi --no-interaction --no-progress"
+        run: "composer install --no-ansi --no-interaction --no-progress"
 
       - name: "Require Silverstripe CMS"
         run: "composer require silverstripe/cms ^4.6"
