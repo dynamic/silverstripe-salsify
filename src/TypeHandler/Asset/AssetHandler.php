@@ -3,7 +3,9 @@
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
 use Dynamic\Salsify\Model\Fetcher;
+use Dynamic\Salsify\ORM\FileDataExtension;
 use Dynamic\Salsify\ORM\ImageDataExtension;
+use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Traits\Yieldable;
 use GuzzleHttp\Client;
 use SilverStripe\Assets\File;
@@ -76,18 +78,38 @@ class AssetHandler extends Extension
 
     /**
      * @param string $id
+     * @param string $type
      * @param string|DataObject $class
-     * @return File|\Dynamic\Salsify\ORM\SalsifyIDExtension
+     * @return File|SalsifyIDExtension|FileDataExtension
      */
-    protected function findOrCreateFile($id, $class = File::class)
+    protected function findOrCreateFile($id, $type, $class = File::class)
     {
-        /** @var File|\Dynamic\Salsify\ORM\SalsifyIDExtension $file */
-        if ($file = $class::get()->find('SalsifyID', $id)) {
+        $filter = [
+            'SalsifyID' => $id,
+            'Type' => $type,
+        ];
+        /** @var File|SalsifyIDExtension|FileDataExtension $file */
+        if ($file = $class::get()->filter($filter)->first()) {
             return $file;
         }
 
+        // TODO - remove at a later date
+        $filter = [
+            'SalsifyID' => $id,
+            'Type' => null,
+        ];
+        if ($file = $class::get()->filter($filter)->first()) {
+            // checks for changes from image to file before trying to update
+            if (!($class === File::class && $file->getClassName() !== File::class)) {
+                $file->Type = $type;
+                return $this->writeFile($file);
+            }
+        }
+        // end of TODO removal
+
         $file = $class::create();
         $file->SalsifyID = $id;
+        $file->Type = $type;
         return $file;
     }
 
@@ -96,15 +118,16 @@ class AssetHandler extends Extension
      * @param string $updatedAt
      * @param string $url
      * @param string $name
+     * @param string $type
      * @param string|DataObject $class
      * @param string $transformation
      *
      * @return File|bool
      * @throws \Exception
      */
-    protected function updateFile($id, $updatedAt, $url, $name, $class = File::class, $transformation = '')
+    protected function updateFile($id, $updatedAt, $url, $name, $type, $class = File::class, $transformation = '')
     {
-        $file = $this->findOrCreateFile($id, $class);
+        $file = $this->findOrCreateFile($id, $type, $class);
         if ($file->SalsifyUpdatedAt && $file->SalsifyUpdatedAt == $updatedAt) {
             if (!$this->isTransformOutOfDate($file, $class, $transformation)) {
                 return $file;
@@ -117,13 +140,7 @@ class AssetHandler extends Extension
         }
         $file->setFromStream(fopen($url, 'r'), $name);
 
-        $published = $file->isPublished();
-        $file->write();
-
-        if ($published) {
-            $file->publishSingle();
-        }
-        return $file;
+        return $this->writeFile($file);
     }
 
     /**
@@ -141,5 +158,21 @@ class AssetHandler extends Extension
 
         /** @var Image|ImageDataExtension $file */
         return $file->Transformation != $transformation;
+    }
+
+    /**
+     * @param File $file
+     * @return File
+     */
+    private function writeFile($file)
+    {
+        $published = $file->isPublished();
+        $file->write();
+
+        if ($published) {
+            $file->publishSingle();
+        }
+
+        return $file;
     }
 }

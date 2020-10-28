@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\TypeHandler\Asset;
 
+use SilverStripe\Assets\File;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -50,7 +51,8 @@ class FileHandler extends AssetHandler
             $data['salsify:id'],
             $data['salsify:updated_at'],
             $data['salsify:url'],
-            $data['salsify:name']
+            $data['salsify:name'],
+            $config['type']
         );
         return preg_match('/ID$/', $dbField) ? $asset->ID : $asset;
     }
@@ -69,6 +71,11 @@ class FileHandler extends AssetHandler
     {
         $files = [];
         $fieldData = $data[$dataField];
+        // convert to array to prevent problems
+        if (!is_array($fieldData)) {
+            $fieldData = [$fieldData];
+        }
+
         foreach ($this->owner->yieldSingle($fieldData) as $fileID) {
             $entryData = array_merge($data, [
                 $dataField => $fileID
