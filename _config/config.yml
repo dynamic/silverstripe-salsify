@@ -19,6 +19,7 @@ Dynamic\Salsify\Model\Mapper:
 SilverStripe\Assets\File:
   extensions:
     - Dynamic\Salsify\ORM\SalsifyIDExtension
+    - Dynamic\Salsify\ORM\FileDataExtension
 
 SilverStripe\Assets\Image:
   extensions:

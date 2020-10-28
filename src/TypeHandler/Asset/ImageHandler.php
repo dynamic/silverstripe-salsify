@@ -92,6 +92,7 @@ class ImageHandler extends AssetHandler
             $assetData['salsify:updated_at'],
             $url,
             $name,
+            $config['type'],
             Image::class,
             $transformation
         );
