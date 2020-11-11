@@ -370,14 +370,13 @@ class Mapper extends Service
             return array_key_exists($salsifyField, $data) ? $salsifyField : false;
         }
 
-        $hasSalsifyField = array_key_exists('salsifyField', $salsifyField);
         $isLiteralField = (
             $this->getFieldType($salsifyField) === 'Literal' &&
             array_key_exists('value', $salsifyField)
         );
         $isSalsifyRelationField = (
             $this->getFieldType($salsifyField) === 'SalsifyRelation' &&
-            $hasSalsifyField
+            array_key_exists('salsifyField', $salsifyField)
         );
 
         if ($isLiteralField) {
@@ -386,10 +385,6 @@ class Mapper extends Service
 
         if ($isSalsifyRelationField) {
             return $salsifyField['salsifyField'];
-        }
-
-        if (!$hasSalsifyField) {
-            return false;
         }
 
         if (array_key_exists($salsifyField['salsifyField'], $data)) {

@@ -87,6 +87,17 @@ class MapperTest extends SapphireTest
                         'type' => 'ManyImages',
                         'sortColumn' => 'SortOrder',
                     ],
+                    'FallbackString' => [
+                        'salsifyField' => 'YYYYY',
+                        'fallback' => 'custom-field-title',
+                    ],
+                    'FallbackArray' => [
+                        'salsifyField' => 'YYYYY',
+                        'fallback' => [
+                            'XXXXX',
+                            'custom-field-seller',
+                        ],
+                    ],
                     'Unknown' => [
                         'unique' => true,
                     ],
@@ -129,6 +140,27 @@ class MapperTest extends SapphireTest
 
         // check to see if existing added
         $this->assertEquals(7, MappedObject::get()->count());
+        $this->testExisting();
+
+        // tests for unchanged
+        $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
+        $mapper->map();
+
+        $this->testImages();
+
+        $this->assertEquals(7, MappedObject::get()->count());
+        $this->assertEquals('modified TEST_MOD', MappedObject::get()->find('Unique', '2')->Modified);
+
+        // test fallbacks
+        $this->assertEquals('Brooklyn Bridge', MappedObject::get()->find('Unique', '3')->FallbackString);
+        $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->FallbackArray);
+    }
+
+    /**
+     * Checks existing records to see if they got updated
+     */
+    private function testExisting()
+    {
         // check to see if existing object with unique was modified
         $this->assertEquals('William McCloundy', MappedObject::get()->find('Unique', '3')->Seller);
         $this->assertEquals('00000000000002', MappedObject::get()->find('Unique', '3')->SalsifyID);
@@ -136,14 +168,13 @@ class MapperTest extends SapphireTest
         // check to see if existing object with salsify id was modified
         $this->assertEquals('Victor Lustig', MappedObject::get()->find('Unique', '2')->Seller);
         $this->assertEquals('00000000000001', MappedObject::get()->find('Unique', '2')->SalsifyID);
+    }
 
-        // tests for unchanged
-        $mapper = new Mapper($this->importerKey, __DIR__ . '/../data.json');
-        $mapper->map();
-
-        $this->assertEquals(7, MappedObject::get()->count());
-        $this->assertEquals('modified TEST_MOD', MappedObject::get()->find('Unique', '2')->Modified);
-
+    /**
+     * Tests images and sorting
+     */
+    private function testImages()
+    {
         // test images
         $this->assertEquals(9, Image::get()->count());
         $this->assertEquals(2, MappedObject::get()->find('Unique', '3')->Images()->count());

@@ -5,15 +5,23 @@ namespace Dynamic\Salsify\Tests\TestOnly;
 use SilverStripe\Assets\Image;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ManyManyList;
 
 /**
  * Class MappedObject
  * @package Dynamic\Salsify\Tests\TestOnly
  *
- * @property string $Unique
- * @property string $Title
- * @property string $Seller
- * @property string $Modified
+ * @property string Unique
+ * @property string Title
+ * @property string Seller
+ * @property string Modified
+ * @property string FallbackString
+ * @property string FallbackArray
+ *
+ * @property int MainImageID
+ * @method Image MainImage
+ *
+ * @method ManyManyList Images
  */
 class MappedObject extends DataObject implements TestOnly
 {
@@ -30,6 +38,8 @@ class MappedObject extends DataObject implements TestOnly
         'Title' => 'Varchar',
         'Seller' => 'Varchar',
         'Modified' => 'Varchar',
+        'FallbackString' => 'Varchar',
+        'FallbackArray' => 'Varchar',
     ];
 
     /**
