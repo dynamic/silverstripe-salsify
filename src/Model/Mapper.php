@@ -888,7 +888,15 @@ class Mapper extends Service
     }
 
     /**
-     * @return \JsonMachine\JsonMachine
+     * @return JsonMachine
+     */
+    public function getProductStream()
+    {
+        return $this->productStream;
+    }
+
+    /**
+     * @return JsonMachine
      */
     public function getAssetStream()
     {
