@@ -917,6 +917,10 @@ class Mapper extends Service
      */
     private function isMapperHashUpToDate($object, $relations)
     {
+        if (!$object->hasMethod('MapperHashes')) {
+            return true;
+        }
+
         $filter = [
             'MapperService' => $this->importerKey,
             'ForRelations' => $relations,
