@@ -196,14 +196,14 @@ class Mapper extends Service
             // if no existing object was found but a unique filter is valid (not empty)
             if (!$object) {
                 // don't try to create related objects that don't exist
-                if (!$salsifyRelations) {
+                if ($salsifyRelations) {
                     return null;
                 }
 
                 if (!$this->hasValidUniqueFilter($class, $mappings, $data)) {
                     return null;
                 }
-                
+
                 $object = $class::create();
             }
         }
@@ -466,10 +466,6 @@ class Mapper extends Service
     {
         if ($obj = $this->findBySalsifyID($class, $mappings, $data)) {
             return $obj;
-        }
-
-        if (!$this->hasValidUniqueFilter($class, $mappings, $data)) {
-            return null;
         }
 
         $filter = $this->getUniqueFilter($class, $mappings, $data);
