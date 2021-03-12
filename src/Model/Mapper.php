@@ -194,11 +194,17 @@ class Mapper extends Service
             $object = $this->findObjectByUnique($class, $mappings, $data);
 
             // if no existing object was found but a unique filter is valid (not empty)
-            if (!$object && !$salsifyRelations) {
-                $object = $class::create();
-            } else {
+            if (!$object) {
                 // don't try to create related objects that don't exist
-                return null;
+                if (!$salsifyRelations) {
+                    return null;
+                }
+
+                if (!$this->hasValidUniqueFilter($class, $mappings, $data)) {
+                    return null;
+                }
+                
+                $object = $class::create();
             }
         }
 
@@ -415,6 +421,18 @@ class Mapper extends Service
      * @param array $mappings
      * @param array $data
      *
+     * @return bool
+     */
+    private function hasValidUniqueFilter($class, $mappings, $data)
+    {
+        return (bool) count(array_filter($this->getUniqueFilter($class, $mappings, $data)));
+    }
+
+    /**
+     * @param string $class
+     * @param array $mappings
+     * @param array $data
+     *
      * @return array
      */
     private function getUniqueFilter($class, $mappings, $data)
@@ -450,11 +468,11 @@ class Mapper extends Service
             return $obj;
         }
 
-        $filter = $this->getUniqueFilter($class, $mappings, $data);
-        if (count(array_filter($filter)) == 0) {
+        if (!$this->hasValidUniqueFilter($class, $mappings, $data)) {
             return null;
         }
 
+        $filter = $this->getUniqueFilter($class, $mappings, $data);
         return DataObject::get($class)->filter($filter)->first();
     }
 
