@@ -193,11 +193,6 @@ class Mapper extends Service
         if ($object === null) {
             $object = $this->findObjectByUnique($class, $mappings, $data);
 
-            $filter = $this->getUniqueFilter($class, $mappings, $data);
-            if (count(array_filter($filter)) == 0) {
-                return null;
-            }
-
             // if no existing object was found but a unique filter is valid (not empty)
             if (!$object && !$salsifyRelations) {
                 $object = $class::create();
@@ -456,6 +451,10 @@ class Mapper extends Service
         }
 
         $filter = $this->getUniqueFilter($class, $mappings, $data);
+        if (count(array_filter($filter)) == 0) {
+            return null;
+        }
+
         return DataObject::get($class)->filter($filter)->first();
     }
 
