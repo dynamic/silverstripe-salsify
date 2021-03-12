@@ -199,8 +199,11 @@ class Mapper extends Service
             }
 
             // if no existing object was found but a unique filter is valid (not empty)
-            if (!$object) {
+            if (!$object && !$salsifyRelations) {
                 $object = $class::create();
+            } else {
+                // don't try to create related objects that don't exist
+                return null;
             }
         }
 
