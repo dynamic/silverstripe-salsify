@@ -228,7 +228,7 @@ class Mapper extends Service
 
         if (array_key_exists('salsify:parent_id', $data) && $this->hasFile()) {
             $products = JsonMachine::fromFile($this->file, '/4/products');
-            foreach($this->yieldSingle($products) as $product) {
+            foreach ($this->yieldSingle($products) as $product) {
                 if ($product['salsify:id'] === $data['salsify:parent_id']) {
                     $data = array_merge($product, $data);
                     break;
