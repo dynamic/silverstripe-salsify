@@ -226,6 +226,16 @@ class Mapper extends Service
             return $object;
         }
 
+        if (array_key_exists('salsify:parent_id', $data) && $this->hasFile()) {
+            $products = JsonMachine::fromFile($this->file, '/4/products');
+            foreach($this->yieldSingle($products) as $product) {
+                if ($product['salsify:id'] === $data['salsify:parent_id']) {
+                    $data = array_merge($product, $data);
+                    break;
+                }
+            }
+        }
+
         foreach ($this->yieldKeyVal($mappings) as $dbField => $salsifyField) {
             $field = $this->getField($salsifyField, $data);
             if ($field === false) {

@@ -129,6 +129,10 @@ class SalsifyFetchExtension extends LeftAndMainExtension
 
         ImportTask::config()->remove('output');
         $data = $this->fetchProduct($record->SalsifyID);
+        if (array_key_exists('salsify:parent_id', $data)) {
+            $parent = $this->fetchProduct($data['salsify:parent_id']);
+            $data = array_merge($parent, $data);
+        }
 
         $this->changeToSalsifyUser();
         $this->mapData($record, $data);
