@@ -112,7 +112,9 @@ class Mapper extends Service
         }
 
         $mapperHash->MapperHash = $this->getMappingHash();
-        $mapperHash->write();
+        if ($mapperHash->isChanged() && $object->ID) {
+            $mapperHash->write();
+        }
     }
 
     /**
@@ -260,7 +262,6 @@ class Mapper extends Service
             if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
                 if (!$this->skipSilently) {
                     ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue");
-                    $this->skipSilently = false;
                 }
                 return false;
             };
@@ -276,10 +277,6 @@ class Mapper extends Service
             $this->writeValue($object, $type, $dbField, $value, $sortColumn);
         }
 
-        if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
-            $this->updateMappingHash($object, $salsifyRelations);
-        }
-
         $this->extend('beforeObjectWrite', $object);
         if ($object->isChanged()) {
             $object->write();
@@ -288,6 +285,11 @@ class Mapper extends Service
         } else {
             ImportTask::output("$class $firstUniqueKey $firstUniqueValue was not changed.");
         }
+
+        if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
+            $this->updateMappingHash($object, $salsifyRelations);
+        }
+
         return $object;
     }
 
@@ -306,18 +308,18 @@ class Mapper extends Service
         }
 
         if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
-            ImportTask::output("Forcing update for $firstUniqueKey $firstUniqueValue. Mappings changed.");
+            ImportTask::output("Forcing update for $object->ClassName $firstUniqueKey $firstUniqueValue. Mappings changed.");
             return false;
         }
 
         if ($salsifyRelations == false) {
             if ($this->objectDataUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
-                ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
+                ImportTask::output("Skipping $object->ClassName $firstUniqueKey $firstUniqueValue. It is up to Date.");
                 return true;
             }
         } else {
             if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
-                ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
+                ImportTask::output("Skipping $object->ClassName $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
                 return true;
             }
         }
@@ -939,6 +941,8 @@ class Mapper extends Service
 
     /**
      * @param DataObject|SalsifyIDExtension $object
+     * @param bool $relations
+     *
      * @return bool
      */
     private function isMapperHashUpToDate($object, $relations)
