@@ -2,6 +2,7 @@
 
 namespace Dynamic\Salsify\ORM;
 
+use SilverStripe\Assets\Image;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
@@ -22,7 +23,9 @@ class AssetFormFactoryExtension extends Extension
         $record = isset($context['Record']) ? $context['Record'] : null;
         if ($record && $record->SalsifyID) {
             $fields->insertAfter('LastEdited', ReadonlyField::create('SalsifyID', 'Salsify ID'));
-            $fields->insertAfter('SalsifyID', ReadonlyField::create('Transformation', 'Salsify Transformation'));
+            if ($record instanceof Image) {
+                $fields->insertAfter('SalsifyID', ReadonlyField::create('Transformation', 'Salsify Transformation'));
+            }
         }
     }
 }
