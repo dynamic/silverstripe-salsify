@@ -219,6 +219,14 @@ class Mapper extends Service
         } else {
             $firstUniqueValue = 'NULL';
         }
+
+        if ($this->hasMethod('shouldSkipForObject')) {
+            if ($this->shouldSkipForObject($object, $data)) {
+                ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue. Not the right object class");
+                return;
+            }
+        }
+
         ImportTask::output("Updating $class $firstUniqueKey $firstUniqueValue");
 
         if (
