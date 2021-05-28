@@ -135,7 +135,8 @@ class AssetHandler extends Extension
         }
 
         $file->SalsifyUpdatedAt = $updatedAt;
-        if ($file->hasField('Transformation')) {
+        if ($file->hasExtension(ImageDataExtension::class)) {
+            /** @var ImageDataExtension|Image|File $file */
             $file->Transformation = $transformation;
         }
         $file->setFromStream(fopen($url, 'r'), $name);

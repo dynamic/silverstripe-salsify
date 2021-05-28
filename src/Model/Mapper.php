@@ -112,7 +112,9 @@ class Mapper extends Service
         }
 
         $mapperHash->MapperHash = $this->getMappingHash();
-        $mapperHash->write();
+        if ($mapperHash->isChanged() && $object->ID) {
+            $mapperHash->write();
+        }
     }
 
     /**
@@ -217,6 +219,14 @@ class Mapper extends Service
         } else {
             $firstUniqueValue = 'NULL';
         }
+
+        if ($this->hasMethod('shouldSkipForObject')) {
+            if ($this->shouldSkipForObject($object, $data)) {
+                ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue. Not the right object class");
+                return;
+            }
+        }
+
         ImportTask::output("Updating $class $firstUniqueKey $firstUniqueValue");
 
         if (
@@ -224,6 +234,16 @@ class Mapper extends Service
             $this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)
         ) {
             return $object;
+        }
+
+        if (array_key_exists('salsify:parent_id', $data) && $this->hasFile()) {
+            $products = JsonMachine::fromFile($this->file, '/4/products');
+            foreach ($this->yieldSingle($products) as $product) {
+                if ($product['salsify:id'] === $data['salsify:parent_id']) {
+                    $data = array_merge($product, $data);
+                    break;
+                }
+            }
         }
 
         foreach ($this->yieldKeyVal($mappings) as $dbField => $salsifyField) {
@@ -250,7 +270,6 @@ class Mapper extends Service
             if ($this->handleShouldSkip($class, $dbField, $salsifyField, $data)) {
                 if (!$this->skipSilently) {
                     ImportTask::output("Skipping $class $firstUniqueKey $firstUniqueValue");
-                    $this->skipSilently = false;
                 }
                 return false;
             };
@@ -266,10 +285,6 @@ class Mapper extends Service
             $this->writeValue($object, $type, $dbField, $value, $sortColumn);
         }
 
-        if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
-            $this->updateMappingHash($object, $salsifyRelations);
-        }
-
         $this->extend('beforeObjectWrite', $object);
         if ($object->isChanged()) {
             $object->write();
@@ -278,6 +293,11 @@ class Mapper extends Service
         } else {
             ImportTask::output("$class $firstUniqueKey $firstUniqueValue was not changed.");
         }
+
+        if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
+            $this->updateMappingHash($object, $salsifyRelations);
+        }
+
         return $object;
     }
 
@@ -296,18 +316,18 @@ class Mapper extends Service
         }
 
         if (!$this->isMapperHashUpToDate($object, $salsifyRelations)) {
-            ImportTask::output("Forcing update for $firstUniqueKey $firstUniqueValue. Mappings changed.");
+            ImportTask::output("Forcing update for $object->ClassName $firstUniqueKey $firstUniqueValue. Mappings changed.");
             return false;
         }
 
         if ($salsifyRelations == false) {
             if ($this->objectDataUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
-                ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue. It is up to Date.");
+                ImportTask::output("Skipping $object->ClassName $firstUniqueKey $firstUniqueValue. It is up to Date.");
                 return true;
             }
         } else {
             if ($this->objectRelationsUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue)) {
-                ImportTask::output("Skipping $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
+                ImportTask::output("Skipping $object->ClassName $firstUniqueKey $firstUniqueValue relations. It is up to Date.");
                 return true;
             }
         }
@@ -929,6 +949,8 @@ class Mapper extends Service
 
     /**
      * @param DataObject|SalsifyIDExtension $object
+     * @param bool $relations
+     *
      * @return bool
      */
     private function isMapperHashUpToDate($object, $relations)
