@@ -21,7 +21,7 @@ trait Yieldable
      */
     public function yieldSingle($list, $callback = null)
     {
-        if (!is_array($list) && !$list instanceof Traversable) {
+        if (!is_array($list) && !$list instanceof \Traversable) {
             $list = [$list];
         }
 
@@ -45,7 +45,7 @@ trait Yieldable
      */
     public function yieldKeyVal($list, $callback = null)
     {
-        if (!is_array($list) && !$list instanceof Traversable) {
+        if (!is_array($list) && !$list instanceof \Traversable) {
             $list = [$list];
         }
 
