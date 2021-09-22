@@ -21,6 +21,10 @@ trait Yieldable
      */
     public function yieldSingle($list, $callback = null)
     {
+        if (!is_array($list) && !$list instanceof Traversable) {
+            $list = [$list];
+        }
+
         foreach ($list as $item) {
             $injected = (yield $item);
 
@@ -41,6 +45,10 @@ trait Yieldable
      */
     public function yieldKeyVal($list, $callback = null)
     {
+        if (!is_array($list) && !$list instanceof Traversable) {
+            $list = [$list];
+        }
+
         foreach ($list as $key => $val) {
             $injected = (yield $key => $val);
 
