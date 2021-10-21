@@ -1,7 +1,8 @@
 <phpunit bootstrap="vendor/silverstripe/cms/tests/bootstrap.php" colors="true">
-    <testsuite name="silverstripe-salsify">
+    <testsuite name="silverstripe-shopify">
         <directory>tests/</directory>
     </testsuite>
+
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src/</directory>
