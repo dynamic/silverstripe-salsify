@@ -1,7 +1,13 @@
 # SilverStripe Salsify
-[![codecov](https://codecov.io/gh/dynamic/silverstripe-salsify/branch/master/graph/badge.svg)](https://codecov.io/gh/dynamic/silverstripe-salsify)
+![CI](https://github.com/dynamic/silverstripe-salsify/workflows/CI/badge.svg)
 [![Build Status](https://travis-ci.com/dynamic/silverstripe-salsify.svg?branch=master)](https://travis-ci.com/dynamic/silverstripe-salsify)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dynamic/silverstripe-salsify/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dynamic/silverstripe-salsify/?branch=master)
+[![codecov](https://codecov.io/gh/dynamic/silverstripe-salsify/branch/master/graph/badge.svg)](https://codecov.io/gh/dynamic/silverstripe-salsify)
+
+[![Latest Stable Version](https://poser.pugx.org/dynamic/silverstripe-shopify/v/stable)](https://packagist.org/packages/dynamic/silverstripe-shopify)
+[![Total Downloads](https://poser.pugx.org/dynamic/silverstripe-shopify/downloads)](https://packagist.org/packages/dynamic/silverstripe-shopify)
+[![Latest Unstable Version](https://poser.pugx.org/dynamic/silverstripe-shopify/v/unstable)](https://packagist.org/packages/dynamic/silverstripe-shopify)
+[![License](https://poser.pugx.org/dynamic/silverstripe-shopify/license)](https://packagist.org/packages/dynamic/silverstripe-shopify)
 
 Salsify integration for SilverStripe websites.
 
