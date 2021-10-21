@@ -62,7 +62,7 @@ jobs:
       - name: "Require Silverstripe CMS for PHPUnit bootstrap"
         run: "composer require silverstripe/cms"
 
-      - name: "Run tests with phpunit/phpunit"
+      - name: "Run tests with phpunit/phpunit --coverage-clover=coverage.xml"
         env:
           SS_DATABASE_PORT: ${{ job.services.mysql.ports['3306'] }}
         run: "vendor/bin/phpunit"
