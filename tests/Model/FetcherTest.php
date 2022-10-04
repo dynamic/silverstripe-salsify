@@ -22,10 +22,11 @@ class FetcherTest extends SapphireTest
     /**
      *
      */
-    public function setUp()
+    public function setUp(): void
     {
+        parent::setUp();
+
         Config::modify()->remove(Fetcher::class, 'apiKey');
-        return parent::setUp();
     }
 
     /**

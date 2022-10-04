@@ -53,8 +53,10 @@ class MapperTest extends SapphireTest
     /**
      *
      */
-    public function setUp()
+    public function setUp(): void
     {
+        parent::setUp();
+
         Config::modify()->set(
             Mapper::class . '.' . $this->importerKey,
             'mapping',
@@ -107,8 +109,8 @@ class MapperTest extends SapphireTest
                 ],
             ]
         );
+
         Config::modify()->set(ImportTask::class, 'output', false);
-        return parent::setUp();
     }
 
     /**
