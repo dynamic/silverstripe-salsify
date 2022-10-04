@@ -23,6 +23,14 @@
             "Dynamic\\Salsify\\Tests\\": "tests/"
         }
     },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/recipe-plugin": true,
+            "silverstripe/vendor-plugin": true
+        },
+        "process-timeout": 600
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "1.x-dev"
