@@ -3,6 +3,7 @@ name: salsify-config
 ---
 Dynamic\Salsify\Model\Fetcher:
   timeout: 2000
+  user-agent: 'SilverStripeSalsifyBot/1.0 (https://github.com/dynamic/silverstripe-salsify) dynamic/silverstripe-salsify/1.0'
 
 Dynamic\Salsify\Model\Mapper:
   skipUpToDate: true

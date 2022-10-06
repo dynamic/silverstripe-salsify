@@ -111,6 +111,7 @@ class Fetcher extends Service
                 'Content-Type' => 'application/json',
             ],
         ]);
+        $client->setUserAgent($this->config()->get('user-agent'));
 
         if ($method === 'POST' && is_array($postBody)) {
             $response = $client->request($method, $url, [

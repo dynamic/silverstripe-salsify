@@ -10,6 +10,7 @@ use Dynamic\Salsify\Traits\Yieldable;
 use GuzzleHttp\Client;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Image;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 
@@ -45,6 +46,8 @@ class AssetHandler extends Extension
                 'Content-Type' => 'application/json',
             ],
         ]);
+
+        $client->setUserAgent(Config::inst()->get(Fetcher::class, 'user-agent'));
 
         $response = $client->get($url);
         return json_decode($response->getBody(), true);
@@ -139,7 +142,14 @@ class AssetHandler extends Extension
             /** @var ImageDataExtension|Image|File $file */
             $file->Transformation = $transformation;
         }
-        $file->setFromStream(fopen($url, 'r'), $name);
+
+        $context = stream_context_create([
+            'http' => [
+                'header' => 'User-Agent: ' . Config::inst()->get(Fetcher::class, 'user-agent'),
+            ],
+        ]);
+
+        $file->setFromStream(fopen($url, 'r', false, $context), $name);
 
         return $this->writeFile($file);
     }
