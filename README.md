@@ -56,6 +56,7 @@ See [License](license.md)
          - [Custom Field Types](#custom-field-types)
          - [Skipping Objects](#skipping-objects)
          - [Modify Field Data](#modify-field-data)
+         - [Attributes in Group as DataObjects](#attributes-in-group-as-dataobjects)
   - [Single Object Import](#single-object-import)
 - [Troubleshooting](#troubleshooting)
 - [Maintainers](#maintainers)
@@ -178,7 +179,7 @@ Dynamic\Salsify\Model\Mapper.example:
        SKU:
         salsifyField: SKU
         unique: true
-      Title: Product Title
+       Title: Product Title
 ```
 
 Each mapper instance will need a service config.
@@ -773,6 +774,7 @@ namespace {
 ##### [Custom Field Types](docs/en/custom-types.md)
 ##### [Skipping Objects](docs/en/mapper-skip-object.md)
 ##### [Modify Field Data](docs/en/mapper-field-modifier.md)
+##### [Attributes in Group as DataObjects](docs/en/attribute-group-as-objects.md)
 
 ### Single Object Import
 Adding a re-fetch button in the cms requires some configuration.
