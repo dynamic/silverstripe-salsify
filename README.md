@@ -57,6 +57,7 @@ See [License](license.md)
          - [Skipping Objects](#skipping-objects)
          - [Modify Field Data](#modify-field-data)
          - [Using a Property To Assign a Parent](#using-a-property-to-assign-a-parent)
+         - [Creating Virtual Pages with Pages](#creating-virtual-pages-with-pages)
          - [Attributes in Group as DataObjects](#attributes-in-group-as-dataobjects)
   - [Single Object Import](#single-object-import)
 - [Troubleshooting](#troubleshooting)
@@ -776,6 +777,7 @@ namespace {
 ##### [Skipping Objects](docs/en/mapper-skip-object.md)
 ##### [Modify Field Data](docs/en/mapper-field-modifier.md)
 ##### [Using a Property To Assign a Parent](docs/en/property-as-parent.md)
+##### [Creating Virtual Pages with Pages](docs/en/virtual-pages.md)
 ##### [Attributes in Group as DataObjects](docs/en/attribute-group-as-objects.md)
 
 ### Single Object Import
