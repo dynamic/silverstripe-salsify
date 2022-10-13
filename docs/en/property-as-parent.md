@@ -1,4 +1,8 @@
 # Using a Property To Assign a Parent
+
+Sometimes a parent page is needed for products. This can all be done in a modification function.
+The following example could also be modified to relate DataObjects to a product object.
+
 ```yaml
 Dynamic\Salsify\Model\Mapper:
   extensions:
@@ -66,6 +70,7 @@ class SalsifyParentMapper extends Extension
 }
 ```
 
+Some basic example pages used in the above example. The `ParentID` is built into pages.
 ```php
 /**
  * Class ProductCategory
