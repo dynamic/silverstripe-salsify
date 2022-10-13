@@ -11,7 +11,7 @@ Dynamic\Salsify\Model\Mapper:
     \Product:
       ParentID:
         salsifyField: 'Category'
-        modification: 'parentMofdifier'
+        modification: 'parentModifier'
 ```
 
 ```php
@@ -30,7 +30,7 @@ class SalsifyParentMapper extends Extension
      * @return array
      * @throws \SilverStripe\ORM\ValidationException
      */
-    public function parentMofdifier($class, $dbField, $config, $data)
+    public function parentModifier($class, $dbField, $config, $data)
     {
         //Debug::show($data);
         $parent = false;
