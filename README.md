@@ -56,6 +56,7 @@ See [License](license.md)
          - [Custom Field Types](#custom-field-types)
          - [Skipping Objects](#skipping-objects)
          - [Modify Field Data](#modify-field-data)
+         - [Using a Property To Assign a Parent](#using-a-property-to-assign-a-parent)
          - [Attributes in Group as DataObjects](#attributes-in-group-as-dataobjects)
   - [Single Object Import](#single-object-import)
 - [Troubleshooting](#troubleshooting)
@@ -774,6 +775,7 @@ namespace {
 ##### [Custom Field Types](docs/en/custom-types.md)
 ##### [Skipping Objects](docs/en/mapper-skip-object.md)
 ##### [Modify Field Data](docs/en/mapper-field-modifier.md)
+##### [Using a Property To Assign a Parent](docs/en/property-as-parent.md)
 ##### [Attributes in Group as DataObjects](docs/en/attribute-group-as-objects.md)
 
 ### Single Object Import
