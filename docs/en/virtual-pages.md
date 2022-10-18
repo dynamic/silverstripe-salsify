@@ -5,7 +5,7 @@ Sometimes it is useful to automatically create a virtual page when a page is cre
 ```yaml
 Dynamic\Salsify\Model\Mapper:
   extensions:
-    - SalsifyVirtualPageMapper
+    - SalsifyParentMapper
   mapping:
     \Product:
       SecondaryCategory: 'SecondaryCategory'
