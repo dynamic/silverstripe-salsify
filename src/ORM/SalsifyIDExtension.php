@@ -128,6 +128,8 @@ class SalsifyIDExtension extends DataExtension
     {
         parent::onBeforeWrite();
 
-        $this->owner->SalsifyID = trim($this->owner->SalsifyID);
+        if ($this->owner->SalsifyID !== null) {
+            $this->owner->SalsifyID = trim($this->owner->SalsifyID);
+        }
     }
 }
