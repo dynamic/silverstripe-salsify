@@ -5,7 +5,8 @@ namespace Dynamic\Salsify\Model;
 use Dynamic\Salsify\ORM\SalsifyIDExtension;
 use Dynamic\Salsify\Task\ImportTask;
 use Exception;
-use JsonMachine\JsonMachine;
+use JsonMachine\Items;
+use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
@@ -36,12 +37,12 @@ class Mapper extends Service
     private $file = null;
 
     /**
-     * @var JsonMachine
+     * @var Items
      */
     private $productStream;
 
     /**
-     * @var JsonMachine
+     * @var Items
      */
     private $assetStream;
 
@@ -122,7 +123,7 @@ class Mapper extends Service
      */
     public function resetProductStream()
     {
-        $this->productStream = JsonMachine::fromFile($this->file, '/4/products');
+        $this->productStream = iterator_to_array(Items::fromFile($this->file, ['pointer' => '/4/products', 'decoder' => new ExtJsonDecoder(true)]));
     }
 
     /**
@@ -130,7 +131,7 @@ class Mapper extends Service
      */
     public function resetAssetStream()
     {
-        $this->assetStream = JsonMachine::fromFile($this->file, '/3/digital_assets');
+        $this->assetStream = iterator_to_array(Items::fromFile($this->file, ['pointer' => '/3/digital_assets', 'decoder' => new ExtJsonDecoder(true)]));
     }
 
     /**
@@ -237,7 +238,7 @@ class Mapper extends Service
         }
 
         if (array_key_exists('salsify:parent_id', $data) && $this->hasFile()) {
-            $products = JsonMachine::fromFile($this->file, '/4/products');
+            $products = iterator_to_array(Items::fromFile($this->file, ['pointer' => '/4/products', 'decoder' => new ExtJsonDecoder(true)]));
             foreach ($this->yieldSingle($products) as $product) {
                 if ($product['salsify:id'] === $data['salsify:parent_id']) {
                     $data = array_merge($product, $data);
@@ -924,7 +925,7 @@ class Mapper extends Service
     }
 
     /**
-     * @return JsonMachine
+     * @return Items
      */
     public function getProductStream()
     {
@@ -932,7 +933,7 @@ class Mapper extends Service
     }
 
     /**
-     * @return JsonMachine
+     * @return Items
      */
     public function getAssetStream()
     {
