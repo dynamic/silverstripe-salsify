@@ -73,7 +73,8 @@ class AssetHandler extends Extension
         foreach ($assetGenerator as $name => $data) {
             if ($data['salsify:id'] == $id) {
                 $asset = $data;
-                $assetGenerator->send(Yieldable::$STOP_GENERATOR);
+                $owner = $this->owner;
+                $assetGenerator->send($owner::$STOP_GENERATOR);
             }
         }
         return $asset;
