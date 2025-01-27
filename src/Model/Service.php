@@ -47,7 +47,11 @@ abstract class Service
 
         $serviceConfig = Config::inst()->get($this->serviceName);
         foreach ($this->yieldKeyVal($serviceConfig) as $key => $value) {
-            $this->config()->merge($key, $value);
+            if (!is_array($value)) {
+                $this->config()->set($key, $value);
+            }else{
+                $this->config()->merge($key, $value);
+            }
 
             if ($key === 'extensions') {
                 if (!is_array($value)) {
