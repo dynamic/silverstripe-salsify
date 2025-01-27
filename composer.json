@@ -11,11 +11,11 @@
     ],
     "license": "BSD-3-Clause",
     "require": {
-        "silverstripe/framework": "^4.10",
+        "silverstripe/framework": "^5.0",
         "halaxa/json-machine": "^1.0"
     },
     "require-dev": {
-        "silverstripe/recipe-testing": "^2.0"
+        "silverstripe/recipe-testing": "^3.0"
     },
     "autoload": {
         "psr-4": {
