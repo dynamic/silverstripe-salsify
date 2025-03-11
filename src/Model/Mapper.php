@@ -230,8 +230,7 @@ class Mapper extends Service
 
         ImportTask::output("Updating $class $firstUniqueKey $firstUniqueValue");
 
-        if (
-            !$forceUpdate &&
+        if (!$forceUpdate &&
             $this->objectUpToDate($object, $data, $firstUniqueKey, $firstUniqueValue, $salsifyRelations)
         ) {
             return $object;
@@ -504,8 +503,7 @@ class Mapper extends Service
     {
         /** @var DataObject $genericObject */
         $genericObject = Injector::inst()->get($class);
-        if (
-            !$genericObject->hasExtension(SalsifyIDExtension::class) &&
+        if (!$genericObject->hasExtension(SalsifyIDExtension::class) &&
             !$genericObject->hasField('SalsifyID')
         ) {
             return false;
@@ -541,8 +539,7 @@ class Mapper extends Service
                 continue;
             }
 
-            if (
-                !array_key_exists('unique', $salsifyField) ||
+            if (!array_key_exists('unique', $salsifyField) ||
                 !array_key_exists('salsifyField', $salsifyField)
             ) {
                 continue;
@@ -907,8 +904,7 @@ class Mapper extends Service
      */
     private function clearValue($object, $dbField, $salsifyField)
     {
-        if (
-            is_array($salsifyField) &&
+        if (is_array($salsifyField) &&
             array_key_exists('keepExistingValue', $salsifyField) &&
             $salsifyField['keepExistingValue']
         ) {
