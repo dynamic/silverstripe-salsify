@@ -426,6 +426,10 @@ class Mapper extends Service
 
             foreach ($this->yieldSingle($salsifyField['fallback']) as $fallback) {
                 if (array_key_exists($fallback, $data)) {
+                    // Apply modification to the fallback field if it exists
+                    if (array_key_exists('modification', $salsifyField)) {
+                        $data = $this->handleModification($this->getFieldType($salsifyField), '', '', $salsifyField, $data);
+                    }
                     return $fallback;
                 }
             }
