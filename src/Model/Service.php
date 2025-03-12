@@ -49,7 +49,7 @@ abstract class Service
         foreach ($this->yieldKeyVal($serviceConfig) as $key => $value) {
             if (!is_array($value)) {
                 $this->config()->set($key, $value);
-            }else{
+            } else {
                 $this->config()->merge($key, $value);
             }
 

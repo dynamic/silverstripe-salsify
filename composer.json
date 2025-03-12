@@ -1,6 +1,7 @@
 {
     "name": "dynamic/silverstripe-salsify",
     "description": "Salsify integration for SilverStripe websites.",
+    "license": "BSD-3-Clause",
     "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",
@@ -9,14 +10,17 @@
         "PXM",
         "PIM"
     ],
-    "license": "BSD-3-Clause",
     "require": {
-        "silverstripe/framework": "^5.0",
-        "halaxa/json-machine": "^1.0"
+        "halaxa/json-machine": "^1.0",
+        "silverstripe/framework": "^5.0"
     },
     "require-dev": {
-        "silverstripe/recipe-testing": "^3.0"
+        "silverstripe/recipe-testing": "^3",
+        "silverstripe/standards": "^1",
+        "squizlabs/php_codesniffer": "^3"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Dynamic\\Salsify\\": "src/",
@@ -30,7 +34,5 @@
             "silverstripe/vendor-plugin": true
         },
         "process-timeout": 600
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }

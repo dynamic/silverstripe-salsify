@@ -20,7 +20,6 @@ use SilverStripe\Versioned\Versioned;
  */
 class Mapper extends Service
 {
-
     /**
      * @var bool
      */

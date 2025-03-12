@@ -16,11 +16,10 @@ use SilverStripe\Core\Injector\Injectable;
  */
 class Fetcher extends Service
 {
-
     /**
      * @var string
      */
-    const API_BASE_URL = 'https://app.salsify.com/api/';
+    protected const API_BASE_URL = 'https://app.salsify.com/api/';
 
     /**
      * @var string

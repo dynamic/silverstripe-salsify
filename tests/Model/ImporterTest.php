@@ -15,7 +15,6 @@ use SilverStripe\Dev\SapphireTest;
  */
 class ImporterTest extends SapphireTest
 {
-
     /**
      *
      */

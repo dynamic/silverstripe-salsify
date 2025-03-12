@@ -13,7 +13,6 @@ use SilverStripe\ORM\DataObject;
  */
 class FileHandler extends AssetHandler
 {
-
     /**
      * @var array
      */

@@ -13,7 +13,6 @@ use SilverStripe\Dev\SapphireTest;
  */
 class FetcherTest extends SapphireTest
 {
-
     /**
      * @var string
      */

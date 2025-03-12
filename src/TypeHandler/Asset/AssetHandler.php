@@ -22,7 +22,6 @@ use SilverStripe\ORM\DataObject;
  */
 class AssetHandler extends Extension
 {
-
     /**
      * @param $id
      * @return array

@@ -15,7 +15,6 @@ use SilverStripe\ORM\DataExtension;
  */
 class FileDataExtension extends DataExtension
 {
-
     /**
      * @var array
      */
