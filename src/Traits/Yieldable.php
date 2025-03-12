@@ -8,7 +8,6 @@ namespace Dynamic\Salsify\Traits;
  */
 trait Yieldable
 {
-
     /**
      * @var string
      */

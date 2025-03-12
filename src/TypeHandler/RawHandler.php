@@ -11,7 +11,6 @@ use SilverStripe\Core\Extension;
  */
 class RawHandler extends Extension
 {
-
     /**
      * @var array
      */

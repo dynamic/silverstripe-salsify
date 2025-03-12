@@ -20,7 +20,6 @@ use SilverStripe\ORM\DataObject;
  */
 class MapperHash extends DataObject
 {
-
     /**
      * @var string
      */

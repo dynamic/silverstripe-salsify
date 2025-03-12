@@ -14,7 +14,6 @@ use SilverStripe\ORM\DataObject;
  */
 class ImageHandler extends AssetHandler
 {
-
     /**
      * @var array
      */

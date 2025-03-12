@@ -27,7 +27,6 @@ use SilverStripe\ORM\HasManyList;
  */
 class SalsifyIDExtension extends DataExtension
 {
-
     /**
      * @var array
      */

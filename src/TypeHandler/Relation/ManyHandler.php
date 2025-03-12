@@ -13,7 +13,6 @@ use SilverStripe\ORM\DataObject;
  */
 class ManyHandler extends Extension
 {
-
     /**
      * @var array
      */

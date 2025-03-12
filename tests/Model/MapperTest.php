@@ -19,7 +19,6 @@ use SilverStripe\Dev\SapphireTest;
  */
 class MapperTest extends SapphireTest
 {
-
     /**
      * @var string
      */
